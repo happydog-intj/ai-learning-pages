@@ -2005,6 +2005,40 @@
 
         // KNN动画
         function animateKNN() {
+            // 计算所有点到待判断点的距离
+            const testPoint = { x: 6, y: 6 };
+            const goodMelons = [
+                { x: 6, y: 8 }, { x: 7, y: 9 }, { x: 5, y: 7 },
+                { x: 8, y: 8 }, { x: 6, y: 9 }
+            ];
+            const badMelons = [
+                { x: 3, y: 3 }, { x: 4, y: 4 }, { x: 2, y: 3 },
+                { x: 3, y: 5 }, { x: 4, y: 2 }
+            ];
+
+            // 计算所有点的距离
+            const allPoints = [];
+            goodMelons.forEach(p => {
+                const dist = Math.sqrt((p.x - testPoint.x) ** 2 + (p.y - testPoint.y) ** 2);
+                allPoints.push({ point: p, dist, type: 'good' });
+            });
+            badMelons.forEach(p => {
+                const dist = Math.sqrt((p.x - testPoint.x) ** 2 + (p.y - testPoint.y) ** 2);
+                allPoints.push({ point: p, dist, type: 'bad' });
+            });
+
+            // 按距离排序并取前K个
+            allPoints.sort((a, b) => a.dist - b.dist);
+            const k = 3;
+            const kNearest = allPoints.slice(0, k);
+
+            // 半径设为第K个点的距离再加一点点（确保包含第K个点）
+            const radius = kNearest[k-1].dist + 0.1;
+
+            // 统计好瓜和坏瓜数量
+            const goodCount = kNearest.filter(p => p.type === 'good').length;
+            const badCount = k - goodCount;
+
             // 添加圆圈显示邻近区域
             const circleDataset = {
                 label: 'K=3邻域',
@@ -2019,7 +2053,7 @@
             };
 
             // 画圆
-            const centerX = 6, centerY = 6, radius = 3.5;
+            const centerX = testPoint.x, centerY = testPoint.y;
             for (let i = 0; i <= 360; i += 10) {
                 const angle = (i * Math.PI) / 180;
                 circleDataset.data.push({
@@ -2032,7 +2066,8 @@
             knnChart.update();
 
             setTimeout(() => {
-                alert('🎯 在K=3邻域内：\n✅ 好瓜: 2个\n❌ 坏瓜: 1个\n\n结论：这是好瓜！✅');
+                const result = goodCount > badCount ? '好瓜！✅' : '坏瓜！❌';
+                alert(`🎯 在K=3邻域内（半径=${radius.toFixed(2)}）：\n✅ 好瓜: ${goodCount}个\n❌ 坏瓜: ${badCount}个\n\n结论：这是${result}`);
             }, 1000);
         }
 

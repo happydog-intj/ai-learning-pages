@@ -508,29 +508,111 @@
             transform: scale(1.1);
         }
 
+        .decision-tree-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            margin: 15px 0;
+        }
+
         .decision-tree {
             text-align: center;
-            margin: 30px 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            min-width: 600px;
+            padding: 10px;
         }
 
         .tree-node {
             display: inline-block;
-            padding: 10px 15px;
-            margin: 8px;
+            padding: 8px 12px;
+            margin: 5px;
             border: 2px solid var(--accent-color);
             border-radius: 8px;
             background: white;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-size: 0.85em;
+        }
+
+        .tree-branches {
+            margin: 10px 0;
             font-size: 0.9em;
+            color: #666;
+        }
+
+        .tree-branches span {
+            display: inline-block;
+            margin: 0 40px;
+        }
+
+        .tree-branches.level2 .branch-left {
+            margin-left: -80px;
+        }
+
+        .tree-branches.level3 .branch-left {
+            margin-left: 100px;
+        }
+
+        .tree-level {
+            margin: 5px 0;
+        }
+
+        .level2-left {
+            margin-right: 120px;
+        }
+
+        .level3-left {
+            margin-right: 180px;
+        }
+
+        .level3-mid {
+            margin-left: 20px;
+        }
+
+        .level4-left {
+            margin-left: 80px;
         }
 
         @media screen and (max-width: 768px) {
+            .decision-tree {
+                min-width: 500px;
+            }
             .tree-node {
-                padding: 8px 12px;
-                margin: 5px;
+                padding: 6px 10px;
+                margin: 4px;
+                font-size: 0.75em;
+            }
+            .tree-branches {
+                margin: 8px 0;
+                font-size: 0.8em;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .decision-tree-wrapper {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .tree-node {
+                padding: 6px 10px;
+                margin: 4px;
+            }
+            .tree-branches {
+                margin: 8px 0;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .decision-tree-wrapper {
+                max-height: 350px;
+            }
+            .tree-node {
+                padding: 5px 8px;
+                margin: 3px;
+                font-size: 0.7em;
+            }
+            .tree-branches {
+                margin: 6px 0;
                 font-size: 0.75em;
             }
         }
@@ -1083,42 +1165,46 @@
 
                 <section>
                     <h2>4.1 决策树 🌳</h2>
-                    <h3 style="color: var(--accent-color);">像医生问诊一样</h3>
-                    <div class="decision-tree">
-                        <div class="tree-node">根蒂蜷缩吗？</div>
-                        <div style="margin: 20px 0;">
-                            <span style="margin: 0 100px;">↙ 是</span>
-                            <span>否 ↘</span>
-                        </div>
-                        <div>
-                            <div class="tree-node" style="margin-right: 150px;">敲声浊响吗？</div>
-                            <div class="tree-node bad-leaf">坏瓜 ❌</div>
-                        </div>
-                        <div style="margin: 20px 0;">
-                            <span style="margin-left: -100px;">↙ 是</span>
-                            <span style="margin-left: 100px;">否 ↘</span>
-                        </div>
-                        <div>
-                            <div class="tree-node leaf" style="margin-right: 250px;">好瓜 ✅</div>
-                            <div class="tree-node">色泽乌黑吗？</div>
-                        </div>
-                        <div style="margin: 20px 0;">
-                            <span style="margin-left: 150px;">↙ 是</span>
-                            <span style="margin-left: 100px;">否 ↘</span>
-                        </div>
-                        <div>
-                            <div class="tree-node leaf" style="margin-left: 100px;">好瓜 ✅</div>
-                            <div class="tree-node bad-leaf">坏瓜 ❌</div>
+                    <h3 class="section-subtitle" style="color: var(--accent-color);">像医生问诊一样</h3>
+                    <div class="decision-tree-wrapper">
+                        <div class="decision-tree">
+                            <div class="tree-node">根蒂蜷缩吗？</div>
+                            <div class="tree-branches">
+                                <span class="branch-left">↙ 是</span>
+                                <span class="branch-right">否 ↘</span>
+                            </div>
+                            <div class="tree-level">
+                                <div class="tree-node level2-left">敲声浊响吗？</div>
+                                <div class="tree-node bad-leaf level2-right">坏瓜 ❌</div>
+                            </div>
+                            <div class="tree-branches level2">
+                                <span class="branch-left">↙ 是</span>
+                                <span class="branch-right">否 ↘</span>
+                            </div>
+                            <div class="tree-level">
+                                <div class="tree-node leaf level3-left">好瓜 ✅</div>
+                                <div class="tree-node level3-mid">色泽乌黑吗？</div>
+                            </div>
+                            <div class="tree-branches level3">
+                                <span class="branch-left">↙ 是</span>
+                                <span class="branch-right">否 ↘</span>
+                            </div>
+                            <div class="tree-level">
+                                <div class="tree-node leaf level4-left">好瓜 ✅</div>
+                                <div class="tree-node bad-leaf level4-right">坏瓜 ❌</div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <section>
                     <h2>4.2 K近邻算法 (KNN) 👥</h2>
-                    <h3 style="color: var(--accent-color);">近朱者赤，近墨者黑</h3>
-                    <canvas id="knnChart"></canvas>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="animateKNN()" style="padding: 10px 30px; font-size: 1.2em; background: var(--success-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <h3 class="section-subtitle" style="color: var(--accent-color);">近朱者赤，近墨者黑</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="knnChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="button-wrapper">
+                        <button onclick="animateKNN()" class="action-button" style="background: var(--success-color);">
                             🎬 演示KNN分类
                         </button>
                     </div>
@@ -1126,8 +1212,10 @@
 
                 <section>
                     <h2>4.3 支持向量机 (SVM) ✂️</h2>
-                    <h3 style="color: var(--accent-color);">画一条最佳分界线</h3>
-                    <canvas id="svmChart"></canvas>
+                    <h3 class="section-subtitle" style="color: var(--accent-color);">画一条最佳分界线</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="svmChart" class="large-canvas"></canvas>
+                    </div>
                 </section>
 
                 <section>
@@ -1783,7 +1871,9 @@
                         title: {
                             display: true,
                             text: '👥 KNN算法 - 看邻居判断（K=3）',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {
@@ -1892,7 +1982,9 @@
                         title: {
                             display: true,
                             text: '✂️ SVM - 最大间隔分类器',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {

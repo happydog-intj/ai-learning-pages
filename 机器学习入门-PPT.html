@@ -33,12 +33,25 @@
 
         .reveal h2 {
             color: var(--accent-color);
-            font-size: 2em;
+            font-size: 1.8em;
         }
 
         .reveal h3 {
             color: var(--primary-color);
-            font-size: 1.5em;
+            font-size: 1.3em;
+        }
+
+        /* 响应式字体 */
+        @media screen and (max-width: 1200px) {
+            .reveal h1 { font-size: 2em; }
+            .reveal h2 { font-size: 1.5em; }
+            .reveal h3 { font-size: 1.2em; }
+        }
+
+        @media screen and (max-width: 768px) {
+            .reveal h1 { font-size: 1.5em; }
+            .reveal h2 { font-size: 1.3em; }
+            .reveal h3 { font-size: 1.1em; }
         }
 
         .reveal section {
@@ -60,14 +73,33 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            font-size: 0.8em;
+            font-size: 0.75em;
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            min-width: 500px;
         }
 
         .comparison-table th,
         .comparison-table td {
             border: 2px solid #ddd;
-            padding: 12px;
+            padding: 8px;
             text-align: center;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 768px) {
+            .comparison-table {
+                font-size: 0.65em;
+            }
+            .comparison-table th,
+            .comparison-table td {
+                padding: 6px 4px;
+            }
         }
 
         .comparison-table th {
@@ -97,26 +129,41 @@
         .code-block {
             background-color: #f4f4f4;
             border-left: 4px solid var(--accent-color);
-            padding: 15px;
+            padding: 12px;
             margin: 15px 0;
             border-radius: 5px;
             font-family: 'Courier New', monospace;
-            font-size: 0.8em;
+            font-size: 0.75em;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .highlight-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            margin: 20px 0;
+            margin: 15px 0;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        @media screen and (max-width: 768px) {
+            .code-block {
+                padding: 10px;
+                font-size: 0.7em;
+            }
+            .highlight-box {
+                padding: 12px;
+            }
+            .highlight-box h3 {
+                font-size: 1em;
+            }
         }
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin: 20px 0;
         }
 
@@ -124,9 +171,19 @@
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             transition: transform 0.3s;
+        }
+
+        @media screen and (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .feature-card {
+                padding: 12px;
+            }
         }
 
         .feature-card:hover {
@@ -138,21 +195,50 @@
             position: relative;
             height: 400px;
             margin: 20px auto;
+            max-width: 100%;
         }
 
         .small-canvas {
             height: 300px;
+            max-width: 100%;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .canvas-container {
+                height: 300px;
+            }
+            .small-canvas {
+                height: 250px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .canvas-container {
+                height: 250px;
+            }
+            .small-canvas {
+                height: 200px;
+            }
         }
 
         .algorithm-box {
             display: inline-block;
             padding: 10px 20px;
-            margin: 10px;
+            margin: 8px;
             border-radius: 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            font-size: 0.9em;
+        }
+
+        @media screen and (max-width: 768px) {
+            .algorithm-box {
+                padding: 8px 15px;
+                margin: 5px;
+                font-size: 0.8em;
+            }
         }
 
         .step-number {
@@ -231,17 +317,28 @@
         .decision-tree {
             text-align: center;
             margin: 30px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tree-node {
             display: inline-block;
-            padding: 15px 25px;
-            margin: 10px;
-            border: 3px solid var(--accent-color);
-            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 8px;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
             background: white;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+        }
+
+        @media screen and (max-width: 768px) {
+            .tree-node {
+                padding: 8px 12px;
+                margin: 5px;
+                font-size: 0.75em;
+            }
         }
 
         .tree-node.leaf {
@@ -254,6 +351,98 @@
             background: var(--danger-color);
             color: white;
             border-color: var(--danger-color);
+        }
+
+        /* 全局响应式优化 */
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal .slides > section {
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 移动端优化 */
+        @media screen and (max-width: 768px) {
+            .reveal .slides > section {
+                padding: 15px 10px;
+            }
+
+            .reveal ul {
+                padding-left: 20px;
+            }
+
+            .reveal ul li {
+                font-size: 0.9em;
+                margin: 8px 0;
+            }
+
+            .emoji-large {
+                font-size: 2em;
+                margin: 15px 0;
+            }
+
+            .watermelon-icon {
+                font-size: 1.5em;
+            }
+
+            button {
+                padding: 8px 20px !important;
+                font-size: 1em !important;
+            }
+        }
+
+        /* 确保图表响应式 */
+        canvas {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        /* 进度条响应式 */
+        .progress-bar {
+            height: 25px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .progress-bar {
+                height: 20px;
+            }
+            .progress-fill {
+                line-height: 20px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* 步骤编号响应式 */
+        .step-number {
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            font-size: 0.9em;
+        }
+
+        @media screen and (max-width: 768px) {
+            .step-number {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                font-size: 0.8em;
+            }
+        }
+
+        /* ML Pipeline 响应式 */
+        #mlPipelineViz > div {
+            flex-wrap: wrap !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            #mlPipelineViz > div {
+                flex-direction: column !important;
+            }
+            #mlPipelineViz > div > div {
+                margin: 10px 0 !important;
+            }
         }
     </style>
 </head>
@@ -896,11 +1085,17 @@
             showNotes: false,
             autoPlayMedia: null,
             preloadIframes: null,
-            width: 1200,
-            height: 700,
-            margin: 0.04,
+            // 响应式尺寸配置
+            width: '100%',
+            height: '100%',
+            margin: 0.05,
             minScale: 0.2,
-            maxScale: 2.0
+            maxScale: 1.5,
+            // 根据屏幕尺寸自动缩放
+            embedded: false,
+            // 让Reveal.js自动计算最佳尺寸
+            autoSlide: 0,
+            autoSlideStoppable: true
         });
 
         // Chart.js 图表配置
@@ -1736,23 +1931,38 @@
                 { icon: '🚀', text: '预测应用', color: '#16a085' }
             ];
 
-            let html = '<div style="display: flex; align-items: center; justify-content: space-between; padding: 20px;">';
+            const isMobile = window.innerWidth <= 768;
+            const flexDirection = isMobile ? 'column' : 'row';
+            const iconSize = isMobile ? '2em' : '2.5em';
+            const fontSize = isMobile ? '0.85em' : '1em';
+            const padding = isMobile ? '8px' : '10px';
+            const arrowDisplay = isMobile ? 'block' : 'inline';
+            const arrowSize = isMobile ? '1.5em' : '2em';
+
+            let html = `<div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; flex-direction: ${flexDirection}; flex-wrap: wrap;">`;
             steps.forEach((step, index) => {
                 html += `
-                    <div style="text-align: center; flex: 1;">
-                        <div style="font-size: 3em;">${step.icon}</div>
-                        <div style="background: ${step.color}; color: white; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold;">
+                    <div style="text-align: center; flex: ${isMobile ? '0 0 100%' : '1'}; margin: ${isMobile ? '10px 0' : '0'};">
+                        <div style="font-size: ${iconSize};">${step.icon}</div>
+                        <div style="background: ${step.color}; color: white; padding: ${padding}; border-radius: 8px; margin-top: 8px; font-weight: bold; font-size: ${fontSize};">
                             ${step.text}
                         </div>
                     </div>
                 `;
                 if (index < steps.length - 1) {
-                    html += `<div style="font-size: 2em; color: #95a5a6; margin: 0 10px;">→</div>`;
+                    html += `<div style="font-size: ${arrowSize}; color: #95a5a6; margin: 0 ${isMobile ? 'auto' : '8px'}; display: ${arrowDisplay};">${isMobile ? '↓' : '→'}</div>`;
                 }
             });
             html += '</div>';
             container.innerHTML = html;
         }
+
+        // 窗口大小改变时重新绘制
+        window.addEventListener('resize', function() {
+            if (document.getElementById('mlPipelineViz')) {
+                drawMLPipeline();
+            }
+        });
 
         // 初始化时绘制一次
         if (document.getElementById('mlPipelineViz')) {

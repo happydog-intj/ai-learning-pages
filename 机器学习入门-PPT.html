@@ -1322,6 +1322,18 @@
                 <section>
                     <h2>4.3 支持向量机 (SVM) ✂️</h2>
                     <h3 class="section-subtitle" style="color: var(--accent-color);">画一条最佳分界线</h3>
+
+                    <div class="algorithm-explanation">
+                        <p><strong>📖 算法原理：</strong></p>
+                        <p>想象在两堆不同的瓜之间画一条线，把它们分开！</p>
+                        <ul>
+                            <li><strong>目标：</strong>找到一条线，把好瓜和坏瓜完美分开</li>
+                            <li><strong>要求：</strong>这条线要离两边的瓜都尽可能远（最大间隔）</li>
+                            <li><strong>支持向量⭐：</strong>离分界线最近的关键点（橙色菱形）</li>
+                        </ul>
+                        <p class="explanation-note">💡 <strong>图示说明：</strong>紫色虚线是决策边界（分界线），绿色✅是好瓜区域，红色❌是坏瓜区域。两条浅色虚线是间隔边界，橙色⭐标记的是支持向量（决定边界位置的关键点）。</p>
+                    </div>
+
                     <div class="chart-wrapper square-chart">
                         <canvas id="svmChart"></canvas>
                     </div>
@@ -2089,13 +2101,20 @@
         // 6. SVM可视化
         const svmCtx = document.getElementById('svmChart');
         if (svmCtx) {
+            // 好瓜：左上角区域（x+y > 10）
             const goodMelonsSVM = [
-                { x: 2, y: 8 }, { x: 3, y: 9 }, { x: 2, y: 7 },
-                { x: 3, y: 8 }, { x: 4, y: 9 }
+                { x: 1.5, y: 9 }, { x: 2, y: 8.5 }, { x: 2.5, y: 8 },
+                { x: 3, y: 8.5 }, { x: 1, y: 9.5 }
             ];
+            // 坏瓜：右下角区域（x+y < 10）
             const badMelonsSVM = [
-                { x: 7, y: 3 }, { x: 8, y: 4 }, { x: 7, y: 2 },
-                { x: 8, y: 3 }, { x: 9, y: 4 }
+                { x: 8, y: 1.5 }, { x: 8.5, y: 1 }, { x: 9, y: 0.5 },
+                { x: 7.5, y: 2 }, { x: 9.5, y: 0 }
+            ];
+            // 支持向量（离边界最近的点）
+            const supportVectors = [
+                { x: 3, y: 7.5 },  // 好瓜的支持向量
+                { x: 7, y: 2.5 }   // 坏瓜的支持向量
             ];
 
             new Chart(svmCtx, {
@@ -2114,12 +2133,38 @@
                         borderColor: '#c0392b',
                         pointRadius: 10
                     }, {
+                        label: '支持向量 ⭐',
+                        data: supportVectors,
+                        backgroundColor: '#f39c12',
+                        borderColor: '#e67e22',
+                        pointRadius: 12,
+                        pointStyle: 'rectRot',
+                        borderWidth: 3
+                    }, {
                         label: '决策边界',
-                        data: [{ x: 0, y: 10 }, { x: 10, y: 0 }],
+                        data: [{ x: 0.5, y: 9.5 }, { x: 9.5, y: 0.5 }],
                         type: 'line',
                         borderColor: '#9b59b6',
                         borderWidth: 3,
                         borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }, {
+                        label: '正间隔边界',
+                        data: [{ x: 0, y: 10 }, { x: 10, y: 0 }],
+                        type: 'line',
+                        borderColor: 'rgba(39, 174, 96, 0.3)',
+                        borderWidth: 1,
+                        borderDash: [2, 2],
+                        pointRadius: 0,
+                        fill: false
+                    }, {
+                        label: '负间隔边界',
+                        data: [{ x: 1, y: 9 }, { x: 9, y: 1 }],
+                        type: 'line',
+                        borderColor: 'rgba(231, 76, 60, 0.3)',
+                        borderWidth: 1,
+                        borderDash: [2, 2],
                         pointRadius: 0,
                         fill: false
                     }]

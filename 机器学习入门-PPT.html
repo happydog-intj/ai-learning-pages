@@ -162,20 +162,70 @@
             color: white;
             padding: 15px;
             border-radius: 10px;
-            margin: 15px 0;
+            margin: 12px 0 10px 0;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .highlight-box h3 {
+            margin: 0;
+            font-size: 1.2em;
+            line-height: 1.4;
+        }
+
+        @media screen and (max-width: 1200px) {
+            .highlight-box {
+                padding: 12px;
+                margin: 10px 0 8px 0;
+            }
+            .highlight-box h3 {
+                font-size: 1.1em;
+            }
         }
 
         @media screen and (max-width: 768px) {
             .code-block {
                 padding: 10px;
                 font-size: 0.7em;
+                margin: 10px 0;
             }
             .highlight-box {
-                padding: 12px;
+                padding: 10px;
+                margin: 8px 0;
+            }
+            .highlight-box h3 {
+                font-size: 0.95em;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .highlight-box {
+                padding: 10px;
+                margin: 8px 0;
             }
             .highlight-box h3 {
                 font-size: 1em;
+                line-height: 1.3;
+            }
+            .code-block {
+                padding: 8px;
+                margin: 8px 0;
+                line-height: 1.4;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .highlight-box {
+                padding: 8px;
+                margin: 6px 0;
+            }
+            .highlight-box h3 {
+                font-size: 0.9em;
+            }
+            .code-block {
+                padding: 6px;
+                margin: 6px 0;
             }
         }
 
@@ -280,17 +330,42 @@
             max-width: 100%;
         }
 
+        .chart-wrapper {
+            width: 100%;
+            margin: 15px 0;
+            max-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .small-canvas {
-            height: 300px;
             max-width: 100%;
+            max-height: 300px !important;
+            height: 300px !important;
+        }
+
+        .large-canvas {
+            max-width: 100%;
+            max-height: 450px !important;
+            height: 450px !important;
         }
 
         @media screen and (max-width: 1200px) {
             .canvas-container {
                 height: 300px;
             }
+            .chart-wrapper {
+                max-height: 350px;
+                margin: 12px 0;
+            }
             .small-canvas {
-                height: 250px;
+                max-height: 250px !important;
+                height: 250px !important;
+            }
+            .large-canvas {
+                max-height: 350px !important;
+                height: 350px !important;
             }
         }
 
@@ -298,8 +373,45 @@
             .canvas-container {
                 height: 250px;
             }
+            .chart-wrapper {
+                max-height: 280px;
+                margin: 10px 0;
+            }
             .small-canvas {
-                height: 200px;
+                max-height: 200px !important;
+                height: 200px !important;
+            }
+            .large-canvas {
+                max-height: 280px !important;
+                height: 280px !important;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .chart-wrapper {
+                max-height: 250px;
+            }
+            .small-canvas {
+                max-height: 180px !important;
+                height: 180px !important;
+            }
+            .large-canvas {
+                max-height: 250px !important;
+                height: 250px !important;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .chart-wrapper {
+                max-height: 200px;
+            }
+            .small-canvas {
+                max-height: 150px !important;
+                height: 150px !important;
+            }
+            .large-canvas {
+                max-height: 200px !important;
+                height: 200px !important;
             }
         }
 
@@ -521,7 +633,31 @@
         /* 确保图表响应式 */
         canvas {
             max-width: 100% !important;
-            height: auto !important;
+        }
+
+        /* 确保所有section的子元素适应容器 */
+        .reveal section h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .reveal section h2 {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .reveal section h2 {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .reveal section h2 {
+                margin-bottom: 8px;
+                font-size: 1.3em;
+            }
         }
 
         /* 进度条响应式 */
@@ -632,7 +768,7 @@
                     <div class="highlight-box center">
                         <h3>机器学习 = 让计算机从经验中学习，像人一样变聪明</h3>
                     </div>
-                    <div style="margin-top: 40px;">
+                    <div class="chart-wrapper">
                         <canvas id="learningProcessChart" class="small-canvas"></canvas>
                     </div>
                 </section>
@@ -655,7 +791,9 @@
 
                 <section>
                     <h2>🎓 三种学习方式</h2>
-                    <canvas id="learningTypesChart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="learningTypesChart" class="large-canvas"></canvas>
+                    </div>
                 </section>
             </section>
 
@@ -1223,9 +1361,22 @@
             autoSlideStoppable: true
         });
 
-        // Chart.js 图表配置
-        Chart.defaults.font.size = 14;
+        // Chart.js 图表配置 - 响应式字体
+        function setChartFontSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            if (width <= 768 || height <= 600) {
+                Chart.defaults.font.size = 10;
+            } else if (width <= 1024 || height <= 700) {
+                Chart.defaults.font.size = 12;
+            } else {
+                Chart.defaults.font.size = 14;
+            }
+        }
+        setChartFontSize();
         Chart.defaults.font.family = "'Segoe UI', Roboto, sans-serif";
+
+        window.addEventListener('resize', setChartFontSize);
 
         // 1. 学习过程图表
         const learningProcessCtx = document.getElementById('learningProcessChart');
@@ -1255,7 +1406,9 @@
                         title: {
                             display: true,
                             text: '👶 从经验中学习 - 识别苹果的过程',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {
@@ -1305,7 +1458,9 @@
                         title: {
                             display: true,
                             text: '三种学习方式对比',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {

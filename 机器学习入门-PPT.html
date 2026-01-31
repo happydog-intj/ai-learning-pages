@@ -660,6 +660,118 @@
             }
         }
 
+        /* 子标题样式 */
+        .section-subtitle {
+            margin: 15px 0 10px 0;
+        }
+
+        @media screen and (max-width: 768px) {
+            .section-subtitle {
+                margin: 10px 0 8px 0;
+                font-size: 1em;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .section-subtitle {
+                margin: 10px 0 8px 0;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .section-subtitle {
+                margin: 8px 0 6px 0;
+                font-size: 0.95em;
+            }
+        }
+
+        /* 按钮容器 */
+        .button-wrapper {
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .action-button {
+            padding: 10px 25px;
+            font-size: 1em;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        @media screen and (max-width: 768px) {
+            .button-wrapper {
+                margin-top: 10px;
+            }
+            .action-button {
+                padding: 8px 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .button-wrapper {
+                margin-top: 8px;
+            }
+            .action-button {
+                padding: 8px 20px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .button-wrapper {
+                margin-top: 6px;
+            }
+            .action-button {
+                padding: 6px 15px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* 公式盒子特殊样式 */
+        .formula-box p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        @media screen and (max-width: 768px) {
+            .formula-box p {
+                margin: 6px 0;
+                font-size: 0.9em;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .formula-box {
+                padding: 10px;
+            }
+            .formula-box p {
+                margin: 5px 0;
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .formula-box {
+                padding: 8px;
+            }
+            .formula-box p {
+                margin: 4px 0;
+                font-size: 0.85em;
+                line-height: 1.3;
+            }
+        }
+
         /* 进度条响应式 */
         .progress-bar {
             height: 25px;
@@ -916,7 +1028,7 @@
                     <div class="highlight-box center">
                         找一条直线，让所有点到这条线的距离之和最小
                     </div>
-                    <h3 style="margin-top: 30px;">📊 房价预测示例</h3>
+                    <h3 class="section-subtitle">📊 房价预测示例</h3>
                     <div class="code-block">
                         面积(m²) → 房价(万)<br>
                         &nbsp;&nbsp;50 &nbsp; → &nbsp;150<br>
@@ -929,9 +1041,11 @@
 
                 <section>
                     <h2>📈 寻找最佳直线（动画演示）</h2>
-                    <canvas id="linearRegressionChart"></canvas>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="animateLinearRegression()" style="padding: 10px 30px; font-size: 1.2em; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <div class="chart-wrapper">
+                        <canvas id="linearRegressionChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="button-wrapper">
+                        <button onclick="animateLinearRegression()" class="action-button">
                             🎬 开始动画
                         </button>
                     </div>
@@ -939,22 +1053,23 @@
 
                 <section>
                     <h2>📐 数学公式（超简单版）</h2>
-                    <div class="highlight-box">
-                        <h3 style="text-align: center;">y = ax + b</h3>
-                        <br>
+                    <div class="highlight-box formula-box">
+                        <h3 style="text-align: center; margin: 0 0 10px 0;">y = ax + b</h3>
                         <p><strong>y</strong> = 房价（要预测的）</p>
                         <p><strong>x</strong> = 面积（已知的）</p>
                         <p><strong>a</strong> = 斜率（面积每增加1，房价增加多少）</p>
                         <p><strong>b</strong> = 截距（0平米时的"基础价"）</p>
                     </div>
-                    <div class="code-block" style="margin-top: 20px; text-align: center;">
+                    <div class="code-block" style="text-align: center;">
                         🎯 <strong>目标：让所有点到直线的距离最小</strong>
                     </div>
                 </section>
 
                 <section>
                     <h2>💡 实际应用</h2>
-                    <canvas id="linearAppsChart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="linearAppsChart" class="large-canvas"></canvas>
+                    </div>
                 </section>
             </section>
 
@@ -1518,7 +1633,9 @@
                         title: {
                             display: true,
                             text: '📏 房价预测 - 线性回归',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {
@@ -1597,7 +1714,9 @@
                         title: {
                             display: true,
                             text: '💡 线性回归实际应用',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {

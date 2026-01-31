@@ -854,6 +854,97 @@
             }
         }
 
+        /* 算法说明区域 */
+        .algorithm-explanation {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(52, 152, 219, 0.1));
+            border-left: 4px solid var(--success-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .algorithm-explanation p {
+            margin: 8px 0;
+        }
+
+        .algorithm-explanation ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .algorithm-explanation li {
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+
+        .explanation-note {
+            background: rgba(241, 196, 15, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 3px solid var(--warning-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .algorithm-explanation {
+                padding: 12px;
+                font-size: 0.85em;
+                margin: 12px 0;
+            }
+            .algorithm-explanation p {
+                margin: 6px 0;
+            }
+            .algorithm-explanation li {
+                margin: 5px 0;
+            }
+            .explanation-note {
+                padding: 8px;
+            }
+        }
+
+        @media screen and (max-height: 700px) {
+            .algorithm-explanation {
+                padding: 10px;
+                font-size: 0.8em;
+                margin: 10px 0;
+            }
+            .algorithm-explanation p {
+                margin: 5px 0;
+                line-height: 1.4;
+            }
+            .algorithm-explanation ul {
+                margin: 8px 0;
+            }
+            .algorithm-explanation li {
+                margin: 4px 0;
+                line-height: 1.4;
+            }
+            .explanation-note {
+                padding: 8px;
+                margin-top: 8px;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .algorithm-explanation {
+                padding: 8px;
+                font-size: 0.75em;
+                margin: 8px 0;
+            }
+            .algorithm-explanation p {
+                margin: 4px 0;
+            }
+            .algorithm-explanation li {
+                margin: 3px 0;
+            }
+            .explanation-note {
+                padding: 6px;
+                margin-top: 6px;
+            }
+        }
+
         /* 进度条响应式 */
         .progress-bar {
             height: 25px;
@@ -1200,6 +1291,18 @@
                 <section>
                     <h2>4.2 K近邻算法 (KNN) 👥</h2>
                     <h3 class="section-subtitle" style="color: var(--accent-color);">近朱者赤，近墨者黑</h3>
+
+                    <div class="algorithm-explanation">
+                        <p><strong>📖 算法原理：</strong></p>
+                        <p>想判断一个西瓜是好是坏？看看它周围K个"邻居"是什么类型就行了！</p>
+                        <ul>
+                            <li><strong>第1步：</strong>找到离待判断西瓜最近的K个西瓜（比如K=3）</li>
+                            <li><strong>第2步：</strong>数一数这K个邻居中，好瓜和坏瓜各有多少</li>
+                            <li><strong>第3步：</strong>少数服从多数，哪种多就判断为哪种</li>
+                        </ul>
+                        <p class="explanation-note">💡 <strong>动画说明：</strong>图中黄色星星🍉是待判断的西瓜，绿色✅是好瓜，红色❌是坏瓜。点击按钮后，会画出K=3邻域范围，找到最近的3个邻居来投票决定！</p>
+                    </div>
+
                     <div class="chart-wrapper">
                         <canvas id="knnChart" class="large-canvas"></canvas>
                     </div>

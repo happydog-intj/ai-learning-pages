@@ -25,6 +25,25 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
+        /* 防止内容溢出 */
+        .reveal .slides {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .reveal .slides > section {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .reveal .slides > section > * {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
         .reveal h1 {
             color: var(--primary-color);
             font-size: 2.5em;
@@ -162,27 +181,90 @@
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+            max-width: 100%;
         }
 
         .feature-card {
             background: white;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 12px 10px;
             text-align: center;
             transition: transform 0.3s;
+            overflow: hidden;
         }
 
+        .feature-card > div:first-child {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .feature-card h3 {
+            margin: 8px 0 5px 0;
+            font-size: 1.1em;
+        }
+
+        .feature-card p {
+            margin: 0;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        /* 中等屏幕 */
+        @media screen and (max-width: 1024px) {
+            .feature-grid {
+                gap: 10px;
+                margin: 12px 0;
+            }
+            .feature-card {
+                padding: 10px 8px;
+            }
+            .feature-card > div:first-child {
+                font-size: 1.5em;
+            }
+            .feature-card h3 {
+                font-size: 1em;
+            }
+            .feature-card p {
+                font-size: 0.8em;
+            }
+        }
+
+        /* 移动端 */
         @media screen and (max-width: 768px) {
             .feature-grid {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 8px;
+                margin: 10px 0;
             }
             .feature-card {
-                padding: 12px;
+                padding: 10px;
+            }
+            .feature-card > div:first-child {
+                font-size: 1.5em;
+            }
+            .feature-card h3 {
+                font-size: 0.95em;
+                margin: 5px 0;
+            }
+            .feature-card p {
+                font-size: 0.8em;
+            }
+        }
+
+        /* 小屏幕 */
+        @media screen and (max-width: 480px) {
+            .feature-card > div:first-child {
+                font-size: 1.3em;
+            }
+            .feature-card h3 {
+                font-size: 0.9em;
+            }
+            .feature-card p {
+                font-size: 0.75em;
             }
         }
 
@@ -366,7 +448,12 @@
         /* 移动端优化 */
         @media screen and (max-width: 768px) {
             .reveal .slides > section {
-                padding: 15px 10px;
+                padding: 10px 15px;
+            }
+
+            .reveal .slides > section > h2 {
+                margin-top: 0;
+                margin-bottom: 15px;
             }
 
             .reveal ul {
@@ -390,6 +477,44 @@
             button {
                 padding: 8px 20px !important;
                 font-size: 1em !important;
+            }
+        }
+
+        /* 小屏幕进一步优化 */
+        @media screen and (max-width: 480px) {
+            .reveal .slides > section {
+                padding: 8px 10px;
+            }
+
+            .reveal .slides > section > h2 {
+                margin-bottom: 10px;
+                font-size: 1.2em;
+            }
+        }
+
+        /* 确保feature-grid容器不溢出 */
+        .feature-grid {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media screen and (max-height: 700px) {
+            .feature-grid {
+                max-height: 400px;
+                overflow-y: auto;
+                padding-right: 5px;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .feature-grid {
+                max-height: 350px;
+            }
+            .feature-card {
+                padding: 8px;
+            }
+            .feature-card > div:first-child {
+                font-size: 1.3em;
             }
         }
 
@@ -472,22 +597,22 @@
                 <h2>📚 课程大纲</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <div style="font-size: 2em;">🎯</div>
+                        <div>🎯</div>
                         <h3>什么是机器学习</h3>
                         <p>让计算机从经验中学习</p>
                     </div>
                     <div class="feature-card">
-                        <div style="font-size: 2em;">📏</div>
+                        <div>📏</div>
                         <h3>线性回归</h3>
                         <p>画一条最佳直线</p>
                     </div>
                     <div class="feature-card">
-                        <div style="font-size: 2em;">🌳</div>
+                        <div>🌳</div>
                         <h3>分类算法</h3>
                         <p>判断西瓜好坏</p>
                     </div>
                     <div class="feature-card">
-                        <div style="font-size: 2em;">📍</div>
+                        <div>📍</div>
                         <h3>聚类算法</h3>
                         <p>物以类聚</p>
                     </div>

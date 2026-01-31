@@ -332,11 +332,17 @@
 
         .chart-wrapper {
             width: 100%;
-            margin: 15px 0;
-            max-height: 400px;
+            margin: 15px auto;
+            max-height: 450px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* 为正方形图表提供容器约束 */
+        .chart-wrapper.square-chart {
+            max-width: 500px;
+            margin: 15px auto;
         }
 
         .small-canvas {
@@ -1303,8 +1309,8 @@
                         <p class="explanation-note">💡 <strong>动画说明：</strong>图中黄色星星🍉是待判断的西瓜，绿色✅是好瓜，红色❌是坏瓜。点击按钮后，会画出K=3邻域范围，找到最近的3个邻居来投票决定！</p>
                     </div>
 
-                    <div class="chart-wrapper">
-                        <canvas id="knnChart" class="large-canvas"></canvas>
+                    <div class="chart-wrapper square-chart">
+                        <canvas id="knnChart"></canvas>
                     </div>
                     <div class="button-wrapper">
                         <button onclick="animateKNN()" class="action-button" style="background: var(--success-color);">
@@ -1316,8 +1322,8 @@
                 <section>
                     <h2>4.3 支持向量机 (SVM) ✂️</h2>
                     <h3 class="section-subtitle" style="color: var(--accent-color);">画一条最佳分界线</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="svmChart" class="large-canvas"></canvas>
+                    <div class="chart-wrapper square-chart">
+                        <canvas id="svmChart"></canvas>
                     </div>
                 </section>
 
@@ -1405,10 +1411,12 @@
 
                 <section>
                     <h2>K-means 聚类 📍</h2>
-                    <h3 style="color: var(--accent-color);">找K个中心点</h3>
-                    <canvas id="kmeansChart"></canvas>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="animateKMeans()" style="padding: 10px 30px; font-size: 1.2em; background: var(--warning-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <h3 class="section-subtitle" style="color: var(--accent-color);">找K个中心点</h3>
+                    <div class="chart-wrapper square-chart">
+                        <canvas id="kmeansChart"></canvas>
+                    </div>
+                    <div class="button-wrapper">
+                        <button onclick="animateKMeans()" class="action-button" style="background: var(--warning-color);">
                             🎬 开始K-means动画
                         </button>
                     </div>
@@ -1965,7 +1973,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
                     plugins: {
                         legend: {
                             display: true,
@@ -1988,7 +1997,10 @@
                                 text: '重量'
                             },
                             min: 0,
-                            max: 10
+                            max: 10,
+                            ticks: {
+                                stepSize: 1
+                            }
                         },
                         y: {
                             title: {
@@ -1996,7 +2008,10 @@
                                 text: '甜度'
                             },
                             min: 0,
-                            max: 10
+                            max: 10,
+                            ticks: {
+                                stepSize: 1
+                            }
                         }
                     }
                 }
@@ -2111,7 +2126,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
                     plugins: {
                         legend: {
                             display: true,
@@ -2133,6 +2149,9 @@
                             title: {
                                 display: true,
                                 text: '特征1'
+                            },
+                            ticks: {
+                                stepSize: 1
                             }
                         },
                         y: {
@@ -2141,6 +2160,9 @@
                             title: {
                                 display: true,
                                 text: '特征2'
+                            },
+                            ticks: {
+                                stepSize: 1
                             }
                         }
                     }
@@ -2174,7 +2196,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
                     plugins: {
                         legend: {
                             display: true
@@ -2182,7 +2205,9 @@
                         title: {
                             display: true,
                             text: '📍 K-means聚类 (K=3)',
-                            font: { size: 18 }
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
                         }
                     },
                     scales: {
@@ -2192,6 +2217,9 @@
                             title: {
                                 display: true,
                                 text: '特征1'
+                            },
+                            ticks: {
+                                stepSize: 1
                             }
                         },
                         y: {
@@ -2200,6 +2228,9 @@
                             title: {
                                 display: true,
                                 text: '特征2'
+                            },
+                            ticks: {
+                                stepSize: 1
                             }
                         }
                     }

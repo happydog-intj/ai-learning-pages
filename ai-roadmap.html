@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 发展路线图 - 从图灵到 AGI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f;
+            color: #e8e8e8;
+            overflow-x: hidden;
+        }
+
+        /* 星空背景 */
+        .space-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 英雄区 */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .brain-icon {
+            font-size: 8em;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(138, 43, 226, 0.6));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 5em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-tagline {
+            font-size: 2em;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .era-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .era-badge {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            color: #8a2be2;
+            transition: all 0.3s ease;
+        }
+
+        /* 时间线 */
+        .timeline-section {
+            position: relative;
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline-path {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, 
+                #667eea 0%, 
+                #764ba2 25%, 
+                #f093fb 50%, 
+                #667eea 75%, 
+                #764ba2 100%
+            );
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 100px;
+            position: relative;
+            opacity: 0;
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .timeline-year {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 900;
+            font-size: 1.2em;
+            z-index: 10;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .timeline-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .timeline-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .timeline-desc {
+            color: #c0c0c0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .timeline-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: #a0a0ff;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+        }
+
+        /* 技术演进图 */
+        .evolution-section {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .evolution-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* 里程碑卡片 */
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .milestone-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .milestone-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.2), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .milestone-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 25px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .milestone-year {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 700;
+            z-index: 10;
+        }
+
+        .milestone-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .milestone-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .milestone-desc {
+            color: #c0c0c0;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .milestone-impact {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            font-size: 0.9em;
+            color: #a0a0a0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 技术流派对比 */
+        .paradigm-section {
+            padding: 80px 20px;
+        }
+
+        .paradigm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .paradigm-card {
+            background: rgba(20, 20, 40, 0.8);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .paradigm-card.symbolic { border-color: rgba(255, 107, 107, 0.5); }
+        .paradigm-card.connectionist { border-color: rgba(102, 126, 234, 0.5); }
+        .paradigm-card.evolutionary { border-color: rgba(76, 175, 80, 0.5); }
+        .paradigm-card.bayesian { border-color: rgba(255, 152, 0, 0.5); }
+
+        .paradigm-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 30px 70px rgba(102, 126, 234, 0.5);
+        }
+
+        .paradigm-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .paradigm-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .paradigm-card.symbolic .paradigm-name { color: #FF6B6B; }
+        .paradigm-card.connectionist .paradigm-name { color: #667eea; }
+        .paradigm-card.evolutionary .paradigm-name { color: #4CAF50; }
+        .paradigm-card.bayesian .paradigm-name { color: #FF9800; }
+
+        .paradigm-period {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .paradigm-desc {
+            color: #c0c0c0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .paradigm-examples {
+            list-style: none;
+        }
+
+        .paradigm-examples li {
+            padding: 8px 0;
+            color: #a0a0a0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .paradigm-examples li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .paradigm-card.symbolic .paradigm-examples li::before { color: #FF6B6B; }
+        .paradigm-card.connectionist .paradigm-examples li::before { color: #667eea; }
+        .paradigm-card.evolutionary .paradigm-examples li::before { color: #4CAF50; }
+        .paradigm-card.bayesian .paradigm-examples li::before { color: #FF9800; }
+
+        /* 能力雷达图 */
+        .capability-section {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .capability-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .capability-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .capability-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .legend-item {
+            background: rgba(20, 20, 40, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .legend-item:hover {
+            border-color: #667eea;
+            transform: translateX(10px);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
+
+        .legend-name {
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .legend-desc {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        /* 重要人物 */
+        .pioneer-section {
+            padding: 80px 20px;
+        }
+
+        .pioneer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .pioneer-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .pioneer-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+        }
+
+        .pioneer-avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .pioneer-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .pioneer-title {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .pioneer-contribution {
+            color: #c0c0c0;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        /* 未来展望 */
+        .future-section {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .future-timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .future-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 50px;
+            gap: 30px;
+        }
+
+        .future-year {
+            min-width: 120px;
+            font-size: 2em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: right;
+        }
+
+        .future-dot {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            flex-shrink: 0;
+        }
+
+        .future-content {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            border-left: 4px solid #667eea;
+        }
+
+        .future-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .future-desc {
+            color: #c0c0c0;
+            line-height: 1.6;
+        }
+
+        .future-probability {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prob-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            animation: fillBar 2s ease-out;
+        }
+
+        @keyframes fillBar {
+            from { width: 0; }
+        }
+
+        .prob-label {
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        /* 交互式3D可视化 */
+        .viz-3d-section {
+            padding: 80px 20px;
+        }
+
+        .viz-3d-canvas {
+            width: 100%;
+            height: 700px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* 响应式 */
+        @media (max-width: 968px) {
+            h1 { font-size: 3em; }
+            .capability-grid { grid-template-columns: 1fr; }
+            .timeline-content { width: 100%; }
+            .timeline-item { flex-direction: column !important; }
+            .timeline-path { display: none; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-bg"></div>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <!-- 英雄区 -->
+        <section class="hero">
+            <div class="brain-icon">🧠</div>
+            <h1>AI 发展路线图</h1>
+            <p class="hero-tagline">从图灵测试到通用人工智能 · 70年创新之旅</p>
+            <div class="era-badges">
+                <span class="era-badge">符号主义时代 1950s-1980s</span>
+                <span class="era-badge">连接主义复兴 1980s-2010s</span>
+                <span class="era-badge">深度学习革命 2012-2020</span>
+                <span class="era-badge">大模型时代 2020-至今</span>
+            </div>
+        </section>
+
+        <!-- 主时间线 -->
+        <section class="timeline-section">
+            <h2 class="section-title">📅 AI 发展时间线</h2>
+            <div class="timeline-container">
+                <div class="timeline-path"></div>
+                <div id="timelineItems"></div>
+            </div>
+        </section>
+
+        <!-- 重要里程碑 -->
+        <section>
+            <h2 class="section-title">🏆 重要里程碑</h2>
+            <div class="milestone-grid" id="milestones"></div>
+        </section>
+
+        <!-- 技术流派对比 -->
+        <section class="paradigm-section">
+            <h2 class="section-title">🎯 AI 技术流派演进</h2>
+            <div class="paradigm-grid" id="paradigms"></div>
+        </section>
+
+        <!-- 能力演进雷达图 -->
+        <section class="capability-section">
+            <h2 class="section-title">📊 AI 能力演进对比</h2>
+            <div class="capability-grid">
+                <canvas id="capabilityCanvas" class="capability-canvas"></canvas>
+                <div class="capability-legend" id="capabilityLegend"></div>
+            </div>
+        </section>
+
+        <!-- 技术演进图 -->
+        <section class="evolution-section">
+            <h2 class="section-title">🌊 技术浪潮演进</h2>
+            <canvas id="evolutionCanvas" class="evolution-canvas"></canvas>
+        </section>
+
+        <!-- AI先驱人物 -->
+        <section class="pioneer-section">
+            <h2 class="section-title">👥 AI 先驱人物</h2>
+            <div class="pioneer-grid" id="pioneers"></div>
+        </section>
+
+        <!-- 未来展望 -->
+        <section class="future-section">
+            <h2 class="section-title">🔮 未来展望：通往 AGI 之路</h2>
+            <div class="future-timeline" id="futureTimeline"></div>
+        </section>
+
+        <!-- 3D可视化 -->
+        <section class="viz-3d-section">
+            <h2 class="section-title">🌐 AI 发展全景 3D 可视化</h2>
+            <canvas id="viz3dCanvas" class="viz-3d-canvas"></canvas>
+        </section>
+    </div>
+
+    <script>
+        // ========== 星空背景 ==========
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // ========== 时间线数据 ==========
+        const timelineData = [
+            {
+                year: '1950',
+                icon: '🎯',
+                title: '图灵测试',
+                desc: 'Alan Turing 提出"图灵测试"，定义机器智能的标准。发表论文《计算机器与智能》，奠定AI理论基础。',
+                tags: ['理论奠基', '图灵', '哲学']
+            },
+            {
+                year: '1956',
+                icon: '🎓',
+                title: 'AI 诞生',
+                desc: '达特茅斯会议，John McCarthy 等人首次提出"人工智能"一词，标志着AI作为独立学科的诞生。',
+                tags: ['达特茅斯', '学科诞生', '符号主义']
+            },
+            {
+                year: '1966',
+                icon: '💬',
+                title: 'ELIZA 聊天机器人',
+                desc: 'Joseph Weizenbaum 开发ELIZA，第一个自然语言处理程序，模拟心理治疗师对话。',
+                tags: ['NLP', '对话系统', 'MIT']
+            },
+            {
+                year: '1974-1980',
+                icon: '❄️',
+                title: '第一次AI寒冬',
+                desc: '由于过度承诺和计算能力限制，AI研究遭遇严重资金短缺，进入第一个低谷期。',
+                tags: ['资金断裂', '期望落差', '反思期']
+            },
+            {
+                year: '1986',
+                icon: '🔗',
+                title: '反向传播算法',
+                desc: 'Rumelhart 等人重新发现并推广反向传播算法，为神经网络训练提供有效方法。',
+                tags: ['神经网络', '反向传播', '连接主义']
+            },
+            {
+                year: '1997',
+                icon: '♟️',
+                title: '深蓝战胜卡斯帕罗夫',
+                desc: 'IBM深蓝计算机在国际象棋比赛中击败世界冠军Garry Kasparov，证明AI在特定领域的超人能力。',
+                tags: ['IBM', '博弈', '里程碑']
+            },
+            {
+                year: '2006',
+                icon: '🏗️',
+                title: '深度学习复兴',
+                desc: 'Geoffrey Hinton 提出深度信念网络(DBN)，解决深层网络训练难题，开启深度学习时代。',
+                tags: ['深度学习', 'Hinton', '预训练']
+            },
+            {
+                year: '2012',
+                icon: '👁️',
+                title: 'AlexNet 革命',
+                desc: 'Alex Krizhevsky 的AlexNet在ImageNet比赛中大幅领先，CNN+GPU成为计算机视觉标准范式。',
+                tags: ['ImageNet', 'CNN', 'GPU加速']
+            },
+            {
+                year: '2014',
+                icon: '🎨',
+                title: 'GAN 生成对抗网络',
+                desc: 'Ian Goodfellow 提出GAN，通过生成器和判别器对抗训练，开创AI创造性生成新纪元。',
+                tags: ['GAN', '生成模型', 'Goodfellow']
+            },
+            {
+                year: '2016',
+                icon: '🎮',
+                title: 'AlphaGo 战胜李世石',
+                desc: 'DeepMind的AlphaGo以4:1战胜围棋世界冠军李世石，震惊世界，证明AI在复杂博弈中的突破。',
+                tags: ['AlphaGo', 'DeepMind', '强化学习']
+            },
+            {
+                year: '2017',
+                icon: '🔄',
+                title: 'Transformer 架构',
+                desc: 'Google提出Transformer架构（Attention is All You Need），彻底改变NLP领域，成为大模型基础。',
+                tags: ['Transformer', 'Attention', 'Google']
+            },
+            {
+                year: '2018',
+                icon: '📖',
+                title: 'BERT 预训练模型',
+                desc: 'Google发布BERT，双向预训练语言模型，在11项NLP任务上刷新记录，预训练-微调范式流行。',
+                tags: ['BERT', '预训练', 'NLP']
+            },
+            {
+                year: '2020',
+                icon: '🤖',
+                title: 'GPT-3 发布',
+                desc: 'OpenAI发布1750亿参数的GPT-3，展现惊人的few-shot学习能力，标志着大模型时代到来。',
+                tags: ['GPT-3', 'OpenAI', '大模型']
+            },
+            {
+                year: '2021',
+                icon: '🧬',
+                title: 'AlphaFold 2 蛋白质折叠',
+                desc: 'DeepMind的AlphaFold 2精确预测蛋白质3D结构，解决生物学50年难题，AI4Science重大突破。',
+                tags: ['AlphaFold', '生物', '科学AI']
+            },
+            {
+                year: '2022',
+                icon: '🎨',
+                title: 'DALL-E 2 / Stable Diffusion',
+                desc: '扩散模型爆发，DALL-E 2、Midjourney、Stable Diffusion掀起AI绘画热潮，AIGC元年。',
+                tags: ['扩散模型', 'AIGC', '图像生成']
+            },
+            {
+                year: '2022.11',
+                icon: '💬',
+                title: 'ChatGPT 现象级爆发',
+                desc: 'OpenAI发布ChatGPT，5天百万用户，2个月破亿，引爆全球AI热潮，AI进入大众视野。',
+                tags: ['ChatGPT', '现象级', 'RLHF']
+            },
+            {
+                year: '2023',
+                icon: '🚀',
+                title: 'GPT-4 多模态大模型',
+                desc: 'GPT-4发布，支持图像输入，性能大幅提升。Claude、Gemini、LLaMA等百花齐放。',
+                tags: ['GPT-4', '多模态', '大模型竞赛']
+            },
+            {
+                year: '2024',
+                icon: '🎬',
+                title: 'Sora 视频生成',
+                desc: 'OpenAI发布Sora，生成长达60秒的高质量视频，展现世界模型能力，AI视频生成新纪元。',
+                tags: ['Sora', '视频生成', '世界模型']
+            }
+        ];
+
+        // ========== 里程碑数据 ==========
+        const milestones = [
+            {
+                year: '1997',
+                icon: '♟️',
+                title: '深蓝 vs 卡斯帕罗夫',
+                desc: 'IBM深蓝成为首个在标准比赛条件下战胜世界冠军的计算机，展示暴力计算的力量。',
+                impact: '影响：证明AI在封闭规则游戏中可以超越人类顶尖水平'
+            },
+            {
+                year: '2011',
+                icon: '🎤',
+                title: 'Siri 语音助手',
+                desc: 'Apple推出Siri，首次将语音AI助手带入主流消费市场，开启智能助手时代。',
+                impact: '影响：AI从实验室走向千家万户，日活用户数亿'
+            },
+            {
+                year: '2012',
+                icon: '👁️',
+                title: 'ImageNet 突破',
+                desc: 'AlexNet将图像识别错误率从26%降至15%，点燃深度学习革命。',
+                impact: '影响：计算机视觉迎来寒武纪大爆发，CNN成为标准范式'
+            },
+            {
+                year: '2016',
+                icon: '🎮',
+                title: 'AlphaGo 震撼世界',
+                desc: '战胜李世石，围棋AI从"不可能"到"超越人类"，深度强化学习证明实力。',
+                impact: '影响：全球掀起AI投资热潮，中国AI创业元年'
+            },
+            {
+                year: '2020',
+                icon: '💊',
+                title: 'GPT-3 zero-shot能力',
+                desc: '1750亿参数展现涌现能力，无需微调完成多种任务，大模型范式确立。',
+                impact: '影响：Scaling Law验证，"更大即更强"成为共识'
+            },
+            {
+                year: '2022',
+                icon: '💬',
+                title: 'ChatGPT 引爆全球',
+                desc: '史上增长最快的应用，2个月破亿用户，让AI从技术圈走向全民。',
+                impact: '影响：改变人类工作方式，引发AI伦理与安全大讨论'
+            }
+        ];
+
+        // ========== 技术流派数据 ==========
+        const paradigms = [
+            {
+                type: 'symbolic',
+                icon: '🎯',
+                name: '符号主义',
+                period: '1956-1990s',
+                desc: '基于逻辑推理和知识表示，认为智能源于符号操作。代表专家系统、知识图谱。',
+                examples: ['专家系统 (MYCIN)', '知识图谱', '语义网络', '产生式规则']
+            },
+            {
+                type: 'connectionist',
+                icon: '🧠',
+                name: '连接主义',
+                period: '1980s-至今',
+                desc: '模拟大脑神经元连接，通过大量简单单元的协同实现智能。神经网络、深度学习。',
+                examples: ['神经网络', '深度学习', 'Transformer', '大模型']
+            },
+            {
+                type: 'evolutionary',
+                icon: '🧬',
+                name: '进化主义',
+                period: '1990s-至今',
+                desc: '借鉴生物进化机制，通过选择、变异、适应实现优化。遗传算法、进化策略。',
+                examples: ['遗传算法', '进化策略', '神经架构搜索', '强化学习']
+            },
+            {
+                type: 'bayesian',
+                icon: '📊',
+                name: '贝叶斯方法',
+                period: '1990s-至今',
+                desc: '基于概率推理和不确定性建模，擅长处理噪声和缺失数据。',
+                examples: ['贝叶斯网络', '概率图模型', 'MCMC采样', '变分推断']
+            }
+        ];
+
+        // ========== AI先驱数据 ==========
+        const pioneers = [
+            { name: 'Alan Turing', title: '计算机科学之父', contribution: '图灵测试、图灵机', avatar: '🎓' },
+            { name: 'John McCarthy', title: 'AI之父', contribution: '提出"人工智能"概念、Lisp语言', avatar: '🧑‍🏫' },
+            { name: 'Marvin Minsky', title: '认知科学先驱', contribution: '感知器、框架理论', avatar: '🧠' },
+            { name: 'Geoffrey Hinton', title: '深度学习教父', contribution: '反向传播、Capsule Network', avatar: '👨‍🔬' },
+            { name: 'Yann LeCun', title: 'CNN之父', contribution: 'LeNet、卷积神经网络', avatar: '👨‍💻' },
+            { name: 'Yoshua Bengio', title: '深度学习先驱', contribution: '序列模型、注意力机制', avatar: '🎯' },
+            { name: 'Andrew Ng', title: 'AI教育家', contribution: 'Coursera、Google Brain', avatar: '👨‍🏫' },
+            { name: 'Demis Hassabis', title: 'DeepMind创始人', contribution: 'AlphaGo、AlphaFold', avatar: '🎮' },
+            { name: 'Sam Altman', title: 'OpenAI CEO', contribution: 'ChatGPT、GPT系列', avatar: '🚀' },
+            { name: '李飞飞', title: 'ImageNet创建者', contribution: 'ImageNet、AI4All', avatar: '👩‍🔬' }
+        ];
+
+        // ========== 未来展望数据 ==========
+        const futureData = [
+            {
+                year: '2025',
+                title: '多模态大模型成熟',
+                desc: 'GPT-5级别模型实现真正的图文音视频统一理解，Sora级视频生成普及，AI Agent开始大规模应用。',
+                probability: 95
+            },
+            {
+                year: '2027',
+                title: '个人AI助手时代',
+                desc: '每个人拥有专属AI助手，深度理解个人习惯、知识和偏好，成为真正的生产力倍增器。',
+                probability: 85
+            },
+            {
+                year: '2030',
+                title: '弱AGI雏形出现',
+                desc: '模型在90%以上的知识工作任务中达到人类平均水平，但仍缺乏真正的通用推理能力。',
+                probability: 70
+            },
+            {
+                year: '2035',
+                title: '强AGI实现',
+                desc: 'AI在所有认知任务上达到或超越人类专家水平，具备自主学习和跨领域迁移能力。',
+                probability: 50
+            },
+            {
+                year: '2040',
+                title: '超级智能（ASI）出现',
+                desc: 'AI在所有领域全面超越人类，可能带来技术奇点，人类文明进入全新阶段。',
+                probability: 30
+            },
+            {
+                year: '2050',
+                title: '人机融合新纪元',
+                desc: '脑机接口成熟，人类与AI深度融合，智能水平指数级提升，重新定义"人类"概念。',
+                probability: 20
+            }
+        ];
+
+        // ========== 加载时间线 ==========
+        function loadTimeline() {
+            const container = document.getElementById('timelineItems');
+            timelineData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item';
+                div.style.animationDelay = (index * 0.1) + 's';
+                
+                const tagsHTML = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                
+                div.innerHTML = `
+                    <div class="timeline-year">${item.year}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-icon">${item.icon}</div>
+                        <h3 class="timeline-title">${item.title}</h3>
+                        <p class="timeline-desc">${item.desc}</p>
+                        <div class="timeline-tags">${tagsHTML}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ========== 加载里程碑 ==========
+        function loadMilestones() {
+            const container = document.getElementById('milestones');
+            milestones.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'milestone-card';
+                card.innerHTML = `
+                    <div class="milestone-year">${item.year}</div>
+                    <div class="milestone-icon">${item.icon}</div>
+                    <h3 class="milestone-title">${item.title}</h3>
+                    <p class="milestone-desc">${item.desc}</p>
+                    <div class="milestone-impact">${item.impact}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ========== 加载技术流派 ==========
+        function loadParadigms() {
+            const container = document.getElementById('paradigms');
+            paradigms.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `paradigm-card ${item.type}`;
+                const examplesHTML = item.examples.map(ex => `<li>${ex}</li>`).join('');
+                card.innerHTML = `
+                    <div class="paradigm-icon">${item.icon}</div>
+                    <h3 class="paradigm-name">${item.name}</h3>
+                    <div class="paradigm-period">${item.period}</div>
+                    <p class="paradigm-desc">${item.desc}</p>
+                    <ul class="paradigm-examples">${examplesHTML}</ul>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ========== 加载先驱人物 ==========
+        function loadPioneers() {
+            const container = document.getElementById('pioneers');
+            pioneers.forEach(person => {
+                const card = document.createElement('div');
+                card.className = 'pioneer-card';
+                card.innerHTML = `
+                    <div class="pioneer-avatar">${person.avatar}</div>
+                    <div class="pioneer-name">${person.name}</div>
+                    <div class="pioneer-title">${person.title}</div>
+                    <p class="pioneer-contribution">${person.contribution}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ========== 加载未来展望 ==========
+        function loadFuture() {
+            const container = document.getElementById('futureTimeline');
+            futureData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'future-item';
+                div.innerHTML = `
+                    <div class="future-year">${item.year}</div>
+                    <div class="future-dot"></div>
+                    <div class="future-content">
+                        <h3 class="future-title">${item.title}</h3>
+                        <p class="future-desc">${item.desc}</p>
+                        <div class="future-probability">
+                            <div class="prob-bar">
+                                <div class="prob-fill" style="width: ${item.probability}%;"></div>
+                            </div>
+                            <span class="prob-label">可能性: ${item.probability}%</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ========== 能力雷达图 ==========
+        class CapabilityRadar {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.dimensions = ['视觉理解', '语言处理', '推理能力', '创造力', '学习速度', '泛化能力'];
+                this.eras = [
+                    { name: '专家系统 1980s', color: '#FF6B6B', scores: [20, 30, 40, 10, 20, 15], desc: '规则驱动' },
+                    { name: '浅层学习 2000s', color: '#4ECDC4', scores: [45, 40, 35, 20, 40, 30], desc: 'SVM/决策树' },
+                    { name: '深度学习 2015', color: '#45B7D1', scores: [85, 70, 50, 40, 60, 50], desc: 'CNN/RNN' },
+                    { name: 'Transformer 2020', color: '#96CEB4', scores: [90, 90, 70, 60, 70, 65], desc: '预训练模型' },
+                    { name: '大模型 2023', color: '#667eea', scores: [95, 95, 85, 80, 80, 75], desc: 'GPT-4/Claude' },
+                    { name: 'AGI 未来', color: '#FFD700', scores: [100, 100, 100, 100, 100, 100], desc: '通用智能' }
+                ];
+                this.visibleEras = [2, 3, 4];
+                this.angle = 0;
+                this.setupLegend();
+                this.animate();
+            }
+
+            setupLegend() {
+                const legend = document.getElementById('capabilityLegend');
+                this.eras.forEach((era, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'legend-item';
+                    item.onclick = () => this.toggleEra(i);
+                    item.innerHTML = `
+                        <div class="legend-color" style="background: ${era.color};"></div>
+                        <div>
+                            <div class="legend-name">${era.name}</div>
+                            <div class="legend-desc">${era.desc}</div>
+                        </div>
+                    `;
+                    legend.appendChild(item);
+                });
+            }
+
+            toggleEra(index) {
+                const idx = this.visibleEras.indexOf(index);
+                if (idx > -1) {
+                    if (this.visibleEras.length > 1) {
+                        this.visibleEras.splice(idx, 1);
+                    }
+                } else {
+                    if (this.visibleEras.length < 4) {
+                        this.visibleEras.push(index);
+                    }
+                }
+            }
+
+            animate() {
+                this.angle += 0.005;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const cx = w / 2;
+                const cy = h / 2;
+                const radius = Math.min(w, h) * 0.35;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 同心圆
+                ctx.strokeStyle = 'rgba(102, 126, 234, 0.2)';
+                ctx.lineWidth = 1;
+                for (let i = 1; i <= 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * i / 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // 维度轴
+                const angleStep = (Math.PI * 2) / this.dimensions.length;
+                this.dimensions.forEach((dim, i) => {
+                    const angle = angleStep * i - Math.PI / 2;
+                    const x = cx + Math.cos(angle) * radius;
+                    const y = cy + Math.sin(angle) * radius;
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#667eea';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    const labelX = cx + Math.cos(angle) * (radius + 35);
+                    const labelY = cy + Math.sin(angle) * (radius + 35);
+                    ctx.fillText(dim, labelX, labelY);
+                });
+
+                // 绘制时代数据
+                this.visibleEras.forEach((eraIdx) => {
+                    const era = this.eras[eraIdx];
+                    ctx.strokeStyle = era.color;
+                    ctx.fillStyle = era.color + '30';
+                    ctx.lineWidth = 3;
+
+                    ctx.beginPath();
+                    era.scores.forEach((score, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const r = radius * (score / 100);
+                        const x = cx + Math.cos(angle) * r;
+                        const y = cy + Math.sin(angle) * r;
+
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 数据点
+                    era.scores.forEach((score, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const r = radius * (score / 100);
+                        const x = cx + Math.cos(angle) * r;
+                        const y = cy + Math.sin(angle) * r;
+
+                        const pulse = Math.sin(this.angle * 3 + eraIdx + i) * 2 + 6;
+                        ctx.fillStyle = era.color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, pulse, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                });
+            }
+        }
+
+        // ========== 技术浪潮演进图 ==========
+        class EvolutionWave {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.time = 0;
+                this.waves = [
+                    { name: '符号主义', start: 0, peak: 0.2, end: 0.4, color: '#FF6B6B', height: 0.6 },
+                    { name: '专家系统', start: 0.15, peak: 0.3, end: 0.5, color: '#FFA07A', height: 0.5 },
+                    { name: '神经网络1.0', start: 0.25, peak: 0.35, end: 0.45, color: '#4ECDC4', height: 0.4 },
+                    { name: '机器学习', start: 0.4, peak: 0.55, end: 0.75, color: '#45B7D1', height: 0.7 },
+                    { name: '深度学习', start: 0.6, peak: 0.75, end: 0.95, color: '#667eea', height: 0.9 },
+                    { name: '大模型时代', start: 0.8, peak: 0.9, end: 1.0, color: '#FFD700', height: 1.0 }
+                ];
+                this.animate();
+            }
+
+            animate() {
+                this.time += 0.002;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 时间轴
+                ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(50, h - 80);
+                ctx.lineTo(w - 50, h - 80);
+                ctx.stroke();
+
+                // 年份标签
+                const years = ['1950s', '1970s', '1990s', '2000s', '2010s', '2020s', '未来'];
+                years.forEach((year, i) => {
+                    const x = 50 + (w - 100) * (i / (years.length - 1));
+                    ctx.fillStyle = '#a0a0a0';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(year, x, h - 60);
+                });
+
+                // 绘制浪潮
+                this.waves.forEach((wave, waveIdx) => {
+                    ctx.beginPath();
+                    for (let i = 0; i <= 100; i++) {
+                        const progress = i / 100;
+                        const x = 50 + (w - 100) * progress;
+                        
+                        let amplitude = 0;
+                        if (progress >= wave.start && progress <= wave.end) {
+                            const localProgress = (progress - wave.start) / (wave.end - wave.start);
+                            // 高斯曲线
+                            const peakPos = (wave.peak - wave.start) / (wave.end - wave.start);
+                            const sigma = 0.2;
+                            amplitude = wave.height * Math.exp(-Math.pow(localProgress - peakPos, 2) / (2 * sigma * sigma));
+                        }
+                        
+                        const y = h - 100 - amplitude * (h - 150) + Math.sin(this.time * 3 + i * 0.1 + waveIdx) * 5;
+                        
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    
+                    ctx.strokeStyle = wave.color;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // 标签
+                    const peakX = 50 + (w - 100) * wave.peak;
+                    const peakY = h - 100 - wave.height * (h - 150);
+                    ctx.fillStyle = wave.color;
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(wave.name, peakX, peakY - 20);
+                });
+            }
+        }
+
+        // ========== 3D可视化 ==========
+        class AI3DViz {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.rotation = 0;
+                this.nodes = [
+                    { name: '符号主义', x: -0.7, y: 0, z: 0.5, size: 40, color: '#FF6B6B' },
+                    { name: '连接主义', x: 0, y: -0.5, z: 0, size: 80, color: '#667eea' },
+                    { name: '深度学习', x: 0.7, y: 0, z: 0.5, size: 120, color: '#45B7D1' },
+                    { name: '大模型', x: 0, y: 0.7, z: -0.3, size: 150, color: '#FFD700' }
+                ];
+                this.animate();
+            }
+
+            animate() {
+                this.rotation += 0.01;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const cx = w / 2;
+                const cy = h / 2;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 3D旋转投影
+                const projected = this.nodes.map(node => {
+                    const rotX = node.x * Math.cos(this.rotation) - node.z * Math.sin(this.rotation);
+                    const rotZ = node.x * Math.sin(this.rotation) + node.z * Math.cos(this.rotation);
+                    
+                    const scale = 300 / (300 + rotZ * 200);
+                    const x2d = cx + rotX * 250 * scale;
+                    const y2d = cy + node.y * 250 * scale;
+                    
+                    return { ...node, x2d, y2d, scale, rotZ };
+                });
+
+                // 按Z轴排序（远的先画）
+                projected.sort((a, b) => a.rotZ - b.rotZ);
+
+                // 绘制节点
+                projected.forEach(node => {
+                    const radius = node.size * node.scale;
+                    
+                    // 发光效果
+                    const gradient = ctx.createRadialGradient(node.x2d, node.y2d, 0, node.x2d, node.y2d, radius * 1.5);
+                    gradient.addColorStop(0, node.color + '60');
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(node.x2d, node.y2d, radius * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 球体
+                    const ballGradient = ctx.createRadialGradient(
+                        node.x2d - radius * 0.3, node.y2d - radius * 0.3, 0,
+                        node.x2d, node.y2d, radius
+                    );
+                    ballGradient.addColorStop(0, node.color);
+                    ballGradient.addColorStop(1, node.color + '80');
+                    ctx.fillStyle = ballGradient;
+                    ctx.beginPath();
+                    ctx.arc(node.x2d, node.y2d, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 标签
+                    ctx.fillStyle = '#e8e8e8';
+                    ctx.font = `bold ${14 * node.scale}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(node.name, node.x2d, node.y2d + radius + 25 * node.scale);
+                });
+            }
+        }
+
+        // ========== 初始化 ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            loadTimeline();
+            loadMilestones();
+            loadParadigms();
+            loadPioneers();
+            loadFuture();
+            new CapabilityRadar('capabilityCanvas');
+            new EvolutionWave('evolutionCanvas');
+            new AI3DViz('viz3dCanvas');
+
+            // 滚动动画
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.milestone-card, .paradigm-card, .pioneer-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

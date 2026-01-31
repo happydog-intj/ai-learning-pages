@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 生态全景补充 - 交互式PPT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            overflow: hidden;
+        }
+
+        /* 幻灯片容器 */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateX(-100%) scale(0.8);
+        }
+
+        .slide.next {
+            transform: translateX(100%) scale(0.8);
+        }
+
+        /* 背景样式 - 极简白色 */
+        .bg-gradient-purple,
+        .bg-gradient-blue,
+        .bg-gradient-pink,
+        .bg-gradient-green,
+        .bg-gradient-orange,
+        .bg-gradient-teal,
+        .bg-gradient-red,
+        .bg-gradient-indigo,
+        .bg-gradient-cyan {
+            background: #ffffff;
+        }
+
+        /* 标题样式 */
+        .slide-title {
+            font-size: 5em;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #000000;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .slide-subtitle {
+            font-size: 2em;
+            text-align: center;
+            color: #666666;
+            margin-bottom: 60px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        /* 内容网格 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .content-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.6s ease-out backwards;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-card:nth-child(1) { animation-delay: 0.1s; }
+        .content-card:nth-child(2) { animation-delay: 0.2s; }
+        .content-card:nth-child(3) { animation-delay: 0.3s; }
+        .content-card:nth-child(4) { animation-delay: 0.4s; }
+        .content-card:nth-child(5) { animation-delay: 0.5s; }
+        .content-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            border-color: #000000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .card-desc {
+            font-size: 1.1em;
+            color: #666666;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .card-items {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .card-items li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            padding-left: 25px;
+            color: #333333;
+        }
+
+        .card-items li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        /* 导航 */
+        .nav-controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            color: #000000;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: #f5f5f5;
+            border-color: #000000;
+            transform: scale(1.1);
+        }
+
+        .page-indicator {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .page-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d0d0d0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .page-dot.active {
+            width: 30px;
+            border-radius: 5px;
+            background: #000000;
+        }
+
+        /* 键盘提示 */
+        .keyboard-hint {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 0.9em;
+            z-index: 100;
+            color: #666666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 对比表格 */
+        .comparison-table {
+            width: 100%;
+            max-width: 1200px;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: fadeInUp 1.2s ease-out;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-table th {
+            background: #f5f5f5;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #000000;
+        }
+
+        .comparison-table td {
+            font-size: 1.1em;
+            color: #333333;
+        }
+
+        /* 大图标展示 */
+        .big-icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            width: 100%;
+            max-width: 1400px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .big-icon-card {
+            text-align: center;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            animation: scaleIn 0.6s ease-out backwards;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .big-icon-card:nth-child(1) { animation-delay: 0.1s; }
+        .big-icon-card:nth-child(2) { animation-delay: 0.2s; }
+        .big-icon-card:nth-child(3) { animation-delay: 0.3s; }
+        .big-icon-card:nth-child(4) { animation-delay: 0.4s; }
+        .big-icon-card:nth-child(5) { animation-delay: 0.5s; }
+        .big-icon-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .big-icon-card:hover {
+            transform: scale(1.05);
+            border-color: #000000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .big-icon {
+            font-size: 5em;
+            margin-bottom: 15px;
+        }
+
+        .big-icon-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .big-icon-desc {
+            font-size: 0.9em;
+            color: #666666;
+        }
+
+        /* 流程图 */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .flow-node {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px 40px;
+            border: 2px solid #000000;
+            font-size: 1.5em;
+            font-weight: 700;
+            min-width: 150px;
+            text-align: center;
+            color: #000000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .flow-arrow {
+            font-size: 3em;
+            color: #666666;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 968px) {
+            .slide {
+                padding: 40px 20px;
+            }
+            .slide-title {
+                font-size: 3em;
+            }
+            .slide-subtitle {
+                font-size: 1.5em;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="keyboard-hint">
+        ⌨️ 使用 ← → 或 点击按钮 切换幻灯片
+    </div>
+
+    <div class="presentation" id="presentation">
+        <!-- Slide 1: 封面 -->
+        <div class="slide active bg-gradient-purple">
+            <div class="slide-title">AI 生态全景补充</div>
+            <div class="slide-subtitle">遗漏的重要概念与产品 · 2024版</div>
+            <div style="font-size: 8em; margin-top: 50px; animation: pulse 2s ease-in-out infinite;">🧠</div>
+            <div style="margin-top: 50px; font-size: 1.3em; opacity: 0.8;">共 10 个主题 · 60+ 工具与概念</div>
+        </div>
+
+        <!-- Slide 2: AI编程助手 -->
+        <div class="slide bg-gradient-blue">
+            <div class="slide-title">💻 AI 编程助手</div>
+            <div class="slide-subtitle">让AI成为你的结对编程伙伴</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">Cursor</div>
+                    <div class="card-desc">最火的AI编辑器，基于VSCode，Tab自动补全+Ctrl+K对话编辑</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🤖</div>
+                    <div class="card-title">GitHub Copilot</div>
+                    <div class="card-desc">微软出品，全IDE支持，代码建议精准度高</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-title">Cline / Claude Dev</div>
+                    <div class="card-desc">Claude集成插件，适合复杂重构和架构设计</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🌊</div>
+                    <div class="card-title">Windsurf</div>
+                    <div class="card-desc">Codeium出品，Flow模式下AI自主编码</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎨</div>
+                    <div class="card-title">v0 by Vercel</div>
+                    <div class="card-desc">前端代码生成神器，自然语言→React组件</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Continue</div>
+                    <div class="card-desc">开源替代品，支持自定义模型</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: AIGC工具 -->
+        <div class="slide bg-gradient-pink">
+            <div class="slide-title">🎨 AIGC 内容生成</div>
+            <div class="slide-subtitle">图像 · 视频 · 音频一站式</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">🖼️</div>
+                    <div class="card-title">图像生成</div>
+                    <ul class="card-items">
+                        <li>Midjourney - 艺术性最强</li>
+                        <li>DALL-E 3 - OpenAI出品</li>
+                        <li>Stable Diffusion - 开源</li>
+                        <li>文心一格 - 百度</li>
+                        <li>通义万相 - 阿里</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎬</div>
+                    <div class="card-title">视频生成</div>
+                    <ul class="card-items">
+                        <li>Sora - OpenAI革命性产品</li>
+                        <li>Runway - 专业级</li>
+                        <li>Pika - 易用性强</li>
+                        <li>可灵 - 快手</li>
+                        <li>Gen-2/Gen-3</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎵</div>
+                    <div class="card-title">音频/语音</div>
+                    <ul class="card-items">
+                        <li>ElevenLabs - 语音克隆</li>
+                        <li>Whisper - 语音识别</li>
+                        <li>Suno - AI音乐</li>
+                        <li>Udio - 音乐生成</li>
+                        <li>火山TTS - 字节</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: AI搜索引擎 -->
+        <div class="slide bg-gradient-green">
+            <div class="slide-title">🔍 AI 搜索引擎</div>
+            <div class="slide-subtitle">重新定义信息获取方式</div>
+            <div class="big-icon-grid">
+                <div class="big-icon-card">
+                    <div class="big-icon">🔮</div>
+                    <div class="big-icon-title">Perplexity</div>
+                    <div class="big-icon-desc">最火AI搜索，引用溯源清晰</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🎯</div>
+                    <div class="big-icon-title">You.com</div>
+                    <div class="big-icon-desc">多模态搜索，支持代码生成</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🇨🇳</div>
+                    <div class="big-icon-title">秘塔搜索</div>
+                    <div class="big-icon-desc">中文优化，完全免费</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🌟</div>
+                    <div class="big-icon-title">天工AI</div>
+                    <div class="big-icon-desc">昆仑万维，多模态搜索</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">💻</div>
+                    <div class="big-icon-title">Phind</div>
+                    <div class="big-icon-desc">编程专用搜索</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">📚</div>
+                    <div class="big-icon-title">Consensus</div>
+                    <div class="big-icon-desc">学术论文搜索</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: AI Agent框架 -->
+        <div class="slide bg-gradient-orange">
+            <div class="slide-title">🤖 AI Agent 框架</div>
+            <div class="slide-subtitle">让AI自主完成复杂任务</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-title">AutoGPT</div>
+                    <div class="card-desc">最早的自主Agent，目标分解+循环执行</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">👶</div>
+                    <div class="card-title">BabyAGI</div>
+                    <div class="card-desc">任务驱动的自主Agent，简洁高效</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔗</div>
+                    <div class="card-title">LangGraph</div>
+                    <div class="card-desc">LangChain出品，状态图+循环控制</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎭</div>
+                    <div class="card-title">MetaGPT</div>
+                    <div class="card-desc">多智能体协作，模拟软件团队</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Semantic Kernel</div>
+                    <div class="card-desc">微软出品，企业级Agent框架</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">👥</div>
+                    <div class="card-title">CrewAI</div>
+                    <div class="card-desc">角色扮演+任务分配的团队协作</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: RAG技术栈 -->
+        <div class="slide bg-gradient-teal">
+            <div class="slide-title">📚 RAG 技术栈</div>
+            <div class="slide-subtitle">检索增强生成 · 知识库的核心</div>
+            <div class="flow-diagram">
+                <div class="flow-node">文档</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">切分</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">Embedding</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">向量DB</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">检索</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">LLM生成</div>
+            </div>
+            <div class="content-grid" style="margin-top: 60px;">
+                <div class="content-card">
+                    <div class="card-icon">🗄️</div>
+                    <div class="card-title">向量数据库</div>
+                    <ul class="card-items">
+                        <li>Pinecone - 云端托管</li>
+                        <li>Weaviate - 开源</li>
+                        <li>Milvus - 国产开源</li>
+                        <li>Qdrant - Rust高性能</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔢</div>
+                    <div class="card-title">Embedding模型</div>
+                    <ul class="card-items">
+                        <li>OpenAI Embeddings</li>
+                        <li>BGE - 智源</li>
+                        <li>M3E - 中文优化</li>
+                        <li>Cohere Embeddings</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔧</div>
+                    <div class="card-title">RAG框架</div>
+                    <ul class="card-items">
+                        <li>LlamaIndex - 最流行</li>
+                        <li>Haystack - 企业级</li>
+                        <li>LangChain - 全能</li>
+                        <li>Vectara - 端到端</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 开源LLM生态 -->
+        <div class="slide bg-gradient-red">
+            <div class="slide-title">🔓 开源 LLM 生态</div>
+            <div class="slide-subtitle">开放的力量 · 可控的未来</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">🦙</div>
+                    <div class="card-title">LLaMA 3.1/3.2</div>
+                    <div class="card-desc">Meta开源，405B参数版本性能接近GPT-4</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-title">Mixtral 8x7B</div>
+                    <div class="card-desc">Mistral AI的MoE模型，性价比之王</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🇨🇳</div>
+                    <div class="card-title">Qwen 通义千问</div>
+                    <div class="card-desc">阿里开源，中文能力顶尖，多模态支持</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">DeepSeek</div>
+                    <div class="card-desc">完全开源，编程能力接近Claude</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎨</div>
+                    <div class="card-title">Yi 零一万物</div>
+                    <div class="card-desc">李开复创立，长上下文200K</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-title">ChatGLM</div>
+                    <div class="card-desc">智谱AI，双语优化，企业级服务</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: AI基础设施 -->
+        <div class="slide bg-gradient-indigo">
+            <div class="slide-title">🏗️ AI 基础设施</div>
+            <div class="slide-subtitle">支撑AI应用的技术栈</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">☁️</div>
+                    <div class="card-title">云服务</div>
+                    <ul class="card-items">
+                        <li>AWS Bedrock</li>
+                        <li>Azure OpenAI</li>
+                        <li>Google Vertex AI</li>
+                        <li>阿里云百炼</li>
+                        <li>腾讯云 TI</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🚀</div>
+                    <div class="card-title">模型托管</div>
+                    <ul class="card-items">
+                        <li>Hugging Face</li>
+                        <li>Replicate</li>
+                        <li>Modal</li>
+                        <li>Together AI</li>
+                        <li>RunPod</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">MLOps</div>
+                    <ul class="card-items">
+                        <li>Weights & Biases</li>
+                        <li>MLflow</li>
+                        <li>LangSmith</li>
+                        <li>Helicone</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-title">推理加速</div>
+                    <ul class="card-items">
+                        <li>vLLM</li>
+                        <li>TGI (HuggingFace)</li>
+                        <li>TensorRT-LLM</li>
+                        <li>llama.cpp</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔧</div>
+                    <div class="card-title">训练框架</div>
+                    <ul class="card-items">
+                        <li>DeepSpeed</li>
+                        <li>Megatron-LM</li>
+                        <li>PyTorch FSDP</li>
+                        <li>JAX/Flax</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 垂直行业应用 -->
+        <div class="slide bg-gradient-cyan">
+            <div class="slide-title">🎯 垂直行业应用</div>
+            <div class="slide-subtitle">AI在各领域的深度实践</div>
+            <div class="big-icon-grid">
+                <div class="big-icon-card">
+                    <div class="big-icon">✍️</div>
+                    <div class="big-icon-title">AI写作</div>
+                    <div class="big-icon-desc">Notion AI / Jasper / Copy.ai</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🎨</div>
+                    <div class="big-icon-title">AI设计</div>
+                    <div class="big-icon-desc">Figma AI / Canva AI / Uizard</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🎬</div>
+                    <div class="big-icon-title">视频编辑</div>
+                    <div class="big-icon-desc">Descript / CapCut / Filmora</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">🤝</div>
+                    <div class="big-icon-title">AI客服</div>
+                    <div class="big-icon-desc">Intercom / Zendesk AI / Ada</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">💼</div>
+                    <div class="big-icon-title">销售助手</div>
+                    <div class="big-icon-desc">Gong / Chorus / Clari</div>
+                </div>
+                <div class="big-icon-card">
+                    <div class="big-icon">⚖️</div>
+                    <div class="big-icon-title">法律AI</div>
+                    <div class="big-icon-desc">Harvey AI / LegalMation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: 核心概念总结 -->
+        <div class="slide bg-gradient-purple">
+            <div class="slide-title">🎓 核心技术概念</div>
+            <div class="slide-subtitle">理解AI的关键术语</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">🔀</div>
+                    <div class="card-title">MoE</div>
+                    <div class="card-desc">混合专家模型，动态激活部分专家，提升效率</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-title">LoRA/QLoRA</div>
+                    <div class="card-desc">低秩适应，高效微调大模型的方法</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">👥</div>
+                    <div class="card-title">RLHF</div>
+                    <div class="card-desc">人类反馈强化学习，让AI更符合人类偏好</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-title">Chain of Thought</div>
+                    <div class="card-desc">思维链，让AI逐步推理解决复杂问题</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🌳</div>
+                    <div class="card-title">Tree of Thoughts</div>
+                    <div class="card-desc">思维树，多路径探索+回溯的推理方法</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔧</div>
+                    <div class="card-title">Function Calling</div>
+                    <div class="card-desc">工具调用，让LLM能够使用外部工具</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: 总结 -->
+        <div class="slide bg-gradient-purple">
+            <div class="slide-title">🎊 总结</div>
+            <div class="slide-subtitle">AI生态的完整拼图</div>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">💻</div>
+                    <div class="card-title">编程</div>
+                    <div class="card-desc">Cursor/Copilot等提升10倍开发效率</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🎨</div>
+                    <div class="card-title">创作</div>
+                    <div class="card-desc">AIGC工具让人人都是创作者</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔍</div>
+                    <div class="card-title">搜索</div>
+                    <div class="card-desc">AI搜索重新定义信息获取</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🤖</div>
+                    <div class="card-title">Agent</div>
+                    <div class="card-desc">自主智能体开启AI应用新范式</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">📚</div>
+                    <div class="card-title">RAG</div>
+                    <div class="card-desc">知识库+检索是企业AI的关键</div>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🔓</div>
+                    <div class="card-title">开源</div>
+                    <div class="card-desc">开源模型让AI民主化触手可及</div>
+                </div>
+            </div>
+            <div style="margin-top: 60px; font-size: 1.5em; text-align: center;">
+                🚀 AI的黄金时代才刚刚开始！
+            </div>
+        </div>
+    </div>
+
+    <!-- 导航控制 -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="page-indicator" id="pageIndicator"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev', 'next');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                } else {
+                    slide.classList.add('next');
+                }
+            });
+            updatePageIndicator();
+        }
+
+        function updatePageIndicator() {
+            const indicator = document.getElementById('pageIndicator');
+            indicator.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'page-dot' + (i === currentSlide ? ' active' : '');
+                dot.onclick = () => goToSlide(i);
+                indicator.appendChild(dot);
+            }
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlides();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlides();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlides();
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // 触摸滑动支持
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevSlide();
+            }
+        }
+
+        // 初始化
+        updateSlides();
+    </script>
+</body>
+</html>

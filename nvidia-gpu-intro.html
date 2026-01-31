@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVIDIA GPU 全系列对比 - 消费级到数据中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #e8e8e8;
+            overflow-x: hidden;
+        }
+
+        /* 动态背景 */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, #1a4d1a 0%, #000 50%),
+                        radial-gradient(circle at 80% 80%, #003d00 0%, #000 50%);
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 英雄区 */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .nvidia-logo {
+            width: 200px;
+            height: 120px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, #76B900, #5B8F00);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            font-weight: 900;
+            color: #000;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(118, 185, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nvidia-logo::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 5em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #76B900, #A4FF00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-tagline {
+            font-size: 2em;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+        }
+
+        .series-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .series-badge {
+            background: rgba(118, 185, 0, 0.1);
+            border: 2px solid rgba(118, 185, 0, 0.4);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            color: #76B900;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .series-badge:hover {
+            background: rgba(118, 185, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(118, 185, 0, 0.4);
+        }
+
+        /* GPU 卡片网格 */
+        .gpu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .gpu-card {
+            background: linear-gradient(135deg, rgba(20, 40, 20, 0.8), rgba(10, 25, 10, 0.8));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(118, 185, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gpu-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(118, 185, 0, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .gpu-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #76B900;
+            box-shadow: 0 25px 60px rgba(118, 185, 0, 0.4);
+        }
+
+        .gpu-tier {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 700;
+            z-index: 10;
+        }
+
+        .gpu-name {
+            font-size: 2em;
+            font-weight: 800;
+            color: #76B900;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gpu-specs {
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(118, 185, 0, 0.2);
+            color: #c0c0c0;
+        }
+
+        .spec-label {
+            font-weight: 600;
+        }
+
+        .spec-value {
+            color: #76B900;
+            font-weight: 700;
+        }
+
+        .gpu-price {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #A4FF00;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .price-unit {
+            font-size: 0.4em;
+            color: #a0a0a0;
+        }
+
+        .gpu-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            background: rgba(118, 185, 0, 0.2);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: #A4FF00;
+            border: 1px solid rgba(118, 185, 0, 0.4);
+        }
+
+        /* 性能对比雷达图 */
+        .comparison-section {
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #76B900, #A4FF00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .radar-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .radar-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(118, 185, 0, 0.3);
+        }
+
+        .legend-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .legend-item {
+            background: rgba(20, 40, 20, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .legend-item:hover {
+            border-color: #76B900;
+            transform: translateX(10px);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .legend-info {
+            flex: 1;
+        }
+
+        .legend-name {
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .legend-desc {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        /* 使用场景矩阵 */
+        .use-case-section {
+            padding: 60px 0;
+        }
+
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .use-case-card {
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid rgba(118, 185, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .use-case-card:hover {
+            border-color: #76B900;
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(118, 185, 0, 0.3);
+        }
+
+        .use-case-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .use-case-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #76B900;
+            margin-bottom: 10px;
+        }
+
+        .use-case-desc {
+            color: #a0a0a0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .recommended-gpu {
+            background: linear-gradient(135deg, #76B900, #5B8F00);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+
+        /* 竞品对比 */
+        .competitor-section {
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .competitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .competitor-card {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .competitor-card.nvidia { border-color: rgba(118, 185, 0, 0.5); }
+        .competitor-card.amd { border-color: rgba(237, 28, 36, 0.5); }
+        .competitor-card.intel { border-color: rgba(0, 113, 197, 0.5); }
+        .competitor-card.google { border-color: rgba(66, 133, 244, 0.5); }
+        .competitor-card.huawei { border-color: rgba(255, 0, 0, 0.5); }
+
+        .competitor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(118, 185, 0, 0.3);
+        }
+
+        .competitor-logo {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .competitor-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .competitor-card.nvidia .competitor-name { color: #76B900; }
+        .competitor-card.amd .competitor-name { color: #ED1C24; }
+        .competitor-card.intel .competitor-name { color: #0071C5; }
+        .competitor-card.google .competitor-name { color: #4285F4; }
+        .competitor-card.huawei .competitor-name { color: #FF0000; }
+
+        .competitor-specs {
+            list-style: none;
+        }
+
+        .competitor-specs li {
+            padding: 10px 0;
+            color: #c0c0c0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .competitor-specs li strong {
+            color: #fff;
+        }
+
+        /* 性能跑分对比 */
+        .benchmark-section {
+            padding: 60px 0;
+        }
+
+        .benchmark-canvas {
+            width: 100%;
+            height: 500px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(118, 185, 0, 0.3);
+            margin: 30px 0;
+        }
+
+        .benchmark-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .benchmark-btn {
+            background: rgba(118, 185, 0, 0.1);
+            border: 2px solid rgba(118, 185, 0, 0.3);
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: #76B900;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .benchmark-btn:hover, .benchmark-btn.active {
+            background: linear-gradient(135deg, #76B900, #5B8F00);
+            color: #000;
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(118, 185, 0, 0.5);
+        }
+
+        /* 价格性能比 */
+        .value-chart {
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .value-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(118, 185, 0, 0.3);
+        }
+
+        /* 规格对比表 */
+        .spec-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 40px 0;
+        }
+
+        .spec-table th {
+            background: rgba(118, 185, 0, 0.2);
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            color: #76B900;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .spec-table td {
+            padding: 20px;
+            border-bottom: 1px solid rgba(118, 185, 0, 0.1);
+            color: #c0c0c0;
+        }
+
+        .spec-table tr:hover {
+            background: rgba(118, 185, 0, 0.1);
+        }
+
+        .model-name {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        /* 技术特性 */
+        .tech-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 60px 0;
+        }
+
+        .tech-card {
+            background: linear-gradient(135deg, rgba(118, 185, 0, 0.1), rgba(91, 143, 0, 0.05));
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(118, 185, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            border-color: #76B900;
+            box-shadow: 0 15px 40px rgba(118, 185, 0, 0.3);
+        }
+
+        .tech-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .tech-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #76B900;
+            margin-bottom: 10px;
+        }
+
+        .tech-desc {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        /* 3D GPU 可视化 */
+        .gpu-3d-section {
+            background: rgba(20, 40, 20, 0.6);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .gpu-3d-canvas {
+            width: 100%;
+            height: 600px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(118, 185, 0, 0.3);
+        }
+
+        /* 响应式 */
+        @media (max-width: 968px) {
+            h1 { font-size: 3em; }
+            .radar-container { grid-template-columns: 1fr; }
+            .gpu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 英雄区 -->
+        <section class="hero">
+            <div class="nvidia-logo">NVIDIA</div>
+            <h1>GPU 全系列对比</h1>
+            <p class="hero-tagline">从游戏到数据中心 · 一站式选型指南</p>
+            <div class="series-badges">
+                <span class="series-badge">GeForce RTX 40 系列</span>
+                <span class="series-badge">GeForce RTX 30 系列</span>
+                <span class="series-badge">RTX Ada 专业卡</span>
+                <span class="series-badge">数据中心 H100/A100</span>
+            </div>
+        </section>
+
+        <!-- 消费级 GPU -->
+        <section>
+            <h2 class="section-title">🎮 GeForce RTX 40 系列 - 游戏与创作</h2>
+            <div class="gpu-grid" id="rtx40Grid"></div>
+        </section>
+
+        <!-- 数据中心 GPU -->
+        <section>
+            <h2 class="section-title">🏢 数据中心系列 - AI 与 HPC</h2>
+            <div class="gpu-grid" id="datacenterGrid"></div>
+        </section>
+
+        <!-- 性能雷达图 -->
+        <section class="comparison-section">
+            <h2 class="section-title">📊 综合性能对比</h2>
+            <div class="radar-container">
+                <canvas id="radarCanvas" class="radar-canvas"></canvas>
+                <div class="legend-grid" id="radarLegend"></div>
+            </div>
+        </section>
+
+        <!-- 使用场景推荐 -->
+        <section class="use-case-section">
+            <h2 class="section-title">🎯 使用场景推荐</h2>
+            <div class="use-case-grid" id="useCaseGrid"></div>
+        </section>
+
+        <!-- 性能跑分对比 -->
+        <section class="benchmark-section">
+            <h2 class="section-title">🏆 性能跑分对比</h2>
+            <canvas id="benchmarkCanvas" class="benchmark-canvas"></canvas>
+            <div class="benchmark-controls">
+                <button class="benchmark-btn active" onclick="changeBenchmark('gaming')">游戏性能</button>
+                <button class="benchmark-btn" onclick="changeBenchmark('ai')">AI 训练</button>
+                <button class="benchmark-btn" onclick="changeBenchmark('rendering')">渲染速度</button>
+                <button class="benchmark-btn" onclick="changeBenchmark('mining')">挖矿算力</button>
+            </div>
+        </section>
+
+        <!-- 竞品对比 -->
+        <section class="competitor-section">
+            <h2 class="section-title">⚔️ 竞品对比分析</h2>
+            <div class="competitor-grid" id="competitorGrid"></div>
+        </section>
+
+        <!-- 价格性能比 -->
+        <section class="value-chart">
+            <h2 class="section-title">💰 性价比分析</h2>
+            <canvas id="valueCanvas" class="value-canvas"></canvas>
+        </section>
+
+        <!-- 技术特性 -->
+        <section>
+            <h2 class="section-title">✨ NVIDIA 独家技术</h2>
+            <div class="tech-features" id="techFeatures"></div>
+        </section>
+
+        <!-- 规格对比表 -->
+        <section>
+            <h2 class="section-title">📋 详细规格对比</h2>
+            <table class="spec-table" id="specTable"></table>
+        </section>
+
+        <!-- 3D GPU 可视化 -->
+        <section class="gpu-3d-section">
+            <h2 class="section-title">🌐 3D 性能可视化</h2>
+            <canvas id="gpu3dCanvas" class="gpu-3d-canvas"></canvas>
+        </section>
+    </div>
+
+    <script>
+        // ========== GPU 数据 ==========
+        const gpuData = {
+            rtx40: [
+                {
+                    name: 'RTX 4090',
+                    tier: '旗舰',
+                    price: 12999,
+                    specs: {
+                        cuda: '16384',
+                        memory: '24GB GDDR6X',
+                        tdp: '450W',
+                        boost: '2.52 GHz'
+                    },
+                    badges: ['游戏之王', '4K 120Hz', 'AI 训练'],
+                    score: { gaming: 100, ai: 95, rendering: 98, mining: 90 }
+                },
+                {
+                    name: 'RTX 4080',
+                    tier: '高端',
+                    price: 8999,
+                    specs: {
+                        cuda: '9728',
+                        memory: '16GB GDDR6X',
+                        tdp: '320W',
+                        boost: '2.51 GHz'
+                    },
+                    badges: ['4K 高刷', '创作利器', '性能强悍'],
+                    score: { gaming: 85, ai: 80, rendering: 83, mining: 75 }
+                },
+                {
+                    name: 'RTX 4070 Ti',
+                    tier: '中高端',
+                    price: 6499,
+                    specs: {
+                        cuda: '7680',
+                        memory: '12GB GDDR6X',
+                        tdp: '285W',
+                        boost: '2.61 GHz'
+                    },
+                    badges: ['2K 旗舰', '性价比高', '温控优秀'],
+                    score: { gaming: 75, ai: 70, rendering: 73, mining: 68 }
+                },
+                {
+                    name: 'RTX 4070',
+                    tier: '中端',
+                    price: 4799,
+                    specs: {
+                        cuda: '5888',
+                        memory: '12GB GDDR6X',
+                        tdp: '200W',
+                        boost: '2.48 GHz'
+                    },
+                    badges: ['2K 甜点', '功耗友好', '主流首选'],
+                    score: { gaming: 68, ai: 62, rendering: 65, mining: 60 }
+                },
+                {
+                    name: 'RTX 4060 Ti',
+                    tier: '主流',
+                    price: 3299,
+                    specs: {
+                        cuda: '4352',
+                        memory: '8GB GDDR6',
+                        tdp: '160W',
+                        boost: '2.54 GHz'
+                    },
+                    badges: ['1080p 144Hz', '入门之选', '省电高效'],
+                    score: { gaming: 55, ai: 48, rendering: 52, mining: 45 }
+                },
+                {
+                    name: 'RTX 4060',
+                    tier: '入门',
+                    price: 2399,
+                    specs: {
+                        cuda: '3072',
+                        memory: '8GB GDDR6',
+                        tdp: '115W',
+                        boost: '2.46 GHz'
+                    },
+                    badges: ['1080p 高帧', '预算友好', '静音低温'],
+                    score: { gaming: 45, ai: 38, rendering: 42, mining: 35 }
+                }
+            ],
+            datacenter: [
+                {
+                    name: 'H100 PCIe',
+                    tier: 'AI 旗舰',
+                    price: 199999,
+                    specs: {
+                        cuda: '16896',
+                        memory: '80GB HBM3',
+                        tdp: '350W',
+                        boost: '1.98 GHz'
+                    },
+                    badges: ['AI 之王', 'Transformer 加速', 'FP8 支持'],
+                    score: { gaming: 60, ai: 100, rendering: 85, mining: 70 }
+                },
+                {
+                    name: 'A100 PCIe',
+                    tier: 'AI 主力',
+                    price: 79999,
+                    specs: {
+                        cuda: '6912',
+                        memory: '80GB HBM2e',
+                        tdp: '300W',
+                        boost: '1.41 GHz'
+                    },
+                    badges: ['大模型训练', 'MIG 分片', '企业首选'],
+                    score: { gaming: 50, ai: 88, rendering: 75, mining: 65 }
+                },
+                {
+                    name: 'L40S',
+                    tier: '推理专用',
+                    price: 49999,
+                    specs: {
+                        cuda: '18176',
+                        memory: '48GB GDDR6',
+                        tdp: '350W',
+                        boost: '2.52 GHz'
+                    },
+                    badges: ['AI 推理', '视频处理', 'Ada 架构'],
+                    score: { gaming: 75, ai: 85, rendering: 88, mining: 72 }
+                }
+            ]
+        };
+
+        const competitors = [
+            {
+                brand: 'nvidia',
+                logo: '💚',
+                name: 'RTX 4090',
+                specs: [
+                    '16384 CUDA 核心',
+                    '24GB GDDR6X',
+                    '游戏性能: 100%',
+                    'AI 性能: 95%',
+                    '价格: ¥12,999'
+                ]
+            },
+            {
+                brand: 'amd',
+                logo: '🔴',
+                name: 'RX 7900 XTX 🇺🇸',
+                specs: [
+                    '6144 流处理器',
+                    '24GB GDDR6',
+                    '游戏性能: 85%',
+                    'AI 性能: 55%',
+                    '价格: ¥7,999'
+                ]
+            },
+            {
+                brand: 'intel',
+                logo: '🔵',
+                name: 'Arc A770 🇺🇸',
+                specs: [
+                    '4096 Xe 核心',
+                    '16GB GDDR6',
+                    '游戏性能: 55%',
+                    'AI 性能: 45%',
+                    '价格: ¥3,499'
+                ]
+            },
+            {
+                brand: 'google',
+                logo: '🌈',
+                name: 'TPU v5p 🇺🇸',
+                specs: [
+                    '专用 AI 芯片',
+                    '95GB HBM',
+                    'AI 性能: 150%',
+                    '云服务专用',
+                    '价格: 租用制'
+                ]
+            },
+            {
+                brand: 'huawei',
+                logo: '🇨🇳',
+                name: '昇腾 910B',
+                specs: [
+                    'AI 专用核心',
+                    '32GB HBM2',
+                    'AI 性能: 75%',
+                    '国产替代方案',
+                    '价格: 约¥50,000'
+                ]
+            },
+            {
+                brand: 'amd',
+                logo: '🟣',
+                name: 'MI300X 🇺🇸',
+                specs: [
+                    '304个计算单元',
+                    '192GB HBM3',
+                    'AI 训练性能: 110%',
+                    '数据中心级',
+                    '价格: 约¥150,000'
+                ]
+            }
+        ];
+
+        const useCases = [
+            {
+                icon: '🎮',
+                title: '4K 游戏',
+                desc: '追求极致画质与高帧率',
+                gpu: 'RTX 4090 / 4080'
+            },
+            {
+                icon: '🖥️',
+                title: '2K 电竞',
+                desc: '144Hz+ 高刷竞技游戏',
+                gpu: 'RTX 4070 Ti / 4070'
+            },
+            {
+                icon: '💻',
+                title: '1080p 畅玩',
+                desc: '主流游戏高特效',
+                gpu: 'RTX 4060 Ti / 4060'
+            },
+            {
+                icon: '🤖',
+                title: '大模型训练',
+                desc: 'LLM 训练与微调',
+                gpu: 'H100 / A100'
+            },
+            {
+                icon: '🔬',
+                title: 'AI 推理',
+                desc: '模型部署与推理服务',
+                gpu: 'L40S / RTX 4090'
+            },
+            {
+                icon: '🎬',
+                title: '视频渲染',
+                desc: '3D 渲染与视频剪辑',
+                gpu: 'RTX 4080 / L40S'
+            },
+            {
+                icon: '🎨',
+                title: '内容创作',
+                desc: 'Blender / DaVinci',
+                gpu: 'RTX 4070 Ti'
+            },
+            {
+                icon: '⛏️',
+                title: '加密挖矿',
+                desc: 'ETH 等算力挖矿',
+                gpu: 'RTX 3090 / 3080'
+            },
+            {
+                icon: '🧬',
+                title: '科学计算',
+                desc: 'CUDA 并行计算',
+                gpu: 'A100 / H100'
+            },
+            {
+                icon: '🏠',
+                title: '家用办公',
+                desc: '轻度游戏+办公',
+                gpu: 'RTX 4060'
+            }
+        ];
+
+        const techFeatures = [
+            { icon: '⚡', title: 'DLSS 3.5', desc: 'AI 驱动的超分辨率技术，帧率提升最高 4 倍' },
+            { icon: '🌟', title: '光线追踪', desc: '第三代 RT 核心，实时光追性能翻倍' },
+            { icon: '🎯', title: 'Reflex', desc: '降低系统延迟，电竞玩家必备' },
+            { icon: '🖼️', title: 'AV1 编码', desc: '双编码器，直播录制更高效' },
+            { icon: '🔧', title: 'CUDA 12', desc: '最新 CUDA 工具包，AI 开发利器' },
+            { icon: '💾', title: 'Tensor 核心', desc: '第四代 Tensor 核心，AI 性能暴涨' }
+        ];
+
+        // ========== 加载 GPU 卡片 ==========
+        function loadGPUCards() {
+            const rtx40Grid = document.getElementById('rtx40Grid');
+            const datacenterGrid = document.getElementById('datacenterGrid');
+
+            gpuData.rtx40.forEach(gpu => {
+                const card = createGPUCard(gpu);
+                rtx40Grid.appendChild(card);
+            });
+
+            gpuData.datacenter.forEach(gpu => {
+                const card = createGPUCard(gpu);
+                datacenterGrid.appendChild(card);
+            });
+        }
+
+        function createGPUCard(gpu) {
+            const card = document.createElement('div');
+            card.className = 'gpu-card';
+            
+            const specsHTML = Object.entries(gpu.specs).map(([key, value]) => 
+                `<div class="spec-row">
+                    <span class="spec-label">${key.toUpperCase()}</span>
+                    <span class="spec-value">${value}</span>
+                </div>`
+            ).join('');
+
+            const badgesHTML = gpu.badges.map(badge => 
+                `<span class="badge">${badge}</span>`
+            ).join('');
+
+            card.innerHTML = `
+                <div class="gpu-tier">${gpu.tier}</div>
+                <h3 class="gpu-name">${gpu.name}</h3>
+                <div class="gpu-specs">${specsHTML}</div>
+                <div class="gpu-price">¥${gpu.price.toLocaleString()}<span class="price-unit">起</span></div>
+                <div class="gpu-badges">${badgesHTML}</div>
+            `;
+
+            return card;
+        }
+
+        // ========== 加载使用场景 ==========
+        function loadUseCases() {
+            const grid = document.getElementById('useCaseGrid');
+            useCases.forEach(useCase => {
+                const card = document.createElement('div');
+                card.className = 'use-case-card';
+                card.innerHTML = `
+                    <div class="use-case-icon">${useCase.icon}</div>
+                    <div class="use-case-title">${useCase.title}</div>
+                    <p class="use-case-desc">${useCase.desc}</p>
+                    <span class="recommended-gpu">推荐: ${useCase.gpu}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ========== 加载竞品 ==========
+        function loadCompetitors() {
+            const grid = document.getElementById('competitorGrid');
+            competitors.forEach(comp => {
+                const card = document.createElement('div');
+                card.className = `competitor-card ${comp.brand}`;
+                const specsHTML = comp.specs.map(spec => `<li>${spec}</li>`).join('');
+                card.innerHTML = `
+                    <div class="competitor-logo">${comp.logo}</div>
+                    <div class="competitor-name">${comp.name}</div>
+                    <ul class="competitor-specs">${specsHTML}</ul>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ========== 加载技术特性 ==========
+        function loadTechFeatures() {
+            const grid = document.getElementById('techFeatures');
+            techFeatures.forEach(tech => {
+                const card = document.createElement('div');
+                card.className = 'tech-card';
+                card.innerHTML = `
+                    <div class="tech-icon">${tech.icon}</div>
+                    <div class="tech-title">${tech.title}</div>
+                    <p class="tech-desc">${tech.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ========== 雷达图 ==========
+        class RadarChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.dimensions = ['游戏性能', 'AI 训练', '渲染速度', '功耗效率', '性价比', '散热表现'];
+                this.models = [
+                    { name: 'RTX 4090', color: '#76B900', scores: [100, 95, 98, 60, 70, 65], desc: '无敌旗舰' },
+                    { name: 'RTX 4070', color: '#A4FF00', scores: [68, 62, 65, 85, 90, 90], desc: '中端甜点' },
+                    { name: 'H100', color: '#5B8F00', scores: [60, 100, 85, 50, 40, 60], desc: 'AI 之王' },
+                    { name: 'RX 7900 XTX', color: '#ED1C24', scores: [85, 55, 80, 70, 85, 75], desc: 'AMD 旗舰' },
+                    { name: 'MI300X', color: '#9B59B6', scores: [65, 110, 88, 55, 50, 65], desc: 'AMD AI' },
+                    { name: '昇腾 910B', color: '#FF0000', scores: [40, 75, 60, 75, 80, 80], desc: '国产 AI' }
+                ];
+                this.visibleModels = [0, 1, 3];
+                this.angle = 0;
+                this.setupLegend();
+                this.animate();
+            }
+
+            setupLegend() {
+                const legend = document.getElementById('radarLegend');
+                this.models.forEach((model, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'legend-item';
+                    item.onclick = () => this.toggleModel(i);
+                    item.innerHTML = `
+                        <div class="legend-color" style="background: ${model.color};"></div>
+                        <div class="legend-info">
+                            <div class="legend-name">${model.name}</div>
+                            <div class="legend-desc">${model.desc}</div>
+                        </div>
+                    `;
+                    legend.appendChild(item);
+                });
+            }
+
+            toggleModel(index) {
+                const idx = this.visibleModels.indexOf(index);
+                if (idx > -1) {
+                    if (this.visibleModels.length > 1) {
+                        this.visibleModels.splice(idx, 1);
+                    }
+                } else {
+                    if (this.visibleModels.length < 4) {
+                        this.visibleModels.push(index);
+                    }
+                }
+            }
+
+            animate() {
+                this.angle += 0.005;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const cx = w / 2;
+                const cy = h / 2;
+                const radius = Math.min(w, h) * 0.35;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 同心圆
+                ctx.strokeStyle = 'rgba(118, 185, 0, 0.2)';
+                ctx.lineWidth = 1;
+                for (let i = 1; i <= 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * i / 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // 维度轴
+                const angleStep = (Math.PI * 2) / this.dimensions.length;
+                this.dimensions.forEach((dim, i) => {
+                    const angle = angleStep * i - Math.PI / 2;
+                    const x = cx + Math.cos(angle) * radius;
+                    const y = cy + Math.sin(angle) * radius;
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#76B900';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    const labelX = cx + Math.cos(angle) * (radius + 35);
+                    const labelY = cy + Math.sin(angle) * (radius + 35);
+                    ctx.fillText(dim, labelX, labelY);
+                });
+
+                // 绘制模型数据
+                this.visibleModels.forEach((modelIdx) => {
+                    const model = this.models[modelIdx];
+                    ctx.strokeStyle = model.color;
+                    ctx.fillStyle = model.color + '30';
+                    ctx.lineWidth = 3;
+
+                    ctx.beginPath();
+                    model.scores.forEach((score, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const r = radius * (score / 100);
+                        const x = cx + Math.cos(angle) * r;
+                        const y = cy + Math.sin(angle) * r;
+
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 数据点
+                    model.scores.forEach((score, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const r = radius * (score / 100);
+                        const x = cx + Math.cos(angle) * r;
+                        const y = cy + Math.sin(angle) * r;
+
+                        const pulse = Math.sin(this.angle * 3 + modelIdx + i) * 2 + 6;
+                        ctx.fillStyle = model.color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, pulse, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                });
+            }
+        }
+
+        // ========== 性能跑分图 ==========
+        class BenchmarkChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.currentMetric = 'gaming';
+                this.animProgress = 0;
+                this.animate();
+            }
+
+            changeMetric(metric) {
+                this.currentMetric = metric;
+                this.animProgress = 0;
+                this.animate();
+            }
+
+            animate() {
+                this.animProgress += 0.02;
+                if (this.animProgress > 1) this.animProgress = 1;
+                this.draw();
+                if (this.animProgress < 1) {
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                ctx.fillRect(0, 0, w, h);
+
+                const allGPUs = [...gpuData.rtx40, ...gpuData.datacenter];
+                const sortedGPUs = allGPUs.sort((a, b) => b.score[this.currentMetric] - a.score[this.currentMetric]);
+
+                const barHeight = 40;
+                const barGap = 15;
+                const startY = (h - (sortedGPUs.length * (barHeight + barGap))) / 2;
+                const maxBarWidth = w * 0.65;
+
+                sortedGPUs.forEach((gpu, i) => {
+                    const y = startY + i * (barHeight + barGap);
+                    const score = gpu.score[this.currentMetric];
+                    const barWidth = (score / 100) * maxBarWidth * this.animProgress;
+
+                    // 背景条
+                    ctx.fillStyle = 'rgba(118, 185, 0, 0.1)';
+                    ctx.fillRect(250, y, maxBarWidth, barHeight);
+
+                    // 数据条
+                    const gradient = ctx.createLinearGradient(250, y, 250 + barWidth, y);
+                    gradient.addColorStop(0, '#76B900');
+                    gradient.addColorStop(1, '#A4FF00');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(250, y, barWidth, barHeight);
+
+                    // GPU 名称
+                    ctx.fillStyle = '#e8e8e8';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(gpu.name, 230, y + barHeight / 2 + 5);
+
+                    // 分数
+                    ctx.fillStyle = '#76B900';
+                    ctx.font = 'bold 20px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(Math.round(score * this.animProgress), 250 + barWidth + 15, y + barHeight / 2 + 7);
+                });
+            }
+        }
+
+        // ========== 性价比散点图 ==========
+        class ValueChart {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.time = 0;
+                this.animate();
+            }
+
+            animate() {
+                this.time += 0.01;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 坐标轴
+                ctx.strokeStyle = 'rgba(118, 185, 0, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(80, h - 80);
+                ctx.lineTo(w - 40, h - 80);
+                ctx.moveTo(80, h - 80);
+                ctx.lineTo(80, 40);
+                ctx.stroke();
+
+                // 标签
+                ctx.fillStyle = '#76B900';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('性能 →', w / 2, h - 20);
+                ctx.save();
+                ctx.translate(25, h / 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('← 价格', 0, 0);
+                ctx.restore();
+
+                // 绘制 GPU 点
+                const allGPUs = [...gpuData.rtx40, ...gpuData.datacenter];
+                allGPUs.forEach((gpu, i) => {
+                    const performance = gpu.score.gaming;
+                    const price = gpu.price;
+                    
+                    const x = 100 + (performance / 100) * (w - 200);
+                    const y = h - 100 - (Math.log10(price) / 5.5) * (h - 150);
+
+                    // 脉动效果
+                    const pulse = Math.sin(this.time * 2 + i) * 3 + 12;
+                    
+                    // 发光圈
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, pulse * 2);
+                    gradient.addColorStop(0, 'rgba(118, 185, 0, 0.4)');
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulse * 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 主点
+                    ctx.fillStyle = '#76B900';
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulse, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 标签
+                    ctx.fillStyle = '#e8e8e8';
+                    ctx.font = 'bold 11px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(gpu.name, x, y - pulse - 8);
+                });
+            }
+        }
+
+        // ========== 3D GPU 可视化 ==========
+        class GPU3DVisualization {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.rotation = 0;
+                this.animate();
+            }
+
+            animate() {
+                this.rotation += 0.01;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                const gpus = [
+                    { name: 'RTX 4090', score: 100, color: '#76B900' },
+                    { name: 'H100', score: 100, color: '#5B8F00' },
+                    { name: 'RTX 4070', score: 68, color: '#A4FF00' }
+                ];
+
+                gpus.forEach((gpu, i) => {
+                    const cx = w / 4 + i * (w / 3);
+                    const cy = h / 2;
+                    const radius = 80 * (gpu.score / 100);
+
+                    // 发光效果
+                    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 1.5);
+                    gradient.addColorStop(0, gpu.color + '40');
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 球体
+                    const ballGradient = ctx.createRadialGradient(
+                        cx - radius * 0.3, cy - radius * 0.3, 0,
+                        cx, cy, radius
+                    );
+                    ballGradient.addColorStop(0, gpu.color);
+                    ballGradient.addColorStop(1, gpu.color + '80');
+                    ctx.fillStyle = ballGradient;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 标签
+                    ctx.fillStyle = gpu.color;
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(gpu.name, cx, cy + radius + 40);
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#a0a0a0';
+                    ctx.fillText(`性能: ${gpu.score}`, cx, cy + radius + 60);
+                });
+            }
+        }
+
+        // ========== 切换跑分指标 ==========
+        let benchmarkChart;
+        function changeBenchmark(metric) {
+            document.querySelectorAll('.benchmark-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            benchmarkChart.changeMetric(metric);
+        }
+
+        // ========== 初始化 ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGPUCards();
+            loadUseCases();
+            loadCompetitors();
+            loadTechFeatures();
+            new RadarChart('radarCanvas');
+            benchmarkChart = new BenchmarkChart('benchmarkCanvas');
+            new ValueChart('valueCanvas');
+            new GPU3DVisualization('gpu3dCanvas');
+
+            // 滚动动画
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.gpu-card, .use-case-card, .competitor-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

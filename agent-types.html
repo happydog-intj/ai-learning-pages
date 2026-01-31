@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent 全景图 - 类型与应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e8e8e8;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-section {
+            margin-bottom: 80px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 35px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, #667eea, transparent) 1;
+        }
+
+        .category-icon {
+            font-size: 3em;
+            margin-right: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .category-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .agent-card {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .agent-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .agent-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .agent-emoji {
+            font-size: 2.5em;
+            margin-right: 15px;
+            animation: rotate 3s ease-in-out infinite;
+        }
+
+        .agent-name {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .agent-tag {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .agent-description {
+            color: #c0c0c0;
+            margin: 20px 0;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+
+        .problem-solving {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 3px solid #667eea;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .problem-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .problem-text {
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .examples {
+            margin-top: 20px;
+        }
+
+        .example-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+
+        .example-item::before {
+            content: '▸';
+            color: #667eea;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 0.95em;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-area {
+            background: rgba(10, 10, 20, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .demo-area.active {
+            display: block;
+        }
+
+        .workflow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 80px;
+            animation: pulse 2s infinite;
+        }
+
+        .workflow-arrow {
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 0 5px;
+        }
+
+        .typing-effect {
+            border-right: 2px solid #667eea;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3s steps(40) infinite, blink 0.75s step-end infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typing {
+            0% { width: 0; }
+            50% { width: 100%; }
+            100% { width: 0; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .comparison-table {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        td {
+            color: #c0c0c0;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .agents-grid { grid-template-columns: 1fr; }
+            .workflow { flex-direction: column; gap: 10px; }
+            .workflow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI Agent 全景图</h1>
+            <p class="subtitle">探索不同类型的 AI Agent 及其应用场景</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">主要类型</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">应用场景</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">可能性</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 对话型 Agent -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">💬</div>
+                <div class="category-title">对话型 Agent</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🗣️</div>
+                        <div>
+                            <div class="agent-name">聊天助手</div>
+                            <div class="agent-tag">ChatBot</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        最常见的 AI Agent，通过自然语言对话理解用户意图并给出回应。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            信息查询、知识问答、创意生成、任务指导
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">ChatGPT - 通用对话</div>
+                        <div class="example-item">Claude - 长文本理解</div>
+                        <div class="example-item">Gemini - 多模态交互</div>
+                    </div>
+                    <button class="demo-button" onclick="toggleDemo('demo1')">查看演示</button>
+                    <div id="demo1" class="demo-area">
+                        <div class="workflow">
+                            <div class="workflow-step">用户提问</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">理解意图</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">生成回答</div>
+                        </div>
+                        <div class="typing-effect">正在思考如何回答您的问题...</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🎯</div>
+                        <div>
+                            <div class="agent-name">任务助手</div>
+                            <div class="agent-tag">Task Assistant</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        专注于完成特定任务，如日程管理、邮件处理、文档撰写等。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            自动化重复任务、提高工作效率、减少人工操作
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Siri / Google Assistant - 语音助手</div>
+                        <div class="example-item">Notion AI - 文档助手</div>
+                        <div class="example-item">Microsoft Copilot - 办公助手</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🎓</div>
+                        <div>
+                            <div class="agent-name">教育导师</div>
+                            <div class="agent-tag">Tutor</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        个性化教学，根据学习进度调整内容，提供练习和反馈。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            个性化学习路径、实时答疑、知识点讲解
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Khan Academy AI - 数学导师</div>
+                        <div class="example-item">Duolingo Max - 语言学习</div>
+                        <div class="example-item">GitHub Copilot - 编程导师</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工具型 Agent -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🛠️</div>
+                <div class="category-title">工具型 Agent</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🔧</div>
+                        <div>
+                            <div class="agent-name">函数调用 Agent</div>
+                            <div class="agent-tag">Function Calling</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        能够调用外部 API 和工具，执行具体操作如查天气、订票、查数据库。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            连接外部系统、执行实际操作、获取实时数据
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">OpenAI Function Calling</div>
+                        <div class="example-item">LangChain Tools</div>
+                        <div class="example-item">AutoGPT</div>
+                    </div>
+                    <button class="demo-button" onclick="toggleDemo('demo2')">查看演示</button>
+                    <div id="demo2" class="demo-area">
+                        <div class="workflow">
+                            <div class="workflow-step">理解需求</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">选择工具</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">调用API</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">返回结果</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🔍</div>
+                        <div>
+                            <div class="agent-name">检索增强 Agent</div>
+                            <div class="agent-tag">RAG</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        通过检索外部知识库来增强回答的准确性和时效性。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            知识更新、领域专业性、减少幻觉、引用来源
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Perplexity - 搜索增强</div>
+                        <div class="example-item">Bing Chat - 网络检索</div>
+                        <div class="example-item">企业知识库助手</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🎨</div>
+                        <div>
+                            <div class="agent-name">创作型 Agent</div>
+                            <div class="agent-tag">Creative</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        生成图像、视频、音乐、代码等创意内容。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            内容创作、设计辅助、创意激发、快速原型
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Midjourney - 图像生成</div>
+                        <div class="example-item">Suno - 音乐创作</div>
+                        <div class="example-item">GitHub Copilot - 代码生成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自主型 Agent -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🚀</div>
+                <div class="category-title">自主型 Agent</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🤖</div>
+                        <div>
+                            <div class="agent-name">自主规划 Agent</div>
+                            <div class="agent-tag">Autonomous</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        能够自主制定计划、分解任务、执行并调整策略。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            复杂任务自动化、无人值守执行、智能决策
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">AutoGPT - 自主任务执行</div>
+                        <div class="example-item">BabyAGI - 任务管理</div>
+                        <div class="example-item">AgentGPT - 目标导向</div>
+                    </div>
+                    <button class="demo-button" onclick="toggleDemo('demo3')">查看演示</button>
+                    <div id="demo3" class="demo-area">
+                        <div class="workflow">
+                            <div class="workflow-step">接收目标</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">规划任务</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">执行步骤</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">评估反馈</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">调整优化</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">💻</div>
+                        <div>
+                            <div class="agent-name">编码 Agent</div>
+                            <div class="agent-tag">Coding Agent</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        自主编写、测试、调试代码，完成软件开发任务。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            代码生成、Bug 修复、重构优化、测试编写
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Devin - AI 软件工程师</div>
+                        <div class="example-item">Cursor - 智能编辑器</div>
+                        <div class="example-item">Aider - 命令行编码助手</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🌐</div>
+                        <div>
+                            <div class="agent-name">网络 Agent</div>
+                            <div class="agent-tag">Web Agent</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        在浏览器中自主操作网页，完成表单填写、数据提取等任务。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            网页自动化、数据爬取、表单填写、在线购物
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Browser Use - 浏览器自动化</div>
+                        <div class="example-item">WebVoyager - 网页导航</div>
+                        <div class="example-item">Playwright Agent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 多智能体系统 -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">👥</div>
+                <div class="category-title">多智能体系统</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🤝</div>
+                        <div>
+                            <div class="agent-name">协作型 Agent</div>
+                            <div class="agent-tag">Collaborative</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        多个 Agent 协同工作，分工合作完成复杂任务。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            复杂项目分解、专业化分工、并行处理
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">MetaGPT - 软件公司模拟</div>
+                        <div class="example-item">ChatDev - 虚拟软件团队</div>
+                        <div class="example-item">Claude Team - 多 worker 协作</div>
+                    </div>
+                    <button class="demo-button" onclick="toggleDemo('demo4')">查看演示</button>
+                    <div id="demo4" class="demo-area">
+                        <div class="workflow">
+                            <div class="workflow-step">产品经理<br/>规划需求</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">架构师<br/>设计方案</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">工程师<br/>编写代码</div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">测试员<br/>质量保证</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">⚖️</div>
+                        <div>
+                            <div class="agent-name">辩论型 Agent</div>
+                            <div class="agent-tag">Debate</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        通过多个 Agent 从不同角度讨论，提高决策质量。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            多视角分析、决策优化、减少偏见、创意激发
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Multi-Agent Debate</div>
+                        <div class="example-item">Reflexion - 自我反思</div>
+                        <div class="example-item">社会模拟系统</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🎯</div>
+                        <div>
+                            <div class="agent-name">专家系统</div>
+                            <div class="agent-tag">Expert System</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        将任务分配给不同专业领域的 Agent，各司其职。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            专业知识整合、领域专精、高质量输出
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">医疗诊断系统</div>
+                        <div class="example-item">法律咨询 Agent</div>
+                        <div class="example-item">金融分析团队</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 记忆型 Agent -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🧠</div>
+                <div class="category-title">记忆型 Agent</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">📝</div>
+                        <div>
+                            <div class="agent-name">长期记忆 Agent</div>
+                            <div class="agent-tag">Long-term Memory</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        能够记住历史对话和用户偏好，提供个性化服务。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            上下文延续、用户画像、个性化推荐
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Mem0 - 记忆层</div>
+                        <div class="example-item">PersonalGPT - 个人助理</div>
+                        <div class="example-item">Character.AI - 角色扮演</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🔄</div>
+                        <div>
+                            <div class="agent-name">反思型 Agent</div>
+                            <div class="agent-tag">Reflective</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        从过往经验中学习，不断优化自己的行为策略。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            错误纠正、性能优化、策略改进、自我进化
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Reflexion - 自我反思框架</div>
+                        <div class="example-item">Self-Refine - 迭代优化</div>
+                        <div class="example-item">经验回放机制</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">📚</div>
+                        <div>
+                            <div class="agent-name">知识库 Agent</div>
+                            <div class="agent-tag">Knowledge Base</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        维护和查询结构化知识，提供准确的领域知识。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            企业知识管理、文档查询、专业领域问答
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">企业 AI 助手</div>
+                        <div class="example-item">医学知识库</div>
+                        <div class="example-item">法律法规查询</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 具身型 Agent -->
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🦾</div>
+                <div class="category-title">具身型 Agent</div>
+            </div>
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🤖</div>
+                        <div>
+                            <div class="agent-name">机器人 Agent</div>
+                            <div class="agent-tag">Robotics</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        在物理世界中执行任务，如导航、抓取、组装等。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            物理任务自动化、人机协作、危险环境作业
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Figure 01 - 人形机器人</div>
+                        <div class="example-item">Boston Dynamics - 运动控制</div>
+                        <div class="example-item">工业机器人</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🎮</div>
+                        <div>
+                            <div class="agent-name">游戏 Agent</div>
+                            <div class="agent-tag">Gaming</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        在虚拟环境中学习和决策，如游戏 AI、虚拟角色。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            游戏测试、NPC 智能化、虚拟世界模拟
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">AlphaGo - 围棋</div>
+                        <div class="example-item">OpenAI Five - Dota 2</div>
+                        <div class="example-item">Minecraft Agent</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-emoji">🚗</div>
+                        <div>
+                            <div class="agent-name">自动驾驶 Agent</div>
+                            <div class="agent-tag">Autonomous Vehicle</div>
+                        </div>
+                    </div>
+                    <p class="agent-description">
+                        感知环境、规划路径、控制车辆实现自动驾驶。
+                    </p>
+                    <div class="problem-solving">
+                        <div class="problem-label">解决问题</div>
+                        <div class="problem-text">
+                            交通安全、出行效率、减少人力成本
+                        </div>
+                    </div>
+                    <div class="examples">
+                        <div class="example-item">Tesla FSD - 全自动驾驶</div>
+                        <div class="example-item">Waymo - 无人出租车</div>
+                        <div class="example-item">物流配送机器人</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对比表格 -->
+        <div class="comparison-table">
+            <h2 style="color: #667eea; margin-bottom: 25px; font-size: 1.8em;">📊 Agent 类型对比</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>自主性</th>
+                        <th>复杂度</th>
+                        <th>应用成熟度</th>
+                        <th>典型场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>对话型</strong></td>
+                        <td>⭐⭐</td>
+                        <td>⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>客服、助手、咨询</td>
+                    </tr>
+                    <tr>
+                        <td><strong>工具型</strong></td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>API 调用、数据处理</td>
+                    </tr>
+                    <tr>
+                        <td><strong>自主型</strong></td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐</td>
+                        <td>自动化任务、代码生成</td>
+                    </tr>
+                    <tr>
+                        <td><strong>多智能体</strong></td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>⭐⭐</td>
+                        <td>复杂项目、团队协作</td>
+                    </tr>
+                    <tr>
+                        <td><strong>记忆型</strong></td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐</td>
+                        <td>个性化服务、长期交互</td>
+                    </tr>
+                    <tr>
+                        <td><strong>具身型</strong></td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>⭐⭐</td>
+                        <td>机器人、自动驾驶</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemo(demoId) {
+            const demo = document.getElementById(demoId);
+            const allDemos = document.querySelectorAll('.demo-area');
+            
+            allDemos.forEach(d => {
+                if (d.id !== demoId) {
+                    d.classList.remove('active');
+                }
+            });
+            
+            demo.classList.toggle('active');
+        }
+
+        // 添加滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

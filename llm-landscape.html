@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大模型全景图 - 知名公司 LLM 对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1d3a 50%, #0f1429 100%);
+            color: #e8e8e8;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .filter-tab {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            padding: 12px 28px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #b0b0b0;
+        }
+
+        .filter-tab:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            color: white;
+        }
+
+        .company-section {
+            margin-bottom: 80px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .company-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border-left: 5px solid;
+        }
+
+        .company-logo {
+            font-size: 4em;
+            margin-right: 25px;
+        }
+
+        .company-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .company-tagline {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .company-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat-badge {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+        }
+
+        .model-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .model-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .model-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.3);
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .model-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .model-tier {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .model-version {
+            color: #667eea;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .model-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .spec-tag {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: #a0a0a0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .spec-tag strong {
+            color: #667eea;
+            margin-right: 5px;
+        }
+
+        .model-description {
+            color: #c0c0c0;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .use-cases {
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .use-cases-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .use-case-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #d0d0d0;
+            font-size: 0.9em;
+        }
+
+        .use-case-item::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 1.2em;
+        }
+
+        .strengths {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .strength-badge {
+            background: rgba(102, 234, 150, 0.15);
+            color: #66ea96;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 1px solid rgba(102, 234, 150, 0.3);
+        }
+
+        .timeline {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .timeline-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .timeline-date {
+            min-width: 120px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .timeline-content {
+            color: #c0c0c0;
+        }
+
+        .comparison-table {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px 0;
+            overflow-x: auto;
+        }
+
+        .comparison-title {
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            color: #d0d0d0;
+        }
+
+        tr:hover {
+            background: rgba(102, 126, 234, 0.08);
+        }
+
+        .rating {
+            display: flex;
+            gap: 3px;
+        }
+
+        .star {
+            color: #FFD700;
+            font-size: 1.2em;
+        }
+
+        .star.empty {
+            color: #444;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .models-grid { grid-template-columns: 1fr; }
+            .company-header { flex-direction: column; text-align: center; }
+        }
+
+        /* 开源/闭源标识 */
+        .license-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+
+        .license-badge.open-source {
+            background: rgba(102, 234, 150, 0.2);
+            color: #66ea96;
+            border: 1px solid rgba(102, 234, 150, 0.4);
+        }
+
+        .license-badge.closed-source {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 大模型全景图</h1>
+            <p class="subtitle">全球知名公司大语言模型对比与选型指南</p>
+        </header>
+
+        <!-- OpenAI -->
+        <div class="company-section" style="border-left-color: #10A37F;">
+            <div class="company-header" style="border-left-color: #10A37F;">
+                <div class="company-logo">🟢</div>
+                <div class="company-info">
+                    <div class="company-name" style="color: #10A37F;">OpenAI</div>
+                    <div class="company-tagline">引领 AGI 时代的先锋</div>
+                    <div class="company-stats">
+                        <span class="stat-badge">成立: 2015</span>
+                        <span class="stat-badge">总部: 旧金山</span>
+                        <span class="stat-badge">明星产品: ChatGPT</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">GPT-4o</div>
+                            <div class="model-version">最新旗舰 | 2024年5月</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 128K tokens</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 文本+图像+音频</span>
+                        <span class="spec-tag"><strong>速度:</strong> 2倍 GPT-4 Turbo</span>
+                    </div>
+                    <p class="model-description">
+                        全能型旗舰模型，在文本、视觉和音频理解上都表现出色。速度快，成本低，是当前最均衡的选择。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">复杂推理和分析任务</div>
+                        <div class="use-case-item">多模态内容理解（图文混合）</div>
+                        <div class="use-case-item">实时语音对话应用</div>
+                        <div class="use-case-item">企业级智能助手</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">⚡ 快速响应</span>
+                        <span class="strength-badge">🎯 高准确性</span>
+                        <span class="strength-badge">🌐 多语言</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">o1 & o1-mini</div>
+                            <div class="model-version">推理模型 | 2024年9月</div>
+                        </div>
+                        <div class="model-tier" style="background: linear-gradient(135deg, #FF6B6B, #C44569);">专业</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>特点:</strong> 深度推理</span>
+                        <span class="spec-tag"><strong>思考链:</strong> 内置推理过程</span>
+                        <span class="spec-tag"><strong>准确性:</strong> 超高</span>
+                    </div>
+                    <p class="model-description">
+                        专注于复杂推理的模型，通过长时间思考来解决困难问题。o1-mini 是经济版，适合编程任务。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">数学和科学问题求解</div>
+                        <div class="use-case-item">复杂编程任务（o1-mini）</div>
+                        <div class="use-case-item">逻辑推理和证明</div>
+                        <div class="use-case-item">学术研究辅助</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🧮 数学专家</span>
+                        <span class="strength-badge">💻 编程高手</span>
+                        <span class="strength-badge">🔬 科学推理</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">GPT-4 Turbo</div>
+                            <div class="model-version">高性能版 | 2024年4月</div>
+                        </div>
+                        <div class="model-tier">高级</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 128K tokens</span>
+                        <span class="spec-tag"><strong>截止日期:</strong> 2024年4月</span>
+                        <span class="spec-tag"><strong>价格:</strong> 中等</span>
+                    </div>
+                    <p class="model-description">
+                        GPT-4 的优化版本，保持强大能力的同时降低成本，支持超长上下文。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">长文档分析和总结</div>
+                        <div class="use-case-item">代码审查和重构</div>
+                        <div class="use-case-item">内容创作和编辑</div>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">GPT-3.5 Turbo</div>
+                            <div class="model-version">经济型 | 稳定版</div>
+                        </div>
+                        <div class="model-tier" style="background: linear-gradient(135deg, #5F9EA0, #20B2AA);">经济</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 16K tokens</span>
+                        <span class="spec-tag"><strong>速度:</strong> 极快</span>
+                        <span class="spec-tag"><strong>价格:</strong> 低</span>
+                    </div>
+                    <p class="model-description">
+                        性价比之王，适合大规模部署和对成本敏感的应用场景。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">客服聊天机器人</div>
+                        <div class="use-case-item">简单文本生成</div>
+                        <div class="use-case-item">批量数据处理</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">💰 成本低</span>
+                        <span class="strength-badge">⚡ 响应快</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anthropic Claude -->
+        <div class="company-section">
+            <div class="company-header" style="border-left-color: #D97757;">
+                <div class="company-logo">🟠</div>
+                <div class="company-info">
+                    <div class="company-name" style="color: #D97757;">Anthropic</div>
+                    <div class="company-tagline">安全可靠的 AI 助手</div>
+                    <div class="company-stats">
+                        <span class="stat-badge">成立: 2021</span>
+                        <span class="stat-badge">总部: 旧金山</span>
+                        <span class="stat-badge">明星产品: Claude</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Claude 3.5 Sonnet</div>
+                            <div class="model-version">最新版 | 2024年10月</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 200K tokens</span>
+                        <span class="spec-tag"><strong>思考模式:</strong> 扩展思考</span>
+                        <span class="spec-tag"><strong>代码能力:</strong> 顶尖</span>
+                    </div>
+                    <p class="model-description">
+                        目前最强的 Claude 版本，编程能力出色，长文本理解优秀，支持计算机使用（Computer Use）。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">复杂代码生成和调试</div>
+                        <div class="use-case-item">长篇文档分析（200K）</div>
+                        <div class="use-case-item">UI/UX 自动化操作</div>
+                        <div class="use-case-item">学术论文撰写</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">💻 编码专家</span>
+                        <span class="strength-badge">📚 长文本王者</span>
+                        <span class="strength-badge">🖱️ 计算机使用</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Claude 3 Opus</div>
+                            <div class="model-version">最强推理 | 2024年3月</div>
+                        </div>
+                        <div class="model-tier" style="background: linear-gradient(135deg, #9B59B6, #8E44AD);">顶级</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 200K tokens</span>
+                        <span class="spec-tag"><strong>准确性:</strong> 最高</span>
+                        <span class="spec-tag"><strong>价格:</strong> 最贵</span>
+                    </div>
+                    <p class="model-description">
+                        Claude 3 系列中能力最强的版本，在复杂任务上表现最佳，但价格较高。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">高精度研究分析</div>
+                        <div class="use-case-item">复杂策略规划</div>
+                        <div class="use-case-item">专业内容创作</div>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Claude 3 Haiku</div>
+                            <div class="model-version">快速版 | 2024年3月</div>
+                        </div>
+                        <div class="model-tier" style="background: linear-gradient(135deg, #3498DB, #2980B9);">经济</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 200K tokens</span>
+                        <span class="spec-tag"><strong>速度:</strong> 极快</span>
+                        <span class="spec-tag"><strong>价格:</strong> 低</span>
+                    </div>
+                    <p class="model-description">
+                        最快最便宜的 Claude 模型，适合需要快速响应的实时应用。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">实时聊天应用</div>
+                        <div class="use-case-item">批量文本处理</div>
+                        <div class="use-case-item">内容审核</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">⚡ 超快速度</span>
+                        <span class="strength-badge">💰 成本低</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Gemini -->
+        <div class="company-section">
+            <div class="company-header" style="border-left-color: #4285F4;">
+                <div class="company-logo">🔵</div>
+                <div class="company-info">
+                    <div class="company-name" style="color: #4285F4;">Google</div>
+                    <div class="company-tagline">搜索巨头的多模态革命</div>
+                    <div class="company-stats">
+                        <span class="stat-badge">成立: 1998</span>
+                        <span class="stat-badge">总部: 山景城</span>
+                        <span class="stat-badge">明星产品: Gemini</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Gemini 2.0 Flash</div>
+                            <div class="model-version">最新 | 2024年12月</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 1M tokens</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 原生支持</span>
+                        <span class="spec-tag"><strong>速度:</strong> 2倍提升</span>
+                    </div>
+                    <p class="model-description">
+                        Google 最新旗舰，支持 100 万 tokens 超长上下文，原生多模态，速度和成本都有显著优化。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">超长文档分析（1M tokens）</div>
+                        <div class="use-case-item">视频内容理解</div>
+                        <div class="use-case-item">实时多模态交互</div>
+                        <div class="use-case-item">大规模数据处理</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">📊 超长上下文</span>
+                        <span class="strength-badge">🎥 视频理解</span>
+                        <span class="strength-badge">⚡ 快速响应</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Gemini 1.5 Pro</div>
+                            <div class="model-version">高级版 | 2024年2月</div>
+                        </div>
+                        <div class="model-tier">高级</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>上下文:</strong> 2M tokens</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 文本+图像+视频+音频</span>
+                    </div>
+                    <p class="model-description">
+                        惊人的 200 万 tokens 上下文窗口，可以处理整本书或几小时的视频内容。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">整本书分析</div>
+                        <div class="use-case-item">长视频内容理解</div>
+                        <div class="use-case-item">大型代码库分析</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🚀 2M 上下文</span>
+                        <span class="strength-badge">🎬 长视频</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Llama -->
+        <div class="company-section">
+            <div class="company-header" style="border-left-color: #0668E1;">
+                <div class="company-logo">🔷</div>
+                <div class="company-info">
+                    <div class="company-name" style="color: #0668E1;">Meta</div>
+                    <div class="company-tagline">开源 AI 的领导者</div>
+                    <div class="company-stats">
+                        <span class="stat-badge">成立: 2004 (Facebook)</span>
+                        <span class="stat-badge">总部: 门洛帕克</span>
+                        <span class="stat-badge">明星产品: Llama</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Llama 3.1 405B</div>
+                            <div class="model-version">超大规模 | 2024年7月</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>参数:</strong> 405B</span>
+                        <span class="spec-tag"><strong>上下文:</strong> 128K tokens</span>
+                        <span class="spec-tag"><strong>开源:</strong> 可商用</span>
+                    </div>
+                    <p class="model-description">
+                        最强开源模型之一，性能接近 GPT-4，完全开源可本地部署，支持商业使用。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">私有部署（数据安全）</div>
+                        <div class="use-case-item">模型微调和定制</div>
+                        <div class="use-case-item">研究和教育</div>
+                        <div class="use-case-item">成本优化（自托管）</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🔓 开源</span>
+                        <span class="strength-badge">🏢 可商用</span>
+                        <span class="strength-badge">🔒 数据私有</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Llama 3.2</div>
+                            <div class="model-version">多模态 | 2024年9月</div>
+                        </div>
+                        <div class="model-tier">多模态</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>版本:</strong> 11B / 90B</span>
+                        <span class="spec-tag"><strong>能力:</strong> 视觉+文本</span>
+                        <span class="spec-tag"><strong>边缘:</strong> 1B / 3B 轻量版</span>
+                    </div>
+                    <p class="model-description">
+                        首个开源多模态 Llama，支持图像理解。还有 1B/3B 轻量版可在手机运行。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">图像理解和描述（11B/90B）</div>
+                        <div class="use-case-item">移动端 AI 应用（1B/3B）</div>
+                        <div class="use-case-item">边缘设备部署</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">📱 边缘计算</span>
+                        <span class="strength-badge">👁️ 视觉理解</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 国内大模型 -->
+        <div class="company-section">
+            <div class="company-header" style="border-left-color: #FF6B6B;">
+                <div class="company-logo">🇨🇳</div>
+                <div class="company-info">
+                    <div class="company-name" style="color: #FF6B6B;">中国科技巨头 & 创新公司</div>
+                    <div class="company-tagline">本土大模型的全面崛起</div>
+                    <div class="company-stats">
+                        <span class="stat-badge">百度 文心</span>
+                        <span class="stat-badge">阿里 通义</span>
+                        <span class="stat-badge">智谱 GLM</span>
+                        <span class="stat-badge">DeepSeek</span>
+                        <span class="stat-badge">零一万物 Yi</span>
+                        <span class="stat-badge">百川智能</span>
+                        <span class="stat-badge">书生·浦语</span>
+                        <span class="stat-badge">讯飞星火</span>
+                        <span class="stat-badge">腾讯混元</span>
+                        <span class="stat-badge">字节豆包</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">文心一言 4.0</div>
+                            <div class="model-version">百度 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 百度</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 支持</span>
+                        <span class="spec-tag"><strong>中文:</strong> 优化</span>
+                    </div>
+                    <p class="model-description">
+                        百度旗舰大模型，中文理解和生成能力强，深度整合百度搜索和知识图谱。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">中文内容创作</div>
+                        <div class="use-case-item">搜索增强问答</div>
+                        <div class="use-case-item">企业智能办公</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🇨🇳 中文优势</span>
+                        <span class="strength-badge">🔍 搜索整合</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">通义千问 2.5</div>
+                            <div class="model-version">阿里云 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 阿里巴巴</span>
+                        <span class="spec-tag"><strong>开源版:</strong> Qwen</span>
+                        <span class="spec-tag"><strong>上下文:</strong> 32K+</span>
+                    </div>
+                    <p class="model-description">
+                        阿里云大模型，有开源版本 Qwen，在中英文双语上表现优异，支持多模态。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">电商智能客服</div>
+                        <div class="use-case-item">代码生成（Qwen-Coder）</div>
+                        <div class="use-case-item">数学推理（Qwen-Math）</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🔓 开源版本</span>
+                        <span class="strength-badge">💻 代码专精</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">GLM-4</div>
+                            <div class="model-version">智谱AI | 2024年</div>
+                        </div>
+                        <div class="model-tier">高级</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 智谱AI</span>
+                        <span class="spec-tag"><strong>上下文:</strong> 128K</span>
+                        <span class="spec-tag"><strong>多模态:</strong> GLM-4V</span>
+                    </div>
+                    <p class="model-description">
+                        清华团队打造，ChatGLM 系列最新版，支持超长上下文和多模态理解。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">学术研究辅助</div>
+                        <div class="use-case-item">长文档处理</div>
+                        <div class="use-case-item">图文理解</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🎓 学术背景</span>
+                        <span class="strength-badge">📚 长上下文</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">DeepSeek-V2</div>
+                            <div class="model-version">深度求索 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 深度求索</span>
+                        <span class="spec-tag"><strong>架构:</strong> MoE 混合专家</span>
+                        <span class="spec-tag"><strong>成本:</strong> 0.14元/M tokens</span>
+                    </div>
+                    <p class="model-description">
+                        完全开源MIT协议，编程能力极强，推理成本极低。DeepSeek-Coder代码能力媲美GPT-4。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">代码生成和调试</div>
+                        <div class="use-case-item">大规模推理任务</div>
+                        <div class="use-case-item">成本敏感应用</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">💻 编程专家</span>
+                        <span class="strength-badge">💰 超低成本</span>
+                        <span class="strength-badge">🔓 MIT开源</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Yi-34B</div>
+                            <div class="model-version">零一万物 | 2024年</div>
+                        </div>
+                        <div class="model-tier">高级</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>创始人:</strong> 李开复</span>
+                        <span class="spec-tag"><strong>上下文:</strong> 200K</span>
+                        <span class="spec-tag"><strong>协议:</strong> Apache 2.0</span>
+                    </div>
+                    <p class="model-description">
+                        零一万物出品，超长200K上下文，多语言能力优秀，性能均衡无短板。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">超长文档分析</div>
+                        <div class="use-case-item">多语言翻译</div>
+                        <div class="use-case-item">通用对话助手</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">📏 200K上下文</span>
+                        <span class="strength-badge">🌍 多语言</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Baichuan2-13B</div>
+                            <div class="model-version">百川智能 | 2024年</div>
+                        </div>
+                        <div class="model-tier">标准</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 百川智能</span>
+                        <span class="spec-tag"><strong>中文:</strong> 语料占比70%+</span>
+                        <span class="spec-tag"><strong>场景:</strong> 垂直领域</span>
+                    </div>
+                    <p class="model-description">
+                        中文语料丰富，提供医疗、法律等垂直行业专业版本，企业部署支持完善。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">医疗健康咨询</div>
+                        <div class="use-case-item">法律文书生成</div>
+                        <div class="use-case-item">企业知识问答</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🏥 垂直领域</span>
+                        <span class="strength-badge">🇨🇳 中文强化</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge open-source">开源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">InternLM2-20B</div>
+                            <div class="model-version">上海AI Lab | 2024年</div>
+                        </div>
+                        <div class="model-tier">标准</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>机构:</strong> 上海人工智能实验室</span>
+                        <span class="spec-tag"><strong>工具链:</strong> XTuner + LMDeploy</span>
+                        <span class="spec-tag"><strong>定位:</strong> 科研 + 产业</span>
+                    </div>
+                    <p class="model-description">
+                        书生·浦语系列，提供完整训练和部署工具链，对科研和产业应用都友好。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">学术研究实验</div>
+                        <div class="use-case-item">模型微调训练</div>
+                        <div class="use-case-item">高效模型部署</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🔧 完整工具链</span>
+                        <span class="strength-badge">🎓 科研友好</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">讯飞星火 3.5</div>
+                            <div class="model-version">科大讯飞 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 科大讯飞</span>
+                        <span class="spec-tag"><strong>特色:</strong> 语音交互</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 支持</span>
+                    </div>
+                    <p class="model-description">
+                        语音技术领先，多模态交互能力强，在教育、医疗等垂直场景深度优化。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">智能语音助手</div>
+                        <div class="use-case-item">教育辅导系统</div>
+                        <div class="use-case-item">医疗语音录入</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🎙️ 语音强项</span>
+                        <span class="strength-badge">📚 教育场景</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">腾讯混元</div>
+                            <div class="model-version">腾讯 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 腾讯</span>
+                        <span class="spec-tag"><strong>生态:</strong> 微信/QQ集成</span>
+                        <span class="spec-tag"><strong>场景:</strong> 游戏/社交</span>
+                    </div>
+                    <p class="model-description">
+                        腾讯生态深度集成，在游戏NPC对话、社交内容理解等场景有独特优势。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">游戏NPC对话</div>
+                        <div class="use-case-item">社交内容审核</div>
+                        <div class="use-case-item">企业微信助手</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🎮 游戏场景</span>
+                        <span class="strength-badge">💬 社交集成</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">字节豆包</div>
+                            <div class="model-version">字节跳动 | 2024年</div>
+                        </div>
+                        <div class="model-tier">标准</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 字节跳动</span>
+                        <span class="spec-tag"><strong>优化:</strong> 对话体验</span>
+                        <span class="spec-tag"><strong>场景:</strong> C端用户</span>
+                    </div>
+                    <p class="model-description">
+                        对话体验优化出色，在抖音等平台集成，面向C端用户的智能助手。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">日常对话助手</div>
+                        <div class="use-case-item">内容创作辅助</div>
+                        <div class="use-case-item">知识问答</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">💬 对话体验</span>
+                        <span class="strength-badge">📱 移动优化</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">MiniMax (ABAB)</div>
+                            <div class="model-version">MiniMax | 2024年</div>
+                        </div>
+                        <div class="model-tier">标准</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> MiniMax</span>
+                        <span class="spec-tag"><strong>特色:</strong> 音视频生成</span>
+                        <span class="spec-tag"><strong>多模态:</strong> 全支持</span>
+                    </div>
+                    <p class="model-description">
+                        ABAB系列，在音视频生成和多模态交互方面有独特优势，创意内容生成能力强。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">音频内容生成</div>
+                        <div class="use-case-item">视频脚本创作</div>
+                        <div class="use-case-item">多模态交互</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">🎵 音视频</span>
+                        <span class="strength-badge">🎨 创意强</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="license-badge closed-source">闭源</div>
+                    <div class="model-header">
+                        <div>
+                            <div class="model-name">Kimi</div>
+                            <div class="model-version">月之暗面 | 2024年</div>
+                        </div>
+                        <div class="model-tier">旗舰</div>
+                    </div>
+                    <div class="model-specs">
+                        <span class="spec-tag"><strong>公司:</strong> 月之暗面（Moonshot AI）</span>
+                        <span class="spec-tag"><strong>上下文:</strong> 200万字</span>
+                        <span class="spec-tag"><strong>特色:</strong> 超长文本</span>
+                    </div>
+                    <p class="model-description">
+                        杨植麟创立，支持200万字超长上下文，在长文档理解和处理方面遥遥领先。
+                    </p>
+                    <div class="use-cases">
+                        <div class="use-cases-title">✨ 适用场景</div>
+                        <div class="use-case-item">长篇论文分析</div>
+                        <div class="use-case-item">整本书籍理解</div>
+                        <div class="use-case-item">大型项目代码审查</div>
+                    </div>
+                    <div class="strengths">
+                        <span class="strength-badge">📚 200万字</span>
+                        <span class="strength-badge">🔬 学术背景</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对比表格 -->
+        <div class="comparison-table">
+            <h2 class="comparison-title">📊 主流大模型全面对比</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>模型</th>
+                        <th>公司</th>
+                        <th>开源</th>
+                        <th>上下文</th>
+                        <th>多模态</th>
+                        <th>代码能力</th>
+                        <th>推理能力</th>
+                        <th>成本</th>
+                        <th>推荐场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GPT-4o</strong></td>
+                        <td>OpenAI</td>
+                        <td>❌</td>
+                        <td>128K</td>
+                        <td>✅✅✅</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>中</td>
+                        <td>通用首选</td>
+                    </tr>
+                    <tr>
+                        <td><strong>o1</strong></td>
+                        <td>OpenAI</td>
+                        <td>❌</td>
+                        <td>128K</td>
+                        <td>❌</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>高</td>
+                        <td>复杂推理</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude 3.5 Sonnet</strong></td>
+                        <td>Anthropic</td>
+                        <td>❌</td>
+                        <td>200K</td>
+                        <td>✅</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>中</td>
+                        <td>编程+长文本</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemini 2.0 Flash</strong></td>
+                        <td>Google</td>
+                        <td>❌</td>
+                        <td>1M</td>
+                        <td>✅✅✅</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>低</td>
+                        <td>超长上下文</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Llama 3.1 405B</strong></td>
+                        <td>Meta</td>
+                        <td>✅</td>
+                        <td>128K</td>
+                        <td>❌</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>自托管</td>
+                        <td>私有部署</td>
+                    </tr>
+                    <tr>
+                        <td><strong>文心一言 4.0</strong></td>
+                        <td>百度</td>
+                        <td>❌</td>
+                        <td>-</td>
+                        <td>✅</td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>低</td>
+                        <td>中文应用</td>
+                    </tr>
+                    <tr>
+                        <td><strong>通义千问 2.5</strong></td>
+                        <td>阿里</td>
+                        <td>部分</td>
+                        <td>32K+</td>
+                        <td>✅</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>低</td>
+                        <td>中文+代码</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GLM-4</strong></td>
+                        <td>智谱AI</td>
+                        <td>✅</td>
+                        <td>128K</td>
+                        <td>✅</td>
+                        <td>⭐⭐⭐</td>
+                        <td>⭐⭐⭐⭐</td>
+                        <td>低</td>
+                        <td>学术研究</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 选型指南 -->
+        <div class="comparison-table">
+            <h2 class="comparison-title">🎯 快速选型指南</h2>
+            <div style="padding: 20px; line-height: 2;">
+                <p style="margin-bottom: 20px; font-size: 1.1em; color: #c0c0c0;">
+                    <strong style="color: #667eea;">💡 根据需求选择合适的模型：</strong>
+                </p>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">🚀 追求极致性能：</strong> GPT-4o / Claude 3.5 Sonnet
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">💻 编程开发：</strong> Claude 3.5 Sonnet / o1-mini / Cursor (Claude)
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">📚 超长文档：</strong> Gemini 1.5 Pro (2M) / Claude 3.5 (200K)
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">🧮 数学推理：</strong> o1 / o1-mini
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">💰 成本优化：</strong> GPT-3.5 Turbo / Claude 3 Haiku / Gemini 2.0 Flash
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">🔒 私有部署：</strong> Llama 3.1 405B / Qwen / GLM-4
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">🇨🇳 中文优先：</strong> 文心一言 4.0 / 通义千问 / GLM-4
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                    <strong style="color: #66ea96;">🎥 多模态：</strong> GPT-4o / Gemini 2.0 Flash / Claude 3.5 Sonnet
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 滚动动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+
+        // 表格行高亮
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.transform = 'scale(1.02)';
+                row.style.transition = 'transform 0.2s ease';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

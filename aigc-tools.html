@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIGC 工具全景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; color: #000; overflow: hidden; }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 10; }
+        h1 { font-size: 4.5em; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h2 { font-size: 3em; font-weight: 600; margin-bottom: 40px; text-align: center; color: #333; }
+        .subtitle { font-size: 1.8em; color: #666; text-align: center; margin-bottom: 60px; }
+        .content { max-width: 1400px; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .three-column { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; transition: all 0.2s ease; }
+        .card:hover { border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; }
+        .card-content { font-size: 1.1em; line-height: 1.6; color: #666; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.2em; color: #333; position: relative; padding-left: 30px; }
+        li::before { content: '•'; position: absolute; left: 10px; font-weight: bold; }
+        li:last-child { border-bottom: none; }
+        .timeline { display: flex; flex-direction: column; gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .timeline-item { display: grid; grid-template-columns: 120px 1fr; gap: 30px; align-items: center; }
+        .timeline-year { font-size: 2em; font-weight: 700; text-align: right; }
+        .timeline-content { border-left: 2px solid #000; padding-left: 30px; }
+        .timeline-title { font-size: 1.4em; font-weight: 600; margin-bottom: 8px; }
+        .timeline-desc { color: #666; line-height: 1.5; }
+        .comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .comparison-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 25px; }
+        .comparison-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; text-align: center; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 50px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 4em; font-weight: 700; margin-bottom: 10px; }
+        .stat-label { font-size: 1.2em; color: #666; }
+        .nav { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; background: #fff; padding: 15px 25px; border-radius: 50px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3em; transition: all 0.2s ease; }
+        .nav-btn:hover { border-color: #000; background: #f5f5f5; }
+        .progress { display: flex; gap: 8px; padding: 0 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #d0d0d0; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { width: 24px; border-radius: 4px; background: #000; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="slide active">
+            <h1>🎨 AIGC 工具全景</h1>
+            <p class="subtitle">图像 · 视频 · 音频 · 让创作更简单</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number">15+</div><div class="stat-label">主流工具</div></div>
+                <div class="stat-item"><div class="stat-number">3</div><div class="stat-label">核心领域</div></div>
+                <div class="stat-item"><div class="stat-number">∞</div><div class="stat-label">创作可能</div></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>AIGC 发展时间线</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">2014</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">GAN 诞生</div>
+                            <div class="timeline-desc">Ian Goodfellow 提出生成对抗网络</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2021</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">DALL-E 发布</div>
+                            <div class="timeline-desc">OpenAI 首个文本生成图像模型</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">扩散模型爆发</div>
+                            <div class="timeline-desc">Stable Diffusion开源，Midjourney爆火，AIGC元年</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">AI视频元年</div>
+                            <div class="timeline-desc">Runway Gen-2、Pika等视频生成工具涌现</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Sora 震撼发布</div>
+                            <div class="timeline-desc">OpenAI Sora生成60秒高质量视频，世界模型突破</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>图像生成工具</h2>
+            <div class="content">
+                <div class="three-column">
+                    <div class="card">
+                        <div class="card-title">Midjourney</div>
+                        <ul>
+                            <li>艺术性最强</li>
+                            <li>风格化突出</li>
+                            <li>社区活跃</li>
+                            <li>$10-60/月</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">DALL-E 3</div>
+                        <ul>
+                            <li>OpenAI 出品</li>
+                            <li>提示词理解好</li>
+                            <li>集成ChatGPT</li>
+                            <li>$20/月</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Stable Diffusion</div>
+                        <ul>
+                            <li>完全开源</li>
+                            <li>本地部署</li>
+                            <li>高度可控</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">文心一格 🇨🇳</div>
+                        <ul>
+                            <li>百度出品</li>
+                            <li>中文理解好</li>
+                            <li>国内访问快</li>
+                            <li>免费试用</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">通义万相 🇨🇳</div>
+                        <ul>
+                            <li>阿里巴巴</li>
+                            <li>风格多样</li>
+                            <li>电商优化</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Leonardo AI</div>
+                        <ul>
+                            <li>游戏资产</li>
+                            <li>3D支持</li>
+                            <li>免费额度大</li>
+                            <li>$12/月起</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>视频生成工具</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Sora</div>
+                        <ul>
+                            <li>OpenAI 革命性产品</li>
+                            <li>60秒高质量视频</li>
+                            <li>世界模型能力</li>
+                            <li>暂未公开发布</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Runway</div>
+                        <ul>
+                            <li>专业级工具</li>
+                            <li>Gen-2/Gen-3</li>
+                            <li>视频编辑集成</li>
+                            <li>$12-76/月</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Pika</div>
+                        <ul>
+                            <li>易用性强</li>
+                            <li>快速生成</li>
+                            <li>3D动画支持</li>
+                            <li>免费试用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">可灵 🇨🇳</div>
+                        <ul>
+                            <li>快手出品</li>
+                            <li>中文提示词</li>
+                            <li>国内访问快</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>音频/语音工具</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">ElevenLabs</div>
+                        <ul>
+                            <li>语音克隆最强</li>
+                            <li>支持29种语言</li>
+                            <li>情感表达丰富</li>
+                            <li>$5-330/月</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Whisper</div>
+                        <ul>
+                            <li>OpenAI 语音识别</li>
+                            <li>多语言支持</li>
+                            <li>完全开源</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Suno</div>
+                        <ul>
+                            <li>AI音乐生成</li>
+                            <li>完整歌曲</li>
+                            <li>多种风格</li>
+                            <li>$10/月起</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">火山TTS 🇨🇳</div>
+                        <ul>
+                            <li>字节跳动</li>
+                            <li>中文自然</li>
+                            <li>情感丰富</li>
+                            <li>按量计费</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>使用场景推荐</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎨 平面设计</div>
+                        <div class="card-content">
+                            海报、logo、插画<br><br>
+                            <strong>推荐：Midjourney + Canva</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎬 短视频</div>
+                        <div class="card-content">
+                            社交媒体、营销视频<br><br>
+                            <strong>推荐：Pika + 可灵</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">📚 有声书</div>
+                        <div class="card-content">
+                            配音、旁白、播客<br><br>
+                            <strong>推荐：ElevenLabs</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎵 音乐创作</div>
+                        <div class="card-content">
+                            BGM、配乐、完整歌曲<br><br>
+                            <strong>推荐：Suno + Udio</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🖼️ 产品图</div>
+                        <div class="card-content">
+                            电商、产品展示<br><br>
+                            <strong>推荐：通义万相</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎭 概念设计</div>
+                        <div class="card-content">
+                            游戏、影视、建筑<br><br>
+                            <strong>推荐：Midjourney + SD</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>选择建议</h1>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">艺术创作</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Midjourney</strong><br>
+                            风格独特、艺术性强<br>
+                            适合：插画师、设计师
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">商业应用</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>通义万相 + 可灵</strong><br>
+                            免费、快速、中文友好<br>
+                            适合：营销、电商
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">开源可控</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Stable Diffusion</strong><br>
+                            本地部署、高度定制<br>
+                            适合：技术团队
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">全能选手</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>ChatGPT + DALL-E 3</strong><br>
+                            一体化、便捷<br>
+                            适合：个人用户
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+        function nextSlide() { current = (current + 1) % total; update(); }
+        function prevSlide() { current = (current - 1 + total) % total; update(); }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        update();
+    </script>
+</body>
+</html>

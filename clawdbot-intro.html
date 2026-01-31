@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦞 Clawdbot - 你的全能 AI 工作伙伴</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e27;
+            color: #e8e8e8;
+            overflow-x: hidden;
+        }
+
+        /* 动画背景 */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0e27, #1a1d3a, #0f1429);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.6);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* 英雄区 */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .logo {
+            font-size: 8em;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            to { filter: drop-shadow(0 0 40px rgba(155, 89, 182, 0.8)); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 5em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out;
+            letter-spacing: -2px;
+        }
+
+        .tagline {
+            font-size: 1.8em;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.4s ease-out;
+        }
+
+        .cta-button {
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .cta-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* 特性网格 */
+        .features-section {
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.3), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .feature-card:hover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 25px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .feature-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-description {
+            color: #c0c0c0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-highlights {
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-highlights li {
+            padding: 8px 0;
+            color: #a0a0a0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .feature-highlights li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* 工作流演示 */
+        .workflow-demo {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 50px;
+            color: #667eea;
+        }
+
+        .workflow-canvas {
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .workflow-step {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .workflow-step:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            font-size: 2em;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .step-label {
+            font-size: 1.1em;
+            color: #c0c0c0;
+            font-weight: 600;
+        }
+
+        /* 架构图 */
+        .architecture {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 60px 0;
+        }
+
+        .arch-canvas {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* 对比区域 */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 60px 0;
+        }
+
+        .comparison-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid;
+        }
+
+        .comparison-card.traditional {
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .comparison-card.clawdbot {
+            border-color: rgba(102, 234, 150, 0.3);
+            box-shadow: 0 0 40px rgba(102, 234, 150, 0.2);
+        }
+
+        .comparison-title {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .comparison-title.traditional {
+            color: #FF6B6B;
+        }
+
+        .comparison-title.clawdbot-title {
+            color: #66ea96;
+        }
+
+        .comparison-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .comparison-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        /* 代码演示 */
+        .code-demo {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px 0;
+        }
+
+        .terminal {
+            background: #1a1d3a;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-button.red { background: #FF5F57; }
+        .terminal-button.yellow { background: #FFBD2E; }
+        .terminal-button.green { background: #28CA42; }
+
+        .terminal-content {
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .prompt {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .command {
+            color: #66ea96;
+        }
+
+        .output {
+            color: #c0c0c0;
+            margin-left: 20px;
+        }
+
+        .typing-line {
+            border-right: 2px solid #667eea;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* 技能展示 */
+        .skills-showcase {
+            padding: 60px 20px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .skill-badge {
+            background: rgba(30, 30, 50, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeInScale 0.6s ease-out backwards;
+        }
+
+        .skill-badge:hover {
+            transform: scale(1.1) rotate(2deg);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .skill-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 统计数据 */
+        .stats-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 40px;
+            padding: 60px 20px;
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            margin: 60px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            animation: countUp 2s ease-out;
+        }
+
+        .stat-number {
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 时间线 */
+        .timeline {
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 60px;
+            position: relative;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: rgba(30, 30, 50, 0.8);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 4px solid #0a0e27;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            h1 { font-size: 3em; }
+            .logo { font-size: 5em; }
+            .comparison { grid-template-columns: 1fr; }
+            .timeline-line { left: 20px; }
+            .timeline-content { width: calc(100% - 60px); margin-left: 60px; }
+            .timeline-item { flex-direction: row !important; }
+        }
+
+        /* 交互演示 */
+        .interactive-demo {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 60px 0;
+        }
+
+        .chat-container {
+            background: #1a1d3a;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 30px auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: messageSlideIn 0.5s ease-out;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 15px 20px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message.assistant .message-bubble {
+            background: rgba(102, 126, 234, 0.2);
+            color: #e8e8e8;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(20, 25, 45, 0.8);
+            color: #e8e8e8;
+            font-size: 1em;
+        }
+
+        .chat-input button {
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        /* 能力矩阵 */
+        .capability-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2px;
+            background: #667eea;
+            padding: 2px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 40px 0;
+        }
+
+        .capability-cell {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .capability-cell:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .capability-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .capability-name {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .capability-desc {
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- 英雄区 -->
+        <section class="hero">
+            <div class="logo-container">
+                <div class="logo">🦞</div>
+            </div>
+            <h1>Clawdbot</h1>
+            <p class="tagline">你的全能 AI 工作伙伴 · 让 AI 真正成为你的延伸</p>
+            <div class="cta-buttons">
+                <a href="#features" class="cta-button cta-primary">探索功能</a>
+                <a href="#demo" class="cta-button cta-secondary">查看演示</a>
+            </div>
+        </section>
+
+        <!-- 核心特性 -->
+        <section id="features" class="features-section">
+            <h2 class="section-title">✨ 核心特性</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔌</div>
+                    <h3 class="feature-title">多渠道接入</h3>
+                    <p class="feature-description">
+                        支持 Telegram、WhatsApp、Discord、Signal 等多个通讯平台，随时随地与 AI 交流。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>Telegram Bot - 最流行的选择</li>
+                        <li>WhatsApp - 个人和企业</li>
+                        <li>Discord - 团队协作</li>
+                        <li>iMessage / SMS - 原生体验</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">持久化记忆</h3>
+                    <p class="feature-description">
+                        不是一次性对话，而是真正"记住"你的 AI。每次对话都建立在历史基础上。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>自动保存对话历史</li>
+                        <li>语义记忆搜索</li>
+                        <li>个性化偏好学习</li>
+                        <li>跨会话上下文延续</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h3 class="feature-title">Skills 技能系统</h3>
+                    <p class="feature-description">
+                        通过 Skills 扩展能力，从 Apple Notes 到 GitHub，从天气查询到智能家居控制。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>60+ 预置技能</li>
+                        <li>ClawdHub 技能商店</li>
+                        <li>自定义技能开发</li>
+                        <li>MCP 协议支持</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3 class="feature-title">多 Agent 协作</h3>
+                    <p class="feature-description">
+                        不止一个 AI，而是一个团队。Claude Team 让多个 Agent 并行工作。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>并行任务处理</li>
+                        <li>Git Worktree 隔离</li>
+                        <li>实时进度监控</li>
+                        <li>iTerm2 可视化</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🖥️</div>
+                    <h3 class="feature-title">浏览器控制</h3>
+                    <p class="feature-description">
+                        AI 能够真正"看到"和操作网页，实现复杂的浏览器自动化任务。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>网页截图和分析</li>
+                        <li>表单自动填写</li>
+                        <li>数据提取和爬取</li>
+                        <li>UI 测试自动化</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">主动式服务</h3>
+                    <p class="feature-description">
+                        不只是被动回答，更能主动提醒、定时检查、智能推送。
+                    </p>
+                    <ul class="feature-highlights">
+                        <li>Cron 定时任务</li>
+                        <li>Heartbeat 心跳检查</li>
+                        <li>智能提醒通知</li>
+                        <li>邮件/日程监控</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 工作流演示 -->
+        <section id="demo" class="workflow-demo">
+            <h2 class="workflow-title">🔄 Clawdbot 工作流程</h2>
+            <canvas id="workflowCanvas" class="workflow-canvas"></canvas>
+            <div class="workflow-steps">
+                <div class="workflow-step" onmouseenter="highlightStep(0)">
+                    <div class="step-number">1</div>
+                    <div class="step-label">接收消息</div>
+                </div>
+                <div class="workflow-step" onmouseenter="highlightStep(1)">
+                    <div class="step-number">2</div>
+                    <div class="step-label">理解意图</div>
+                </div>
+                <div class="workflow-step" onmouseenter="highlightStep(2)">
+                    <div class="step-number">3</div>
+                    <div class="step-label">调用工具</div>
+                </div>
+                <div class="workflow-step" onmouseenter="highlightStep(3)">
+                    <div class="step-number">4</div>
+                    <div class="step-label">执行任务</div>
+                </div>
+                <div class="workflow-step" onmouseenter="highlightStep(4)">
+                    <div class="step-number">5</div>
+                    <div class="step-label">返回结果</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 架构图 -->
+        <section class="architecture">
+            <h2 class="section-title">🏗️ 系统架构</h2>
+            <canvas id="archCanvas" class="arch-canvas"></canvas>
+        </section>
+
+        <!-- 对比 -->
+        <section class="comparison">
+            <div class="comparison-card traditional">
+                <h3 class="comparison-title traditional">❌ 传统 AI 助手</h3>
+                <div class="comparison-item">
+                    <span class="comparison-icon">💬</span>
+                    <span>只能在单一平台对话</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🧠</span>
+                    <span>每次对话都是全新开始</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🔒</span>
+                    <span>能力固定，无法扩展</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">⏸️</span>
+                    <span>被动响应，不会主动</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">☁️</span>
+                    <span>数据必须上云处理</span>
+                </div>
+            </div>
+
+            <div class="comparison-card clawdbot">
+                <h3 class="comparison-title clawdbot-title">✅ Clawdbot</h3>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🌐</span>
+                    <span>多平台统一接入</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">💾</span>
+                    <span>持久化记忆和上下文</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🔓</span>
+                    <span>60+ Skills 随意扩展</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">⏰</span>
+                    <span>主动服务和定时任务</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🏠</span>
+                    <span>本地部署，数据私有</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技能展示 -->
+        <section class="skills-showcase">
+            <h2 class="section-title">🎯 强大的 Skills 生态</h2>
+            <div class="skills-grid" id="skillsGrid"></div>
+        </section>
+
+        <!-- 代码演示 -->
+        <section class="code-demo">
+            <h2 class="section-title">💻 简单易用</h2>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-button red"></div>
+                    <div class="terminal-button yellow"></div>
+                    <div class="terminal-button green"></div>
+                </div>
+                <div class="terminal-content" id="terminalContent"></div>
+            </div>
+        </section>
+
+        <!-- 统计数据 -->
+        <section class="stats-section">
+            <div class="stat-box">
+                <div class="stat-number">60+</div>
+                <div class="stat-label">Skills 技能</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">8+</div>
+                <div class="stat-label">通讯平台</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">可能性</div>
+            </div>
+        </section>
+
+        <!-- 能力矩阵 -->
+        <section>
+            <h2 class="section-title">🎨 全方位能力</h2>
+            <div class="capability-matrix">
+                <div class="capability-cell">
+                    <div class="capability-icon">📝</div>
+                    <div class="capability-name">文本处理</div>
+                    <div class="capability-desc">写作、总结、翻译</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">💻</div>
+                    <div class="capability-name">代码开发</div>
+                    <div class="capability-desc">编程、调试、审查</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">🎨</div>
+                    <div class="capability-name">创意设计</div>
+                    <div class="capability-desc">图像、PPT、网页</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">📊</div>
+                    <div class="capability-name">数据分析</div>
+                    <div class="capability-desc">Excel、可视化、报告</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">🔍</div>
+                    <div class="capability-name">信息检索</div>
+                    <div class="capability-desc">搜索、RAG、知识库</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">🤖</div>
+                    <div class="capability-name">自动化</div>
+                    <div class="capability-desc">工作流、脚本、定时</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">🏠</div>
+                    <div class="capability-name">智能家居</div>
+                    <div class="capability-desc">灯光、音响、传感器</div>
+                </div>
+                <div class="capability-cell">
+                    <div class="capability-icon">📱</div>
+                    <div class="capability-name">移动控制</div>
+                    <div class="capability-desc">通知、相机、位置</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 交互演示 -->
+        <section class="interactive-demo">
+            <h2 class="section-title">💬 实时对话演示</h2>
+            <div class="chat-container" id="chatContainer"></div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="输入你的问题..." />
+                <button onclick="sendMessage()">发送</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ========== 粒子背景 ==========
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+                particle.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ========== 工作流动画 ==========
+        class WorkflowAnimation {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.steps = [
+                    { x: 0.1, y: 0.5, label: '用户', icon: '👤' },
+                    { x: 0.3, y: 0.5, label: 'Gateway', icon: '🚪' },
+                    { x: 0.5, y: 0.5, label: 'Agent', icon: '🧠' },
+                    { x: 0.7, y: 0.3, label: 'Skills', icon: '🛠️' },
+                    { x: 0.7, y: 0.7, label: 'Tools', icon: '⚙️' },
+                    { x: 0.9, y: 0.5, label: '执行', icon: '✅' }
+                ];
+                this.particles = [];
+                this.currentStep = 0;
+                this.animate();
+            }
+
+            animate() {
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const ctx = this.ctx;
+
+                // 清空
+                ctx.fillStyle = 'rgba(10, 14, 39, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                // 绘制连接线
+                ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < this.steps.length - 1; i++) {
+                    const s1 = this.steps[i];
+                    const s2 = this.steps[i + 1];
+                    ctx.beginPath();
+                    ctx.moveTo(s1.x * w, s1.y * h);
+                    ctx.lineTo(s2.x * w, s2.y * h);
+                    ctx.stroke();
+                }
+
+                // 绘制节点
+                this.steps.forEach((step, i) => {
+                    const x = step.x * w;
+                    const y = step.y * h;
+
+                    // 节点圆圈
+                    ctx.fillStyle = i === this.currentStep ? '#667eea' : 'rgba(102, 126, 234, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 40, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (i === this.currentStep) {
+                        ctx.strokeStyle = '#667eea';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 50, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+
+                    // 图标
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(step.icon, x, y);
+
+                    // 标签
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillStyle = '#e8e8e8';
+                    ctx.fillText(step.label, x, y + 65);
+                });
+
+                // 更新当前步骤
+                if (Math.random() < 0.02) {
+                    this.currentStep = (this.currentStep + 1) % this.steps.length;
+                }
+            }
+        }
+
+        // ========== 架构图动画 ==========
+        class ArchitectureAnimation {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.time = 0;
+                this.layers = [
+                    { y: 0.15, label: '通讯层', items: ['Telegram', 'WhatsApp', 'Discord', 'Signal'], color: '#667eea' },
+                    { y: 0.35, label: 'Gateway', items: ['路由', '认证', '会话管理'], color: '#764ba2' },
+                    { y: 0.55, label: 'Agent 核心', items: ['LLM', '推理', '规划'], color: '#f093fb' },
+                    { y: 0.75, label: 'Skills & Tools', items: ['60+ Skills', 'MCP', '自定义工具'], color: '#58C4DD' }
+                ];
+                this.animate();
+            }
+
+            animate() {
+                this.time += 0.02;
+                this.draw();
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const ctx = this.ctx;
+
+                ctx.fillStyle = 'rgba(10, 14, 39, 0.1)';
+                ctx.fillRect(0, 0, w, h);
+
+                this.layers.forEach((layer, layerIdx) => {
+                    const y = layer.y * h;
+
+                    // 绘制层背景
+                    ctx.fillStyle = layer.color + '20';
+                    ctx.fillRect(50, y - 40, w - 100, 80);
+
+                    // 绘制标签
+                    ctx.fillStyle = layer.color;
+                    ctx.font = 'bold 18px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(layer.label, 70, y - 50);
+
+                    // 绘制项目
+                    const itemWidth = (w - 200) / layer.items.length;
+                    layer.items.forEach((item, idx) => {
+                        const x = 100 + idx * itemWidth + itemWidth / 2;
+                        
+                        // 脉动效果
+                        const pulse = Math.sin(this.time * 2 + idx + layerIdx) * 0.2 + 1;
+                        
+                        ctx.fillStyle = layer.color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 20 * pulse, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(item, x, y + 40);
+                    });
+
+                    // 绘制连接线到下一层
+                    if (layerIdx < this.layers.length - 1) {
+                        const nextY = this.layers[layerIdx + 1].y * h;
+                        ctx.strokeStyle = layer.color + '40';
+                        ctx.lineWidth = 1;
+                        
+                        layer.items.forEach((_, idx) => {
+                            const x1 = 100 + idx * itemWidth + itemWidth / 2;
+                            this.layers[layerIdx + 1].items.forEach((_, nextIdx) => {
+                                const nextItemWidth = (w - 200) / this.layers[layerIdx + 1].items.length;
+                                const x2 = 100 + nextIdx * nextItemWidth + nextItemWidth / 2;
+                                
+                                ctx.beginPath();
+                                ctx.moveTo(x1, y + 20);
+                                ctx.lineTo(x2, nextY - 40);
+                                ctx.stroke();
+                            });
+                        });
+                    }
+                });
+            }
+        }
+
+        // ========== 技能展示 ==========
+        const skills = [
+            { icon: '📧', name: 'Email' },
+            { icon: '📅', name: 'Calendar' },
+            { icon: '📝', name: 'Notes' },
+            { icon: '💾', name: 'GitHub' },
+            { icon: '🌤️', name: 'Weather' },
+            { icon: '🏠', name: 'Smart Home' },
+            { icon: '🎵', name: 'Music' },
+            { icon: '📊', name: 'Analytics' },
+            { icon: '🔐', name: 'Security' },
+            { icon: '🎬', name: 'Media' },
+            { icon: '📱', name: 'Mobile' },
+            { icon: '🌐', name: 'Browser' }
+        ];
+
+        function loadSkills() {
+            const grid = document.getElementById('skillsGrid');
+            skills.forEach((skill, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'skill-badge';
+                badge.style.animationDelay = (idx * 0.05) + 's';
+                badge.innerHTML = `
+                    <div class="skill-icon">${skill.icon}</div>
+                    <div class="skill-name">${skill.name}</div>
+                `;
+                grid.appendChild(badge);
+            });
+        }
+
+        // ========== 终端演示 ==========
+        const terminalCommands = [
+            { type: 'prompt', text: '$ ' },
+            { type: 'command', text: 'clawdbot setup', delay: 50 },
+            { type: 'output', text: '✓ 初始化配置文件...', delay: 300 },
+            { type: 'output', text: '✓ 创建工作空间...', delay: 300 },
+            { type: 'output', text: '✓ 安装默认 Skills...', delay: 300 },
+            { type: 'output', text: '🎉 Clawdbot 安装完成！', delay: 300 },
+            { type: 'prompt', text: '\n$ ', delay: 500 },
+            { type: 'command', text: 'clawdbot gateway start', delay: 50 },
+            { type: 'output', text: '🚀 Gateway 启动中...', delay: 300 },
+            { type: 'output', text: '✅ 已连接到 Telegram', delay: 300 },
+            { type: 'output', text: '🦞 Clawdbot 就绪！', delay: 300 }
+        ];
+
+        let terminalIndex = 0;
+        let charIndex = 0;
+
+        function typeTerminal() {
+            const container = document.getElementById('terminalContent');
+            
+            if (terminalIndex >= terminalCommands.length) {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                    terminalIndex = 0;
+                    charIndex = 0;
+                    typeTerminal();
+                }, 2000);
+                return;
+            }
+
+            const cmd = terminalCommands[terminalIndex];
+            
+            if (charIndex === 0 && cmd.delay) {
+                setTimeout(typeTerminal, cmd.delay);
+                return;
+            }
+
+            if (charIndex < cmd.text.length) {
+                const span = document.createElement('span');
+                span.className = cmd.type;
+                span.textContent = cmd.text.substring(0, charIndex + 1);
+                
+                const lines = container.querySelectorAll('div');
+                if (lines.length === 0 || charIndex === 0) {
+                    const line = document.createElement('div');
+                    line.appendChild(span);
+                    container.appendChild(line);
+                } else {
+                    lines[lines.length - 1].innerHTML = '';
+                    lines[lines.length - 1].appendChild(span);
+                }
+
+                charIndex++;
+                setTimeout(typeTerminal, cmd.type === 'command' ? 50 : 30);
+            } else {
+                charIndex = 0;
+                terminalIndex++;
+                setTimeout(typeTerminal, 100);
+            }
+        }
+
+        // ========== 聊天演示 ==========
+        const demoMessages = [
+            { role: 'user', text: '帮我查一下明天的天气' },
+            { role: 'assistant', text: '好的！让我查询一下...\n\n明天上海：\n🌤️ 多云转晴\n🌡️ 温度: 8-15°C\n💨 风力: 3-4级\n\n记得多穿点衣服！' },
+            { role: 'user', text: '提醒我下午3点开会' },
+            { role: 'assistant', text: '✅ 已设置提醒：\n📅 2026-01-30 15:00\n📝 开会\n\n到时候我会通过 Telegram 提醒你！' }
+        ];
+
+        let messageIndex = 0;
+
+        function loadDemoChat() {
+            const container = document.getElementById('chatContainer');
+            if (messageIndex >= demoMessages.length) {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                    messageIndex = 0;
+                    loadDemoChat();
+                }, 3000);
+                return;
+            }
+
+            const msg = demoMessages[messageIndex];
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${msg.role}`;
+            messageDiv.innerHTML = `<div class="message-bubble">${msg.text}</div>`;
+            container.appendChild(messageDiv);
+            
+            messageIndex++;
+            setTimeout(loadDemoChat, 2500);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const container = document.getElementById('chatContainer');
+            
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `<div class="message-bubble">${text}</div>`;
+            container.appendChild(userMsg);
+
+            input.value = '';
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'message assistant';
+                botMsg.innerHTML = `<div class="message-bubble">🦞 收到！我会帮你处理这个任务。</div>`;
+                container.appendChild(botMsg);
+                container.scrollTop = container.scrollHeight;
+            }, 800);
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        document.getElementById('userInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // ========== 步骤高亮 ==========
+        function highlightStep(index) {
+            // 这里可以添加更多交互逻辑
+            console.log('Highlighting step:', index);
+        }
+
+        // ========== 初始化 ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            new WorkflowAnimation('workflowCanvas');
+            new ArchitectureAnimation('archCanvas');
+            loadSkills();
+            setTimeout(typeTerminal, 1000);
+            setTimeout(loadDemoChat, 2000);
+
+            // 滚动动画
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.feature-card, .comparison-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

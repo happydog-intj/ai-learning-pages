@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧗 盲人下山 - 梯度下降算法可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .canvas-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            border-radius: 10px;
+            background: white;
+            cursor: crosshair;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .info-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .info-card.orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .story-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .story-section h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .story-section p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .status-bar {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        .status-bar.running {
+            background: #fff3e0;
+            color: #e65100;
+            animation: pulse 1.5s infinite;
+        }
+
+        .speed-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .speed-btn {
+            padding: 10px;
+            font-size: 0.95em;
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .speed-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .speed-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧗 盲人下山 - 梯度下降算法</h1>
+        <p class="subtitle">一个直观的机器学习优化算法可视化演示</p>
+
+        <div class="story-section">
+            <h3>📖 故事背景</h3>
+            <p>
+                想象一位盲人站在山上，他想下到山谷（最低点），但他看不见周围的地形。
+                他能做的只有：<strong>感受脚下的坡度</strong>，然后沿着<strong>最陡的下坡方向</strong>走一小步。
+                重复这个过程，最终他会到达山谷。这就是<strong>梯度下降算法</strong>的核心思想！
+            </p>
+        </div>
+
+        <div class="main-content">
+            <div class="canvas-section">
+                <canvas id="canvas" width="1000" height="750"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: linear-gradient(to bottom, #8B4513, #90EE90);"></div>
+                        <span>3D山地地形（损失函数）</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #ff6b6b; box-shadow: 0 0 10px rgba(255,107,107,0.6);"></div>
+                        <span>🧑 盲人当前位置</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #4ecdc4;"></div>
+                        <span>行走路径（优化轨迹）</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #ffd700;"></div>
+                        <span>⭐ 山谷（全局最小值）</span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 10px; color: #7f8c8d; font-size: 0.9em;">
+                    💡 提示：点击3D地形的任意位置设置起点
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-group">
+                    <label>
+                        🎬 动画速度模式
+                        <span class="value-display" id="speedModeValue">🚶 正常</span>
+                    </label>
+                    <div class="speed-buttons">
+                        <button class="speed-btn" data-mode="slow" onclick="setSpeedMode('slow')">
+                            🐌 慢速
+                        </button>
+                        <button class="speed-btn active" data-mode="normal" onclick="setSpeedMode('normal')">
+                            🚶 正常
+                        </button>
+                        <button class="speed-btn" data-mode="fast" onclick="setSpeedMode('fast')">
+                            🏃 快速
+                        </button>
+                    </div>
+                    <small style="color: #7f8c8d;" id="speedDesc">标准速度</small>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        ⚡ 学习率（步长）
+                        <span class="value-display" id="lrValue">0.008</span>
+                    </label>
+                    <input type="range" id="learningRate" min="0.002" max="0.05" step="0.002" value="0.008">
+                    <small style="color: #7f8c8d;">步长越大，下山越快，但可能越过山谷</small>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        🎯 地形复杂度
+                        <span class="value-display" id="terrainValue">中等</span>
+                    </label>
+                    <input type="range" id="terrain" min="1" max="3" step="1" value="2">
+                    <small style="color: #7f8c8d;">复杂度越高，局部最小值越多</small>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-start" onclick="start()" id="startBtn">
+                        🚀 开始下山
+                    </button>
+                    <button class="btn-stop" onclick="stop()" id="stopBtn" disabled>
+                        ⏸️ 暂停
+                    </button>
+                </div>
+
+                <button class="btn-reset" onclick="reset()" style="width: 100%;">
+                    🔄 重新选择起点
+                </button>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="info-label">当前高度</div>
+                        <div class="info-value" id="height">0.00</div>
+                    </div>
+                    <div class="info-card green">
+                        <div class="info-label">行走步数</div>
+                        <div class="info-value" id="steps">0</div>
+                    </div>
+                    <div class="info-card orange">
+                        <div class="info-label">梯度大小</div>
+                        <div class="info-value" id="gradient">0.00</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">距离山谷</div>
+                        <div class="info-value" id="distance">-</div>
+                    </div>
+                </div>
+
+                <div class="status-bar" id="status">
+                    点击画布选择盲人的起始位置
+                </div>
+            </div>
+        </div>
+
+        <div class="story-section" style="background: #e3f2fd; border-left-color: #2196f3;">
+            <h3 style="color: #1565c0;">💡 算法原理</h3>
+            <p style="color: #1565c0;">
+                <strong>1. 计算梯度：</strong>盲人感受脚下的坡度方向<br>
+                <strong>2. 反向移动：</strong>沿着下坡方向走一小步（学习率决定步长）<br>
+                <strong>3. 动量优化：</strong>保持之前的移动方向，避免震荡<br>
+                <strong>4. 梯度裁剪：</strong>防止步长过大导致越过山谷<br>
+                <strong>5. 收敛检测：</strong>当梯度接近0时停止
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 状态变量
+        let state = {
+            x: null,
+            y: null,
+            steps: 0,
+            running: false,
+            intervalId: null,
+            path: [],
+            learningRate: 0.008,  // 进一步降低默认学习率
+            baseLearningRate: 0.008,  // 基础学习率
+            terrain: 2,
+            startSet: false,
+            velocityX: 0,  // 添加动量
+            velocityY: 0,
+            momentum: 0.8,  // 提高动量系数，使移动更平滑
+            speedMode: 'normal',  // 速度模式：slow/normal/fast
+            animationInterval: 30  // 动画间隔(ms)
+        };
+
+        // 速度模式配置
+        const speedModes = {
+            slow: {
+                lrMultiplier: 0.3,    // 学习率乘数
+                interval: 60,         // 动画间隔(ms)
+                label: '🐌 慢速',
+                description: '学习率×0.3，适合观察细节'
+            },
+            normal: {
+                lrMultiplier: 1.0,
+                interval: 30,
+                label: '🚶 正常',
+                description: '标准速度'
+            },
+            fast: {
+                lrMultiplier: 2.5,
+                interval: 20,
+                label: '🏃 快速',
+                description: '学习率×2.5，快速收敛'
+            }
+        };
+
+        // 地形参数（影响损失函数的形状）
+        let terrainParams = {
+            1: { scale: 2.0, valleys: 1, noise: 0.0 },   // 简单：纯二次函数
+            2: { scale: 2.0, valleys: 2, noise: 0.15 },  // 中等
+            3: { scale: 2.0, valleys: 3, noise: 0.25 }   // 复杂
+        };
+
+        // 损失函数：模拟山地地形（确保最小值在(0.5, 0.5)）
+        function lossFunction(x, y) {
+            const params = terrainParams[state.terrain];
+            const scale = params.scale;
+            const valleys = params.valleys;
+            const noise = params.noise;
+
+            // 主要的二次函数（抛物面） - 中心在(0.5, 0.5)，这是全局最小值
+            let loss = scale * (Math.pow(x - 0.5, 2) + Math.pow(y - 0.5, 2));
+
+            // 添加平滑的局部起伏（但不改变全局最小值位置）
+            if (valleys >= 2) {
+                // 使用以(0.5,0.5)为中心的对称波动
+                const dx = x - 0.5;
+                const dy = y - 0.5;
+                const r = Math.sqrt(dx * dx + dy * dy);
+                loss += noise * Math.sin(8 * Math.PI * r) * r;
+            }
+            if (valleys >= 3) {
+                // 添加一些小的不对称性
+                loss += noise * 0.3 * Math.sin(4 * Math.PI * x) * Math.cos(4 * Math.PI * y);
+            }
+
+            return loss;
+        }
+
+        // 计算梯度（偏导数）
+        function computeGradient(x, y) {
+            const h = 0.001;  // 很小的步长用于数值微分
+            const dx = (lossFunction(x + h, y) - lossFunction(x - h, y)) / (2 * h);
+            const dy = (lossFunction(x, y + h) - lossFunction(x, y - h)) / (2 * h);
+            return { dx, dy };
+        }
+
+        // 3D等距投影转换
+        function to3D(x, y, z) {
+            // 等距投影参数 - 增大地形
+            const scale = 450;  // 增大缩放比例
+            const offsetX = canvas.width / 2;
+            const offsetY = canvas.height / 2 + 100;  // 调整Y偏移
+            const heightScale = 180;  // 增大高度缩放
+
+            // 等距投影公式
+            // 中心点调整：将0.5,0.5作为中心
+            const centerX = x - 0.5;
+            const centerY = y - 0.5;
+
+            const isoX = (centerX - centerY) * scale + offsetX;
+            const isoY = (centerX + centerY) * scale * 0.5 - z * heightScale + offsetY;
+
+            return { x: isoX, y: isoY };
+        }
+
+        // 简单的噪声函数（用于纹理生成）
+        function noise(x, y) {
+            const n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+            return n - Math.floor(n);
+        }
+
+        // 生成山石纹理颜色
+        function getRockTexture(x, y, baseZ, shading) {
+            // 根据高度决定基础颜色
+            const heightRatio = Math.max(0, Math.min(1, 1 - baseZ * 1.5));
+
+            // 添加噪声纹理
+            const noiseVal = noise(x * 100, y * 100) * 0.3 +
+                           noise(x * 50, y * 50) * 0.2 +
+                           noise(x * 200, y * 200) * 0.15;
+
+            let r, g, b;
+
+            if (heightRatio < 0.3) {
+                // 高山：深灰色岩石
+                r = 80 + noiseVal * 40;
+                g = 70 + noiseVal * 35;
+                b = 60 + noiseVal * 30;
+            } else if (heightRatio < 0.6) {
+                // 中等：棕色岩石
+                r = 120 + noiseVal * 50;
+                g = 90 + noiseVal * 40;
+                b = 60 + noiseVal * 30;
+            } else if (heightRatio < 0.85) {
+                // 低处：土黄色
+                r = 160 + noiseVal * 40;
+                g = 140 + noiseVal * 35;
+                b = 90 + noiseVal * 30;
+            } else {
+                // 山谷：绿色草地
+                r = 100 + noiseVal * 30;
+                g = 160 + noiseVal * 40;
+                b = 80 + noiseVal * 25;
+            }
+
+            // 应用光照
+            r *= shading;
+            g *= shading;
+            b *= shading;
+
+            return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+        }
+
+        // 绘制3D地形
+        function drawTerrain() {
+            // 先绘制背景（天空渐变）
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#87CEEB');  // 天蓝色
+            skyGradient.addColorStop(0.5, '#B0E0E6');  // 粉蓝色
+            skyGradient.addColorStop(1, '#F0F8FF');  // 近白色
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制网格分辨率（增加以获得更多细节）
+            const gridSize = 30;
+            const step = 1 / gridSize;
+
+            // 存储所有面片用于Z排序
+            const faces = [];
+
+            // 生成地形网格面片
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const x0 = i * step;
+                    const y0 = j * step;
+                    const x1 = (i + 1) * step;
+                    const y1 = (j + 1) * step;
+
+                    // 四个顶点的高度
+                    const z00 = lossFunction(x0, y0);
+                    const z10 = lossFunction(x1, y0);
+                    const z01 = lossFunction(x0, y1);
+                    const z11 = lossFunction(x1, y1);
+
+                    // 计算面片中心用于排序
+                    const centerX = (x0 + x1) / 2;
+                    const centerY = (y0 + y1) / 2;
+                    const centerZ = (z00 + z10 + z01 + z11) / 4;
+
+                    // 转换为3D坐标
+                    const p00 = to3D(x0, y0, z00);
+                    const p10 = to3D(x1, y0, z10);
+                    const p01 = to3D(x0, y1, z01);
+                    const p11 = to3D(x1, y1, z11);
+
+                    // 计算法向量和光照
+                    const normalX = (z10 - z00 + z11 - z01) / 2;
+                    const normalY = (z01 - z00 + z11 - z10) / 2;
+                    const normalMag = Math.sqrt(normalX * normalX + normalY * normalY + 0.01);
+
+                    // 光照方向（从右上方照射）
+                    const lightX = 0.5;
+                    const lightY = 0.5;
+                    const lightZ = 1.0;
+                    const lightDot = (-normalX * lightX - normalY * lightY + 1.0 * lightZ) /
+                                    (normalMag * Math.sqrt(lightX * lightX + lightY * lightY + lightZ * lightZ));
+
+                    // 环境光 + 漫反射
+                    const ambient = 0.5;
+                    const diffuse = 0.5;
+                    const shading = ambient + diffuse * Math.max(0, lightDot);
+
+                    // 使用纹理颜色
+                    const textureColor = getRockTexture(centerX, centerY, centerZ, shading);
+
+                    faces.push({
+                        vertices: [p00, p10, p11, p01],
+                        color: textureColor,
+                        depth: centerY + centerX,  // 用于Z排序
+                        centerZ: centerZ,
+                        shading: shading
+                    });
+                }
+            }
+
+            // Z排序（画家算法）
+            faces.sort((a, b) => a.depth - b.depth);
+
+            // 绘制所有面片
+            faces.forEach(face => {
+                ctx.fillStyle = face.color;
+
+                // 网格线颜色：高处更深，低处更浅
+                const gridAlpha = 0.15 + face.shading * 0.15;
+                ctx.strokeStyle = `rgba(60, 60, 60, ${gridAlpha})`;
+                ctx.lineWidth = 0.8;
+
+                ctx.beginPath();
+                ctx.moveTo(face.vertices[0].x, face.vertices[0].y);
+                for (let i = 1; i < face.vertices.length; i++) {
+                    ctx.lineTo(face.vertices[i].x, face.vertices[i].y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // 在高处添加高光效果
+                if (face.centerZ < 0.1 && face.shading > 0.8) {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.1 * face.shading})`;
+                    ctx.fill();
+                }
+            });
+
+            // 绘制山谷星星（3D位置）
+            const valleyZ = lossFunction(0.5, 0.5);
+            const valley3D = to3D(0.5, 0.5, valleyZ);
+
+            // 星星外发光圈
+            const glowGradient = ctx.createRadialGradient(valley3D.x, valley3D.y, 0, valley3D.x, valley3D.y, 35);
+            glowGradient.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+            glowGradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
+            glowGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.beginPath();
+            ctx.arc(valley3D.x, valley3D.y, 35, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 星星发光效果
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.9)';
+            ctx.shadowBlur = 25;
+
+            // 星星底座
+            ctx.fillStyle = '#ffd700';
+            ctx.strokeStyle = '#ff8c00';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(valley3D.x, valley3D.y, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+
+            // 星星图标
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⭐', valley3D.x, valley3D.y);
+
+            // 添加标签背景
+            const labelY = valley3D.y + 45;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(valley3D.x - 80, labelY - 15, 160, 28);
+
+            // 添加标签
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('🏔️ 山谷（全局最优解）', valley3D.x, labelY);
+        }
+
+        // 绘制路径（3D）
+        function drawPath() {
+            if (state.path.length < 2) return;
+
+            // 绘制路径线
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([]);
+            ctx.shadowColor = 'rgba(78, 205, 196, 0.5)';
+            ctx.shadowBlur = 10;
+
+            ctx.beginPath();
+            for (let i = 0; i < state.path.length; i++) {
+                const point = state.path[i];
+                const z = lossFunction(point.x, point.y);
+                const pos3D = to3D(point.x, point.y, z);
+
+                if (i === 0) {
+                    ctx.moveTo(pos3D.x, pos3D.y);
+                } else {
+                    ctx.lineTo(pos3D.x, pos3D.y);
+                }
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 绘制路径点
+            state.path.forEach((point, i) => {
+                const z = lossFunction(point.x, point.y);
+                const pos3D = to3D(point.x, point.y, z);
+                const alpha = 0.3 + (i / state.path.length) * 0.7;
+
+                ctx.fillStyle = `rgba(78, 205, 196, ${alpha})`;
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(pos3D.x, pos3D.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+
+        // 绘制盲人（3D）
+        function drawPerson() {
+            if (state.x === null || state.y === null) return;
+
+            const z = lossFunction(state.x, state.y);
+            const pos3D = to3D(state.x, state.y, z);
+
+            // 盲人的阴影（投射到地面）
+            const shadowZ = lossFunction(state.x, state.y) - 0.1;
+            const shadowPos = to3D(state.x, state.y, shadowZ);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(shadowPos.x, shadowPos.y + 15, 18, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 盲人身体（发光效果）
+            ctx.shadowColor = 'rgba(255, 107, 107, 0.6)';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#ff6b6b';
+            ctx.strokeStyle = '#c92a2a';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(pos3D.x, pos3D.y, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 盲人图标
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🧑', pos3D.x, pos3D.y);
+
+            // 梯度方向箭头（3D）
+            if (state.running) {
+                const grad = computeGradient(state.x, state.y);
+                const gradMag = Math.sqrt(grad.dx ** 2 + grad.dy ** 2);
+
+                if (gradMag > 0.001) {
+                    // 计算箭头终点（沿梯度反方向）
+                    const arrowStep = 0.05;
+                    const arrowEndX = state.x - arrowStep * grad.dx / gradMag;
+                    const arrowEndY = state.y - arrowStep * grad.dy / gradMag;
+                    const arrowEndZ = lossFunction(arrowEndX, arrowEndY);
+                    const arrowEnd3D = to3D(arrowEndX, arrowEndY, arrowEndZ);
+
+                    // 绘制箭头
+                    ctx.strokeStyle = '#ff6b6b';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([8, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(pos3D.x, pos3D.y);
+                    ctx.lineTo(arrowEnd3D.x, arrowEnd3D.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // 箭头头部
+                    const angle = Math.atan2(arrowEnd3D.y - pos3D.y, arrowEnd3D.x - pos3D.x);
+                    const headLen = 12;
+                    ctx.beginPath();
+                    ctx.moveTo(arrowEnd3D.x, arrowEnd3D.y);
+                    ctx.lineTo(
+                        arrowEnd3D.x - headLen * Math.cos(angle - Math.PI / 6),
+                        arrowEnd3D.y - headLen * Math.sin(angle - Math.PI / 6)
+                    );
+                    ctx.moveTo(arrowEnd3D.x, arrowEnd3D.y);
+                    ctx.lineTo(
+                        arrowEnd3D.x - headLen * Math.cos(angle + Math.PI / 6),
+                        arrowEnd3D.y - headLen * Math.sin(angle + Math.PI / 6)
+                    );
+                    ctx.stroke();
+                }
+            }
+
+            // 显示当前高度标签
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 13px Arial';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            const heightText = `高度: ${z.toFixed(3)}`;
+            ctx.strokeText(heightText, pos3D.x, pos3D.y - 35);
+            ctx.fillText(heightText, pos3D.x, pos3D.y - 35);
+        }
+
+        // 绘制所有内容
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawTerrain();
+            drawPath();
+            drawPerson();
+        }
+
+        // 更新UI
+        function updateUI() {
+            if (state.x !== null && state.y !== null) {
+                const loss = lossFunction(state.x, state.y);
+                const grad = computeGradient(state.x, state.y);
+                const gradMag = Math.sqrt(grad.dx ** 2 + grad.dy ** 2);
+                const distToValley = Math.sqrt((state.x - 0.5) ** 2 + (state.y - 0.5) ** 2);
+
+                document.getElementById('height').textContent = loss.toFixed(4);
+                document.getElementById('steps').textContent = state.steps;
+                document.getElementById('gradient').textContent = gradMag.toFixed(4);
+                document.getElementById('distance').textContent = (distToValley * 100).toFixed(1) + '%';
+            }
+        }
+
+        // 梯度下降迭代（带动量优化）
+        function gradientDescentStep() {
+            const grad = computeGradient(state.x, state.y);
+            const gradMag = Math.sqrt(grad.dx ** 2 + grad.dy ** 2);
+
+            // 计算到山谷的距离
+            const distToValley = Math.sqrt(Math.pow(state.x - 0.5, 2) + Math.pow(state.y - 0.5, 2));
+
+            // 收敛条件：梯度很小或者非常接近山谷
+            if (gradMag < 0.005 || distToValley < 0.01) {
+                stop();
+                setStatus('🎉 到达山谷！优化完成！', false);
+                return;
+            }
+
+            // 梯度裁剪，防止过大的更新
+            const maxGrad = 3.0;
+            let clippedGradX = grad.dx;
+            let clippedGradY = grad.dy;
+            if (gradMag > maxGrad) {
+                clippedGradX = grad.dx / gradMag * maxGrad;
+                clippedGradY = grad.dy / gradMag * maxGrad;
+            }
+
+            // 根据速度模式调整实际学习率
+            const effectiveLR = state.baseLearningRate * speedModes[state.speedMode].lrMultiplier;
+
+            // 使用动量更新（momentum优化）
+            state.velocityX = state.momentum * state.velocityX - effectiveLR * clippedGradX;
+            state.velocityY = state.momentum * state.velocityY - effectiveLR * clippedGradY;
+
+            // 更新位置
+            const oldLoss = lossFunction(state.x, state.y);
+            const oldX = state.x;
+            const oldY = state.y;
+
+            state.x += state.velocityX;
+            state.y += state.velocityY;
+
+            // 边界检查
+            state.x = Math.max(0.05, Math.min(0.95, state.x));
+            state.y = Math.max(0.05, Math.min(0.95, state.y));
+
+            // 检查是否真的在下降
+            const newLoss = lossFunction(state.x, state.y);
+            if (newLoss > oldLoss && state.steps > 5) {
+                // 回退并减小速度
+                state.x = oldX;
+                state.y = oldY;
+                state.velocityX *= 0.3;
+                state.velocityY *= 0.3;
+            }
+
+            // 记录路径
+            state.path.push({ x: state.x, y: state.y });
+            state.steps++;
+
+            // 限制路径长度
+            if (state.path.length > 300) {
+                state.path.shift();
+            }
+
+            draw();
+            updateUI();
+        }
+
+        // 开始下山
+        function start() {
+            if (!state.startSet) {
+                alert('请先在画布上点击选择盲人的起始位置！');
+                return;
+            }
+
+            if (state.running) return;
+
+            state.running = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+
+            const modeLabel = speedModes[state.speedMode].label;
+            setStatus(`${modeLabel} 盲人正在下山...`, true);
+
+            // 根据速度模式使用不同的动画间隔
+            const interval = speedModes[state.speedMode].interval;
+
+            state.intervalId = setInterval(() => {
+                gradientDescentStep();
+
+                // 最大步数限制
+                if (state.steps > 1500) {
+                    stop();
+                    setStatus('⚠️ 达到最大步数限制，尝试增加学习率或切换到快速模式', false);
+                }
+            }, interval);
+        }
+
+        // 停止
+        function stop() {
+            if (state.intervalId) {
+                clearInterval(state.intervalId);
+                state.intervalId = null;
+            }
+
+            state.running = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+
+            if (state.steps > 0) {
+                setStatus('⏸️ 已暂停。可以继续或重置', false);
+            }
+        }
+
+        // 重置
+        function reset() {
+            stop();
+            state.x = null;
+            state.y = null;
+            state.steps = 0;
+            state.path = [];
+            state.startSet = false;
+            state.velocityX = 0;  // 重置动量
+            state.velocityY = 0;
+
+            draw();
+            updateUI();
+            setStatus('点击画布选择盲人的起始位置', false);
+        }
+
+        // 设置状态消息
+        function setStatus(msg, running) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.className = running ? 'status-bar running' : 'status-bar';
+        }
+
+        // 画布点击事件（需要将屏幕坐标转换回3D世界坐标）
+        canvas.addEventListener('click', (e) => {
+            if (state.running) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // 简化：直接映射到网格
+            // 在实际3D中需要反向投影，这里使用近似方法
+            let minDist = Infinity;
+            let bestX = 0.5;
+            let bestY = 0.5;
+
+            // 搜索最近的网格点
+            for (let i = 0; i <= 20; i++) {
+                for (let j = 0; j <= 20; j++) {
+                    const testX = i / 20;
+                    const testY = j / 20;
+                    const testZ = lossFunction(testX, testY);
+                    const pos3D = to3D(testX, testY, testZ);
+
+                    const dist = Math.sqrt(
+                        Math.pow(pos3D.x - clickX, 2) +
+                        Math.pow(pos3D.y - clickY, 2)
+                    );
+
+                    if (dist < minDist) {
+                        minDist = dist;
+                        bestX = testX;
+                        bestY = testY;
+                    }
+                }
+            }
+
+            state.x = bestX;
+            state.y = bestY;
+            state.steps = 0;
+            state.path = [{ x: bestX, y: bestY }];
+            state.startSet = true;
+
+            draw();
+            updateUI();
+            setStatus('✅ 起点已设置！点击"开始下山"', false);
+        });
+
+        // 设置速度模式
+        function setSpeedMode(mode) {
+            if (state.running) {
+                alert('请先停止当前动画再切换速度模式');
+                return;
+            }
+
+            state.speedMode = mode;
+            const config = speedModes[mode];
+
+            // 更新UI
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            document.getElementById('speedModeValue').textContent = config.label;
+            document.getElementById('speedDesc').textContent = config.description;
+
+            // 显示实际学习率
+            updateLearningRateDisplay();
+        }
+
+        // 更新学习率显示
+        function updateLearningRateDisplay() {
+            const effectiveLR = state.baseLearningRate * speedModes[state.speedMode].lrMultiplier;
+            const display = document.getElementById('lrValue');
+            display.textContent = effectiveLR.toFixed(4);
+        }
+
+        // 学习率滑块
+        document.getElementById('learningRate').addEventListener('input', (e) => {
+            state.baseLearningRate = parseFloat(e.target.value);
+            updateLearningRateDisplay();
+        });
+
+        // 地形滑块
+        document.getElementById('terrain').addEventListener('input', (e) => {
+            state.terrain = parseInt(e.target.value);
+            const labels = { 1: '简单', 2: '中等', 3: '复杂' };
+            document.getElementById('terrainValue').textContent = labels[state.terrain];
+
+            if (!state.running) {
+                draw();
+            }
+        });
+
+        // 初始化
+        draw();
+        updateUI();
+        updateLearningRateDisplay();
+    </script>
+</body>
+</html>

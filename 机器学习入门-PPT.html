@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍉 机器学习入门 - 跟着西瓜学AI</title>
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        .reveal {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .reveal h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .reveal h2 {
+            color: var(--accent-color);
+            font-size: 2em;
+        }
+
+        .reveal h3 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+        }
+
+        .reveal section {
+            text-align: left;
+        }
+
+        .center {
+            text-align: center !important;
+        }
+
+        .emoji-large {
+            font-size: 3em;
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.8em;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 2px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .comparison-table th {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .good {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .bad {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .warning {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 400px;
+            margin: 20px auto;
+        }
+
+        .small-canvas {
+            height: 300px;
+        }
+
+        .algorithm-box {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .fragment {
+            opacity: 0;
+        }
+
+        .fragment.visible {
+            opacity: 1;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li:before {
+            content: "▸ ";
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--accent-color));
+            text-align: center;
+            color: white;
+            line-height: 30px;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+
+        .watermelon-icon {
+            font-size: 2em;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .reveal .slides section .fragment.highlight-current-blue {
+            opacity: 1;
+            visibility: inherit;
+        }
+
+        .reveal .slides section .fragment.highlight-current-blue.current-fragment {
+            color: var(--accent-color);
+            font-weight: bold;
+            transform: scale(1.1);
+        }
+
+        .decision-tree {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .tree-node {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border: 3px solid var(--accent-color);
+            border-radius: 10px;
+            background: white;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .tree-node.leaf {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .tree-node.bad-leaf {
+            background: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- 封面 -->
+            <section class="center">
+                <h1>🍉 机器学习入门</h1>
+                <h2>跟着西瓜学AI</h2>
+                <p style="font-size: 1.2em; margin-top: 50px;">
+                    参考《机器学习》（周志华 著）
+                </p>
+                <p style="font-size: 0.9em; color: #666;">
+                    中学生都能看懂的机器学习科普
+                </p>
+                <div style="margin-top: 50px; font-size: 3em;">
+                    <span class="watermelon-icon">🍉</span>
+                    <span class="watermelon-icon" style="animation-delay: 0.3s;">🤖</span>
+                    <span class="watermelon-icon" style="animation-delay: 0.6s;">🧠</span>
+                </div>
+            </section>
+
+            <!-- 目录 -->
+            <section>
+                <h2>📚 课程大纲</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div style="font-size: 2em;">🎯</div>
+                        <h3>什么是机器学习</h3>
+                        <p>让计算机从经验中学习</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 2em;">📏</div>
+                        <h3>线性回归</h3>
+                        <p>画一条最佳直线</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 2em;">🌳</div>
+                        <h3>分类算法</h3>
+                        <p>判断西瓜好坏</p>
+                    </div>
+                    <div class="feature-card">
+                        <div style="font-size: 2em;">📍</div>
+                        <h3>聚类算法</h3>
+                        <p>物以类聚</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第1章：什么是机器学习 -->
+            <section>
+                <section class="center">
+                    <h1>第一章</h1>
+                    <h2>🎯 什么是机器学习？</h2>
+                    <div class="emoji-large">🤖 🧠 📚</div>
+                </section>
+
+                <section>
+                    <h2>一句话理解</h2>
+                    <div class="highlight-box center">
+                        <h3>机器学习 = 让计算机从经验中学习，像人一样变聪明</h3>
+                    </div>
+                    <div style="margin-top: 40px;">
+                        <canvas id="learningProcessChart" class="small-canvas"></canvas>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>👶 生活中的例子</h2>
+                    <div class="code-block">
+                        小时候学认水果：<br><br>
+                        第1次：妈妈说"这是苹果" 🍎<br>
+                        第2次：妈妈说"这是苹果" 🍎<br>
+                        第3次：妈妈说"这是苹果" 🍎<br>
+                        ...<br>
+                        第10次：<strong class="good">你自己认出了 → "这是苹果！" ✅</strong>
+                    </div>
+                    <div class="highlight-box">
+                        🤖 <strong>机器学习做同样的事：</strong><br>
+                        给计算机看1000张苹果照片 → 学会识别苹果 → 看到新照片能判断
+                    </div>
+                </section>
+
+                <section>
+                    <h2>🎓 三种学习方式</h2>
+                    <canvas id="learningTypesChart"></canvas>
+                </section>
+            </section>
+
+            <!-- 第2章：基础概念 -->
+            <section>
+                <section class="center">
+                    <h1>第二章</h1>
+                    <h2>🍉 基础概念 - 西瓜案例</h2>
+                </section>
+
+                <section>
+                    <h2>🍉 西瓜数据集</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>色泽</th>
+                                <th>根蒂</th>
+                                <th>敲声</th>
+                                <th>纹理</th>
+                                <th>好瓜？</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>青绿</td>
+                                <td>蜷缩</td>
+                                <td>浊响</td>
+                                <td>清晰</td>
+                                <td class="good">是 ✅</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>乌黑</td>
+                                <td>蜷缩</td>
+                                <td>沉闷</td>
+                                <td>清晰</td>
+                                <td class="good">是 ✅</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>青绿</td>
+                                <td>蜷缩</td>
+                                <td>沉闷</td>
+                                <td>模糊</td>
+                                <td class="bad">否 ❌</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>浅白</td>
+                                <td>蜷缩</td>
+                                <td>浊响</td>
+                                <td>清晰</td>
+                                <td class="bad">否 ❌</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="text-align: center; color: #666; margin-top: 20px;">
+                        <strong>任务：</strong>根据特征判断西瓜是不是好瓜
+                    </p>
+                </section>
+
+                <section>
+                    <h2>📖 术语对照表</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>术语</th>
+                                <th>通俗说法</th>
+                                <th>西瓜例子</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>数据集</strong></td>
+                                <td>所有样本的集合</td>
+                                <td>17个西瓜</td>
+                            </tr>
+                            <tr>
+                                <td><strong>样本/示例</strong></td>
+                                <td>一条数据记录</td>
+                                <td>一个西瓜</td>
+                            </tr>
+                            <tr>
+                                <td><strong>特征/属性</strong></td>
+                                <td>描述样本的指标</td>
+                                <td>色泽、根蒂、敲声</td>
+                            </tr>
+                            <tr>
+                                <td><strong>标签/类别</strong></td>
+                                <td>样本的结果</td>
+                                <td>好瓜/坏瓜</td>
+                            </tr>
+                            <tr>
+                                <td><strong>模型</strong></td>
+                                <td>学习到的规律</td>
+                                <td>判断西瓜的规则</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>🎯 机器学习流程</h2>
+                    <div id="mlPipelineViz" style="margin: 30px 0;"></div>
+                </section>
+            </section>
+
+            <!-- 第3章：线性回归 -->
+            <section>
+                <section class="center">
+                    <h1>第三章</h1>
+                    <h2>📏 线性回归</h2>
+                    <h3>画一条最佳直线</h3>
+                </section>
+
+                <section>
+                    <h2>🎯 目标</h2>
+                    <div class="highlight-box center">
+                        找一条直线，让所有点到这条线的距离之和最小
+                    </div>
+                    <h3 style="margin-top: 30px;">📊 房价预测示例</h3>
+                    <div class="code-block">
+                        面积(m²) → 房价(万)<br>
+                        &nbsp;&nbsp;50 &nbsp; → &nbsp;150<br>
+                        &nbsp;&nbsp;80 &nbsp; → &nbsp;240<br>
+                        &nbsp;&nbsp;100 &nbsp;→ &nbsp;300<br>
+                        &nbsp;&nbsp;120 &nbsp;→ &nbsp;360<br><br>
+                        <strong>要预测: 90m² 的房子多少钱？</strong>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📈 寻找最佳直线（动画演示）</h2>
+                    <canvas id="linearRegressionChart"></canvas>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="animateLinearRegression()" style="padding: 10px 30px; font-size: 1.2em; background: var(--accent-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🎬 开始动画
+                        </button>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📐 数学公式（超简单版）</h2>
+                    <div class="highlight-box">
+                        <h3 style="text-align: center;">y = ax + b</h3>
+                        <br>
+                        <p><strong>y</strong> = 房价（要预测的）</p>
+                        <p><strong>x</strong> = 面积（已知的）</p>
+                        <p><strong>a</strong> = 斜率（面积每增加1，房价增加多少）</p>
+                        <p><strong>b</strong> = 截距（0平米时的"基础价"）</p>
+                    </div>
+                    <div class="code-block" style="margin-top: 20px; text-align: center;">
+                        🎯 <strong>目标：让所有点到直线的距离最小</strong>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>💡 实际应用</h2>
+                    <canvas id="linearAppsChart"></canvas>
+                </section>
+            </section>
+
+            <!-- 第4章：分类算法 -->
+            <section>
+                <section class="center">
+                    <h1>第四章</h1>
+                    <h2>🌳 分类算法</h2>
+                    <h3>判断西瓜好坏</h3>
+                </section>
+
+                <section>
+                    <h2>4.1 决策树 🌳</h2>
+                    <h3 style="color: var(--accent-color);">像医生问诊一样</h3>
+                    <div class="decision-tree">
+                        <div class="tree-node">根蒂蜷缩吗？</div>
+                        <div style="margin: 20px 0;">
+                            <span style="margin: 0 100px;">↙ 是</span>
+                            <span>否 ↘</span>
+                        </div>
+                        <div>
+                            <div class="tree-node" style="margin-right: 150px;">敲声浊响吗？</div>
+                            <div class="tree-node bad-leaf">坏瓜 ❌</div>
+                        </div>
+                        <div style="margin: 20px 0;">
+                            <span style="margin-left: -100px;">↙ 是</span>
+                            <span style="margin-left: 100px;">否 ↘</span>
+                        </div>
+                        <div>
+                            <div class="tree-node leaf" style="margin-right: 250px;">好瓜 ✅</div>
+                            <div class="tree-node">色泽乌黑吗？</div>
+                        </div>
+                        <div style="margin: 20px 0;">
+                            <span style="margin-left: 150px;">↙ 是</span>
+                            <span style="margin-left: 100px;">否 ↘</span>
+                        </div>
+                        <div>
+                            <div class="tree-node leaf" style="margin-left: 100px;">好瓜 ✅</div>
+                            <div class="tree-node bad-leaf">坏瓜 ❌</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>4.2 K近邻算法 (KNN) 👥</h2>
+                    <h3 style="color: var(--accent-color);">近朱者赤，近墨者黑</h3>
+                    <canvas id="knnChart"></canvas>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="animateKNN()" style="padding: 10px 30px; font-size: 1.2em; background: var(--success-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🎬 演示KNN分类
+                        </button>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>4.3 支持向量机 (SVM) ✂️</h2>
+                    <h3 style="color: var(--accent-color);">画一条最佳分界线</h3>
+                    <canvas id="svmChart"></canvas>
+                </section>
+
+                <section>
+                    <h2>📊 四种算法对比</h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>算法</th>
+                                <th>形象比喻</th>
+                                <th>优点</th>
+                                <th>缺点</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🌳 <strong>决策树</strong></td>
+                                <td>医生问诊</td>
+                                <td class="good">直观易懂</td>
+                                <td class="bad">容易过拟合</td>
+                            </tr>
+                            <tr>
+                                <td>👥 <strong>KNN</strong></td>
+                                <td>近朱者赤</td>
+                                <td class="good">原理简单</td>
+                                <td class="bad">计算量大</td>
+                            </tr>
+                            <tr>
+                                <td>✂️ <strong>SVM</strong></td>
+                                <td>画分界线</td>
+                                <td class="good">泛化能力强</td>
+                                <td class="bad">训练慢</td>
+                            </tr>
+                            <tr>
+                                <td>🎲 <strong>朴素贝叶斯</strong></td>
+                                <td>概率推理</td>
+                                <td class="good">快速高效</td>
+                                <td class="bad">独立性假设</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- 第5章：聚类算法 -->
+            <section>
+                <section class="center">
+                    <h1>第五章</h1>
+                    <h2>📍 聚类算法</h2>
+                    <h3>物以类聚</h3>
+                </section>
+
+                <section>
+                    <h2>🎯 什么是聚类？</h2>
+                    <div class="highlight-box">
+                        在没有标签的情况下，把相似的东西归为一类
+                    </div>
+                    <table class="comparison-table" style="margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>分类（监督学习）</th>
+                                <th>聚类（无监督学习）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>标签</strong></td>
+                                <td class="good">有标签</td>
+                                <td class="warning">无标签</td>
+                            </tr>
+                            <tr>
+                                <td><strong>老师</strong></td>
+                                <td>有老师教</td>
+                                <td>自己发现规律</td>
+                            </tr>
+                            <tr>
+                                <td><strong>例子</strong></td>
+                                <td>判断西瓜好坏</td>
+                                <td>给西瓜分组</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>K-means 聚类 📍</h2>
+                    <h3 style="color: var(--accent-color);">找K个中心点</h3>
+                    <canvas id="kmeansChart"></canvas>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="animateKMeans()" style="padding: 10px 30px; font-size: 1.2em; background: var(--warning-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🎬 开始K-means动画
+                        </button>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>💡 聚类的实际应用</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div style="font-size: 2em;">🛍️</div>
+                            <h3>客户细分</h3>
+                            <p>高端客户、价格敏感型、冲动消费型</p>
+                        </div>
+                        <div class="feature-card">
+                            <div style="font-size: 2em;">📰</div>
+                            <h3>新闻分组</h3>
+                            <p>政治类、娱乐类、体育类</p>
+                        </div>
+                        <div class="feature-card">
+                            <div style="font-size: 2em;">🧬</div>
+                            <h3>基因分析</h3>
+                            <p>发现基因家族、识别相似物种</p>
+                        </div>
+                        <div class="feature-card">
+                            <div style="font-size: 2em;">🏙️</div>
+                            <h3>城市规划</h3>
+                            <p>商业区、居民区、工业区</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 第6章：模型评估 -->
+            <section>
+                <section class="center">
+                    <h1>第六章</h1>
+                    <h2>📊 模型评估</h2>
+                    <h3>考试打分</h3>
+                </section>
+
+                <section>
+                    <h2>🎯 混淆矩阵</h2>
+                    <div style="text-align: center;">
+                        <canvas id="confusionMatrixChart" class="small-canvas"></canvas>
+                    </div>
+                    <table class="comparison-table" style="margin-top: 20px; font-size: 0.7em;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>实际：好瓜</th>
+                                <th>实际：坏瓜</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>预测：好瓜</strong></td>
+                                <td class="good">真正例 TP: 40</td>
+                                <td class="bad">假正例 FP: 5</td>
+                            </tr>
+                            <tr>
+                                <td><strong>预测：坏瓜</strong></td>
+                                <td class="bad">假反例 FN: 3</td>
+                                <td class="good">真反例 TN: 52</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>📏 评估指标</h2>
+                    <canvas id="metricsChart"></canvas>
+                </section>
+
+                <section>
+                    <h2>⚖️ 精确率 vs 召回率</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">精确率 (Precision)</h3>
+                            <p style="font-size: 1.5em; margin: 20px 0;">88.9%</p>
+                            <p>预测为好瓜的，有多少真是好瓜</p>
+                            <p style="margin-top: 15px;"><strong>"你说话有多靠谱"</strong></p>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--accent-color);">
+                            <h3 style="color: var(--accent-color);">召回率 (Recall)</h3>
+                            <p style="font-size: 1.5em; margin: 20px 0;">93.0%</p>
+                            <p>实际的好瓜，你找出了多少</p>
+                            <p style="margin-top: 15px;"><strong>"你有多灵敏"</strong></p>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 30px; text-align: center;">
+                        <h3>F1分数 = 90.9%</h3>
+                        <p>精确率和召回率的调和平均数</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📈 ROC曲线与AUC</h2>
+                    <canvas id="rocChart"></canvas>
+                    <div class="code-block" style="margin-top: 20px;">
+                        <strong>AUC (曲线下面积):</strong><br>
+                        0.9-1.0: 优秀 ⭐⭐⭐⭐⭐<br>
+                        0.8-0.9: 良好 ⭐⭐⭐⭐<br>
+                        0.7-0.8: 一般 ⭐⭐⭐<br>
+                        0.5-0.7: 较差 ⭐⭐<br>
+                        0.5: 随机猜测（没用）
+                    </div>
+                </section>
+            </section>
+
+            <!-- 第7章：进阶话题 -->
+            <section>
+                <section class="center">
+                    <h1>第七章</h1>
+                    <h2>⚠️ 进阶话题</h2>
+                    <h3>过拟合 vs 欠拟合</h3>
+                </section>
+
+                <section>
+                    <h2>📊 过拟合 vs 欠拟合</h2>
+                    <canvas id="fittingChart"></canvas>
+                </section>
+
+                <section>
+                    <h2>🎓 学习类比</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card" style="border-color: var(--danger-color);">
+                            <h3 style="color: var(--danger-color);">学生A (欠拟合)</h3>
+                            <p style="font-size: 1.2em;">📚</p>
+                            <p>课本没学懂</p>
+                            <div style="margin-top: 20px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 40%; background: var(--danger-color);">40分</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">学生B (恰到好处)</h3>
+                            <p style="font-size: 1.2em;">🎯</p>
+                            <p>理解了知识</p>
+                            <div style="margin-top: 20px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%;">90分</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-card" style="border-color: var(--warning-color); margin-top: 20px;">
+                        <h3 style="color: var(--warning-color);">学生C (过拟合)</h3>
+                        <p style="font-size: 1.2em;">📝</p>
+                        <p>背答案，不会举一反三</p>
+                        <div style="margin-top: 20px;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%; background: var(--warning-color);">作业100分</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%; background: var(--danger-color);">考试60分</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 总结 -->
+            <section>
+                <section class="center">
+                    <h1>🎓 课程总结</h1>
+                </section>
+
+                <section>
+                    <h2>核心要点回顾</h2>
+                    <div class="feature-grid">
+                        <div class="algorithm-box">🧠 LLM是大脑</div>
+                        <div class="algorithm-box">📚 RAG是记忆</div>
+                        <div class="algorithm-box">🤖 Agent是行动</div>
+                        <div class="algorithm-box">📏 线性回归画直线</div>
+                        <div class="algorithm-box">🌳 决策树问问题</div>
+                        <div class="algorithm-box">👥 KNN看邻居</div>
+                        <div class="algorithm-box">✂️ SVM画分界</div>
+                        <div class="algorithm-box">📍 聚类找同类</div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>💡 给学习者的建议</h2>
+                    <div class="highlight-box">
+                        <h3 style="margin-top: 0;">🌟 机器学习并不神秘</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✅ 核心就是"从经验中学习"</li>
+                            <li>✅ 就像你学认字、学骑车</li>
+                            <li>✅ 计算机用数学方法做同样的事</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h3 style="margin-top: 0;">🚀 学习建议</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>1️⃣ 从简单项目开始</li>
+                            <li>2️⃣ 理解原理，不要死记硬背</li>
+                            <li>3️⃣ 多动手，少看理论</li>
+                            <li>4️⃣ 把概念和生活联系起来</li>
+                            <li>5️⃣ 不要怕出错，试错也是学习</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="center">
+                    <h1>感谢观看！</h1>
+                    <div style="font-size: 3em; margin: 50px 0;">
+                        <span class="watermelon-icon">🍉</span>
+                        <span class="watermelon-icon" style="animation-delay: 0.2s;">🤖</span>
+                        <span class="watermelon-icon" style="animation-delay: 0.4s;">🧠</span>
+                        <span class="watermelon-icon" style="animation-delay: 0.6s;">📚</span>
+                    </div>
+                    <h3>祝你学习愉快！</h3>
+                    <p style="margin-top: 50px; color: #666;">
+                        按 <kbd>→</kbd> 下一页 | 按 <kbd>←</kbd> 上一页 | 按 <kbd>Esc</kbd> 查看大纲
+                    </p>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+
+    <script>
+        // 初始化 Reveal.js
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            controls: true,
+            progress: true,
+            center: false,
+            slideNumber: true,
+            overview: true,
+            keyboard: true,
+            touch: true,
+            loop: false,
+            rtl: false,
+            fragments: true,
+            help: true,
+            showNotes: false,
+            autoPlayMedia: null,
+            preloadIframes: null,
+            width: 1200,
+            height: 700,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0
+        });
+
+        // Chart.js 图表配置
+        Chart.defaults.font.size = 14;
+        Chart.defaults.font.family = "'Segoe UI', Roboto, sans-serif";
+
+        // 1. 学习过程图表
+        const learningProcessCtx = document.getElementById('learningProcessChart');
+        if (learningProcessCtx) {
+            new Chart(learningProcessCtx, {
+                type: 'line',
+                data: {
+                    labels: ['第1次', '第2次', '第3次', '第4次', '第5次', '第10次'],
+                    datasets: [{
+                        label: '识别准确率',
+                        data: [20, 35, 50, 65, 80, 95],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '👶 从经验中学习 - 识别苹果的过程',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '准确率 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. 学习类型对比图
+        const learningTypesCtx = document.getElementById('learningTypesChart');
+        if (learningTypesCtx) {
+            new Chart(learningTypesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['监督学习\n(有老师)', '无监督学习\n(自己找规律)', '强化学习\n(试错)'],
+                    datasets: [{
+                        label: '应用场景数量',
+                        data: [50, 30, 20],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(241, 196, 15, 0.7)'
+                        ],
+                        borderColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#f1c40f'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '三种学习方式对比',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '相对应用比例 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. 线性回归图表
+        let linearRegressionChart;
+        const linearRegressionCtx = document.getElementById('linearRegressionChart');
+        if (linearRegressionCtx) {
+            const scatterData = [
+                { x: 50, y: 150 },
+                { x: 80, y: 240 },
+                { x: 100, y: 300 },
+                { x: 120, y: 360 }
+            ];
+
+            linearRegressionChart = new Chart(linearRegressionCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实际房价',
+                        data: scatterData,
+                        backgroundColor: '#e74c3c',
+                        borderColor: '#c0392b',
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }, {
+                        label: '预测线',
+                        data: [{ x: 40, y: 120 }, { x: 130, y: 390 }],
+                        type: 'line',
+                        borderColor: '#3498db',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '📏 房价预测 - 线性回归',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: '面积 (m²)'
+                            },
+                            min: 40,
+                            max: 130
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '房价 (万元)'
+                            },
+                            min: 100,
+                            max: 400
+                        }
+                    }
+                }
+            });
+        }
+
+        // 线性回归动画
+        function animateLinearRegression() {
+            let step = 0;
+            const slopes = [
+                [{ x: 40, y: 80 }, { x: 130, y: 200 }],   // 太平
+                [{ x: 40, y: 50 }, { x: 130, y: 320 }],   // 太陡
+                [{ x: 40, y: 120 }, { x: 130, y: 390 }]   // 完美
+            ];
+
+            const interval = setInterval(() => {
+                if (step >= slopes.length) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                linearRegressionChart.data.datasets[1].data = slopes[step];
+                linearRegressionChart.data.datasets[1].label = step === slopes.length - 1 ?
+                    '✅ 最佳拟合线' : `⚠️ 尝试 ${step + 1}`;
+                linearRegressionChart.update();
+                step++;
+            }, 1500);
+        }
+
+        // 4. 线性回归应用场景
+        const linearAppsCtx = document.getElementById('linearAppsChart');
+        if (linearAppsCtx) {
+            new Chart(linearAppsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['房价预测', '股票预测', '温度预测', '销售预测', '成绩预测'],
+                    datasets: [{
+                        label: '适用度',
+                        data: [95, 70, 85, 90, 80],
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        pointBackgroundColor: '#3498db',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#3498db',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '💡 线性回归实际应用',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 5. KNN可视化
+        let knnChart;
+        const knnCtx = document.getElementById('knnChart');
+        if (knnCtx) {
+            const goodMelons = [
+                { x: 6, y: 8 }, { x: 7, y: 9 }, { x: 5, y: 7 },
+                { x: 8, y: 8 }, { x: 6, y: 9 }
+            ];
+            const badMelons = [
+                { x: 3, y: 3 }, { x: 4, y: 4 }, { x: 2, y: 3 },
+                { x: 3, y: 5 }, { x: 4, y: 2 }
+            ];
+            const testMelon = [{ x: 6, y: 6 }];
+
+            knnChart = new Chart(knnCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '好瓜 ✅',
+                        data: goodMelons,
+                        backgroundColor: '#27ae60',
+                        borderColor: '#229954',
+                        pointRadius: 10,
+                        pointStyle: 'circle'
+                    }, {
+                        label: '坏瓜 ❌',
+                        data: badMelons,
+                        backgroundColor: '#e74c3c',
+                        borderColor: '#c0392b',
+                        pointRadius: 10,
+                        pointStyle: 'circle'
+                    }, {
+                        label: '待判断 🍉',
+                        data: testMelon,
+                        backgroundColor: '#f39c12',
+                        borderColor: '#d68910',
+                        pointRadius: 15,
+                        pointStyle: 'star'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '👥 KNN算法 - 看邻居判断（K=3）',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: '重量'
+                            },
+                            min: 0,
+                            max: 10
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '甜度'
+                            },
+                            min: 0,
+                            max: 10
+                        }
+                    }
+                }
+            });
+        }
+
+        // KNN动画
+        function animateKNN() {
+            // 添加圆圈显示邻近区域
+            const circleDataset = {
+                label: 'K=3邻域',
+                data: [],
+                backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                borderColor: '#f39c12',
+                borderWidth: 2,
+                pointRadius: 0,
+                showLine: true,
+                fill: true,
+                tension: 0
+            };
+
+            // 画圆
+            const centerX = 6, centerY = 6, radius = 3.5;
+            for (let i = 0; i <= 360; i += 10) {
+                const angle = (i * Math.PI) / 180;
+                circleDataset.data.push({
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                });
+            }
+
+            knnChart.data.datasets.push(circleDataset);
+            knnChart.update();
+
+            setTimeout(() => {
+                alert('🎯 在K=3邻域内：\n✅ 好瓜: 2个\n❌ 坏瓜: 1个\n\n结论：这是好瓜！✅');
+            }, 1000);
+        }
+
+        // 6. SVM可视化
+        const svmCtx = document.getElementById('svmChart');
+        if (svmCtx) {
+            const goodMelonsSVM = [
+                { x: 2, y: 8 }, { x: 3, y: 9 }, { x: 2, y: 7 },
+                { x: 3, y: 8 }, { x: 4, y: 9 }
+            ];
+            const badMelonsSVM = [
+                { x: 7, y: 3 }, { x: 8, y: 4 }, { x: 7, y: 2 },
+                { x: 8, y: 3 }, { x: 9, y: 4 }
+            ];
+
+            new Chart(svmCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '好瓜 ✅',
+                        data: goodMelonsSVM,
+                        backgroundColor: '#27ae60',
+                        borderColor: '#229954',
+                        pointRadius: 10
+                    }, {
+                        label: '坏瓜 ❌',
+                        data: badMelonsSVM,
+                        backgroundColor: '#e74c3c',
+                        borderColor: '#c0392b',
+                        pointRadius: 10
+                    }, {
+                        label: '决策边界',
+                        data: [{ x: 0, y: 10 }, { x: 10, y: 0 }],
+                        type: 'line',
+                        borderColor: '#9b59b6',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '✂️ SVM - 最大间隔分类器',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '特征1'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '特征2'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 7. K-means聚类
+        let kmeansChart;
+        const kmeansCtx = document.getElementById('kmeansChart');
+        if (kmeansCtx) {
+            const clusterData = [
+                // 簇1
+                { x: 2, y: 8 }, { x: 3, y: 9 }, { x: 2, y: 7 }, { x: 3, y: 8 },
+                // 簇2
+                { x: 8, y: 3 }, { x: 9, y: 4 }, { x: 8, y: 2 }, { x: 9, y: 3 },
+                // 簇3
+                { x: 5, y: 5 }, { x: 6, y: 6 }, { x: 5, y: 6 }, { x: 6, y: 5 }
+            ];
+
+            kmeansChart = new Chart(kmeansCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '数据点',
+                        data: clusterData,
+                        backgroundColor: '#95a5a6',
+                        borderColor: '#7f8c8d',
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        title: {
+                            display: true,
+                            text: '📍 K-means聚类 (K=3)',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '特征1'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '特征2'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // K-means动画
+        function animateKMeans() {
+            const cluster1 = [
+                { x: 2, y: 8 }, { x: 3, y: 9 }, { x: 2, y: 7 }, { x: 3, y: 8 }
+            ];
+            const cluster2 = [
+                { x: 8, y: 3 }, { x: 9, y: 4 }, { x: 8, y: 2 }, { x: 9, y: 3 }
+            ];
+            const cluster3 = [
+                { x: 5, y: 5 }, { x: 6, y: 6 }, { x: 5, y: 6 }, { x: 6, y: 5 }
+            ];
+
+            kmeansChart.data.datasets = [
+                {
+                    label: '簇1（小而甜）',
+                    data: cluster1,
+                    backgroundColor: '#e74c3c',
+                    borderColor: '#c0392b',
+                    pointRadius: 10
+                },
+                {
+                    label: '簇2（大而淡）',
+                    data: cluster2,
+                    backgroundColor: '#3498db',
+                    borderColor: '#2980b9',
+                    pointRadius: 10
+                },
+                {
+                    label: '簇3（中等）',
+                    data: cluster3,
+                    backgroundColor: '#27ae60',
+                    borderColor: '#229954',
+                    pointRadius: 10
+                },
+                {
+                    label: '中心点',
+                    data: [
+                        { x: 2.5, y: 8 },
+                        { x: 8.5, y: 3 },
+                        { x: 5.5, y: 5.5 }
+                    ],
+                    backgroundColor: '#f39c12',
+                    borderColor: '#d68910',
+                    pointRadius: 15,
+                    pointStyle: 'star'
+                }
+            ];
+            kmeansChart.update();
+        }
+
+        // 8. 混淆矩阵热力图
+        const confusionMatrixCtx = document.getElementById('confusionMatrixChart');
+        if (confusionMatrixCtx) {
+            new Chart(confusionMatrixCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['真正例\nTP=40', '假正例\nFP=5', '假反例\nFN=3', '真反例\nTN=52'],
+                    datasets: [{
+                        label: '数量',
+                        data: [40, 5, 3, 52],
+                        backgroundColor: [
+                            'rgba(39, 174, 96, 0.7)',
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(39, 174, 96, 0.7)'
+                        ],
+                        borderColor: [
+                            '#27ae60',
+                            '#e74c3c',
+                            '#e74c3c',
+                            '#27ae60'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '混淆矩阵 - 预测结果统计',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '样本数量'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 9. 评估指标对比
+        const metricsCtx = document.getElementById('metricsChart');
+        if (metricsCtx) {
+            new Chart(metricsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['准确率\nAccuracy', '精确率\nPrecision', '召回率\nRecall', 'F1分数\nF1-Score'],
+                    datasets: [{
+                        label: '分数 (%)',
+                        data: [92, 88.9, 93, 90.9],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)'
+                        ],
+                        borderColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#9b59b6',
+                            '#f1c40f'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '📊 模型评估指标对比',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '百分比 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 10. ROC曲线
+        const rocCtx = document.getElementById('rocChart');
+        if (rocCtx) {
+            new Chart(rocCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: '优秀模型 (AUC=0.9)',
+                        data: [
+                            { x: 0, y: 0 },
+                            { x: 0.1, y: 0.6 },
+                            { x: 0.2, y: 0.8 },
+                            { x: 0.3, y: 0.9 },
+                            { x: 1, y: 1 }
+                        ],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '一般模型 (AUC=0.7)',
+                        data: [
+                            { x: 0, y: 0 },
+                            { x: 0.3, y: 0.5 },
+                            { x: 0.5, y: 0.7 },
+                            { x: 1, y: 1 }
+                        ],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '随机猜测 (AUC=0.5)',
+                        data: [
+                            { x: 0, y: 0 },
+                            { x: 1, y: 1 }
+                        ],
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        borderDash: [10, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: '📈 ROC曲线 - 模型性能对比',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            min: 0,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: '假正率 (FPR)'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: '真正率 (TPR / 召回率)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 11. 过拟合vs欠拟合
+        const fittingCtx = document.getElementById('fittingChart');
+        if (fittingCtx) {
+            const dataPoints = [
+                { x: 1, y: 2.1 },
+                { x: 2, y: 3.9 },
+                { x: 3, y: 6.2 },
+                { x: 4, y: 7.8 },
+                { x: 5, y: 10.1 }
+            ];
+
+            new Chart(fittingCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '数据点',
+                        data: dataPoints,
+                        backgroundColor: '#34495e',
+                        borderColor: '#2c3e50',
+                        pointRadius: 8
+                    }, {
+                        label: '❌ 欠拟合（太简单）',
+                        data: [{ x: 0, y: 4 }, { x: 6, y: 8 }],
+                        type: 'line',
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }, {
+                        label: '✅ 恰到好处',
+                        data: [
+                            { x: 0, y: 0 },
+                            { x: 1, y: 2 },
+                            { x: 2, y: 4 },
+                            { x: 3, y: 6 },
+                            { x: 4, y: 8 },
+                            { x: 5, y: 10 },
+                            { x: 6, y: 12 }
+                        ],
+                        type: 'line',
+                        borderColor: '#27ae60',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0.3
+                    }, {
+                        label: '⚠️ 过拟合（太复杂）',
+                        data: [
+                            { x: 0, y: -1 },
+                            { x: 1, y: 2.1 },
+                            { x: 1.5, y: 1 },
+                            { x: 2, y: 3.9 },
+                            { x: 2.5, y: 5 },
+                            { x: 3, y: 6.2 },
+                            { x: 3.5, y: 5 },
+                            { x: 4, y: 7.8 },
+                            { x: 4.5, y: 9 },
+                            { x: 5, y: 10.1 },
+                            { x: 6, y: 13 }
+                        ],
+                        type: 'line',
+                        borderColor: '#f39c12',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '⚖️ 过拟合 vs 欠拟合 vs 恰到好处',
+                            font: { size: 18 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 6
+                        },
+                        y: {
+                            min: -2,
+                            max: 14
+                        }
+                    }
+                }
+            });
+        }
+
+        // ML Pipeline可视化
+        Reveal.addEventListener('slidechanged', function(event) {
+            if (event.currentSlide.querySelector('#mlPipelineViz')) {
+                drawMLPipeline();
+            }
+        });
+
+        function drawMLPipeline() {
+            const container = document.getElementById('mlPipelineViz');
+            if (!container) return;
+
+            const steps = [
+                { icon: '📚', text: '收集数据', color: '#3498db' },
+                { icon: '🧹', text: '数据预处理', color: '#9b59b6' },
+                { icon: '🔧', text: '特征工程', color: '#e67e22' },
+                { icon: '🤖', text: '选择算法', color: '#e74c3c' },
+                { icon: '🎓', text: '训练模型', color: '#27ae60' },
+                { icon: '📊', text: '评估模型', color: '#f39c12' },
+                { icon: '🚀', text: '预测应用', color: '#16a085' }
+            ];
+
+            let html = '<div style="display: flex; align-items: center; justify-content: space-between; padding: 20px;">';
+            steps.forEach((step, index) => {
+                html += `
+                    <div style="text-align: center; flex: 1;">
+                        <div style="font-size: 3em;">${step.icon}</div>
+                        <div style="background: ${step.color}; color: white; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold;">
+                            ${step.text}
+                        </div>
+                    </div>
+                `;
+                if (index < steps.length - 1) {
+                    html += `<div style="font-size: 2em; color: #95a5a6; margin: 0 10px;">→</div>`;
+                }
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // 初始化时绘制一次
+        if (document.getElementById('mlPipelineViz')) {
+            setTimeout(drawMLPipeline, 100);
+        }
+
+    </script>
+</body>
+</html>

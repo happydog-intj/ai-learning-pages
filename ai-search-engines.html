@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 搜索引擎全景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; color: #000; overflow: hidden; }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 10; }
+        h1 { font-size: 4.5em; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h2 { font-size: 3em; font-weight: 600; margin-bottom: 40px; text-align: center; color: #333; }
+        .subtitle { font-size: 1.8em; color: #666; text-align: center; margin-bottom: 60px; }
+        .content { max-width: 1400px; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; transition: all 0.2s ease; }
+        .card:hover { border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; }
+        .card-content { font-size: 1.1em; line-height: 1.6; color: #666; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.2em; color: #333; position: relative; padding-left: 30px; }
+        li::before { content: '•'; position: absolute; left: 10px; font-weight: bold; }
+        li:last-child { border-bottom: none; }
+        .timeline { display: flex; flex-direction: column; gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .timeline-item { display: grid; grid-template-columns: 120px 1fr; gap: 30px; align-items: center; }
+        .timeline-year { font-size: 2em; font-weight: 700; text-align: right; }
+        .timeline-content { border-left: 2px solid #000; padding-left: 30px; }
+        .timeline-title { font-size: 1.4em; font-weight: 600; margin-bottom: 8px; }
+        .timeline-desc { color: #666; line-height: 1.5; }
+        .comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .comparison-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; }
+        .comparison-title { font-size: 1.8em; font-weight: 600; margin-bottom: 20px; text-align: center; }
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .pros, .cons { padding: 15px; border-radius: 6px; }
+        .pros { background: #f0fdf4; border-left: 3px solid #22c55e; }
+        .cons { background: #fef2f2; border-left: 3px solid #ef4444; }
+        .pros-title { font-weight: 600; margin-bottom: 10px; color: #22c55e; }
+        .cons-title { font-weight: 600; margin-bottom: 10px; color: #ef4444; }
+        .pros-cons ul { list-style: none; }
+        .pros-cons li { font-size: 1em; padding: 6px 0; border: none; color: #666; padding-left: 20px; }
+        .pros li::before { content: '✓'; color: #22c55e; }
+        .cons li::before { content: '✗'; color: #ef4444; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 50px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 4em; font-weight: 700; margin-bottom: 10px; }
+        .stat-label { font-size: 1.2em; color: #666; }
+        .nav { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; background: #fff; padding: 15px 25px; border-radius: 50px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3em; transition: all 0.2s ease; }
+        .nav-btn:hover { border-color: #000; background: #f5f5f5; }
+        .progress { display: flex; gap: 8px; padding: 0 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #d0d0d0; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { width: 24px; border-radius: 4px; background: #000; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="slide active">
+            <h1>🔍 AI 搜索引擎</h1>
+            <p class="subtitle">重新定义信息获取方式</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number">6+</div><div class="stat-label">主流产品</div></div>
+                <div class="stat-item"><div class="stat-number">10x</div><div class="stat-label">效率提升</div></div>
+                <div class="stat-item"><div class="stat-number">实时</div><div class="stat-label">网络数据</div></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>为什么需要 AI 搜索？</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">传统搜索的问题</div>
+                        <ul>
+                            <li>返回一堆链接</li>
+                            <li>需要逐个点开阅读</li>
+                            <li>信息碎片化</li>
+                            <li>广告干扰多</li>
+                            <li>时间成本高</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">AI 搜索的优势</div>
+                        <ul>
+                            <li>直接给出答案</li>
+                            <li>自动整合多源信息</li>
+                            <li>引用来源可溯</li>
+                            <li>对话式追问</li>
+                            <li>结构化输出</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>发展时间线</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Perplexity 创立</div>
+                            <div class="timeline-desc">AI搜索先驱，引用溯源模式</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Bing Chat 集成</div>
+                            <div class="timeline-desc">微软将GPT-4集成到Bing搜索</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">中国AI搜索元年</div>
+                            <div class="timeline-desc">秘塔、天工等国产AI搜索涌现</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">多模态搜索</div>
+                            <div class="timeline-desc">支持图像、视频等多模态输入和输出</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Perplexity</h2>
+            <p class="subtitle">AI搜索领头羊</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>实时搜索网络数据</li>
+                            <li>清晰的引用来源</li>
+                            <li>对话式追问</li>
+                            <li>多模态支持</li>
+                            <li>Pro 模式深度研究</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">价格</div>
+                            <div class="card-content">
+                                免费版：基础搜索<br>
+                                Pro版：$20/月<br>
+                                无限搜索 + Pro模式
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>引用清晰</li>
+                                    <li>答案准确</li>
+                                    <li>界面简洁</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>中文支持一般</li>
+                                    <li>需要魔法上网</li>
+                                    <li>Pro版较贵</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>中国AI搜索对比</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">秘塔搜索 🇨🇳</div>
+                        <ul>
+                            <li>完全免费</li>
+                            <li>中文优化</li>
+                            <li>无广告干扰</li>
+                            <li>简洁清爽</li>
+                            <li>国内访问快</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">天工AI 🇨🇳</div>
+                        <ul>
+                            <li>昆仑万维</li>
+                            <li>多模态搜索</li>
+                            <li>AI生成图片</li>
+                            <li>免费使用</li>
+                            <li>功能丰富</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">360AI搜索 🇨🇳</div>
+                        <ul>
+                            <li>360出品</li>
+                            <li>安全可靠</li>
+                            <li>中文理解</li>
+                            <li>免费使用</li>
+                            <li>搜索+生成</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>垂直领域搜索</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Phind</div>
+                        <ul>
+                            <li>编程专用搜索</li>
+                            <li>代码示例丰富</li>
+                            <li>技术文档整合</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Consensus</div>
+                        <ul>
+                            <li>学术论文搜索</li>
+                            <li>引用科学文献</li>
+                            <li>研究综述</li>
+                            <li>免费/付费</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">You.com</div>
+                        <ul>
+                            <li>多模态搜索</li>
+                            <li>代码生成</li>
+                            <li>图像理解</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>使用场景推荐</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔬 深度研究</div>
+                        <div class="card-content">
+                            需要全面了解某个主题<br><br>
+                            <strong>推荐：Perplexity Pro</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🇨🇳 中文查询</div>
+                        <div class="card-content">
+                            主要使用中文内容<br><br>
+                            <strong>推荐：秘塔搜索</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">💻 编程问题</div>
+                        <div class="card-content">
+                            技术问题、代码示例<br><br>
+                            <strong>推荐：Phind</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">📚 学术研究</div>
+                        <div class="card-content">
+                            论文查找、文献综述<br><br>
+                            <strong>推荐：Consensus</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">💰 免费需求</div>
+                        <div class="card-content">
+                            预算有限、个人使用<br><br>
+                            <strong>推荐：秘塔 + You.com</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎯 综合使用</div>
+                        <div class="card-content">
+                            日常搜索、多场景<br><br>
+                            <strong>推荐：Perplexity + 秘塔</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>选择建议</h1>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">国际用户</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Perplexity</strong><br>
+                            功能最全、答案最准<br>
+                            适合：深度研究、英文查询
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">中国用户</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>秘塔搜索</strong><br>
+                            免费、快速、中文友好<br>
+                            适合：日常查询、学习研究
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">开发者</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Phind</strong><br>
+                            专注编程、代码示例丰富<br>
+                            适合：技术问题、代码查找
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">学术研究</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Consensus</strong><br>
+                            科学文献、研究综述<br>
+                            适合：论文查找、文献回顾
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+        function nextSlide() { current = (current + 1) % total; update(); }
+        function prevSlide() { current = (current - 1 + total) % total; update(); }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        update();
+    </script>
+</body>
+</html>

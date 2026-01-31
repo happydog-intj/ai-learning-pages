@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG 技术栈全景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; color: #000; overflow: hidden; }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 10; }
+        h1 { font-size: 4.5em; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h2 { font-size: 3em; font-weight: 600; margin-bottom: 40px; text-align: center; color: #333; }
+        .subtitle { font-size: 1.8em; color: #666; text-align: center; margin-bottom: 60px; }
+        .content { max-width: 1400px; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .three-column { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; transition: all 0.2s ease; }
+        .card:hover { border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; }
+        .card-content { font-size: 1.1em; line-height: 1.6; color: #666; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.2em; color: #333; position: relative; padding-left: 30px; }
+        li::before { content: '•'; position: absolute; left: 10px; font-weight: bold; }
+        li:last-child { border-bottom: none; }
+        .comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .comparison-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 25px; }
+        .comparison-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; text-align: center; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 50px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 4em; font-weight: 700; margin-bottom: 10px; }
+        .stat-label { font-size: 1.2em; color: #666; }
+        .flow { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .flow-item { flex: 1; text-align: center; padding: 20px; }
+        .flow-arrow { font-size: 2em; color: #666; }
+        .flow-box { background: #f5f5f5; border: 2px solid #000; border-radius: 8px; padding: 20px; margin: 10px 0; }
+        .flow-title { font-size: 1.3em; font-weight: 600; margin-bottom: 10px; }
+        .flow-desc { color: #666; font-size: 0.95em; }
+        .nav { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; background: #fff; padding: 15px 25px; border-radius: 50px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3em; transition: all 0.2s ease; }
+        .nav-btn:hover { border-color: #000; background: #f5f5f5; }
+        .progress { display: flex; gap: 8px; padding: 0 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #d0d0d0; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { width: 24px; border-radius: 4px; background: #000; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="slide active">
+            <h1>📚 RAG 技术栈</h1>
+            <p class="subtitle">检索增强生成 · 企业AI的核心</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number">5</div><div class="stat-label">核心组件</div></div>
+                <div class="stat-item"><div class="stat-number">10+</div><div class="stat-label">向量数据库</div></div>
+                <div class="stat-item"><div class="stat-number">∞</div><div class="stat-label">知识库</div></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>什么是 RAG？</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">传统 LLM 的问题</div>
+                        <ul>
+                            <li>知识截止日期</li>
+                            <li>无法访问私有数据</li>
+                            <li>容易产生幻觉</li>
+                            <li>无法实时更新</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">RAG 的优势</div>
+                        <ul>
+                            <li>实时知识库更新</li>
+                            <li>私有数据安全</li>
+                            <li>减少幻觉</li>
+                            <li>可溯源性强</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>RAG 工作流程</h2>
+            <div class="content">
+                <div class="flow">
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">📄 文档</div>
+                            <div class="flow-desc">PDF/Word/网页</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">✂️ 分块</div>
+                            <div class="flow-desc">切分成小段</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">🧮 向量化</div>
+                            <div class="flow-desc">Embedding模型</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">💾 存储</div>
+                            <div class="flow-desc">向量数据库</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 60px;"></div>
+                <div class="flow">
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">❓ 用户提问</div>
+                            <div class="flow-desc">自然语言查询</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">🔍 检索</div>
+                            <div class="flow-desc">语义相似搜索</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">🤖 LLM生成</div>
+                            <div class="flow-desc">结合上下文回答</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-box">
+                            <div class="flow-title">✅ 答案+引用</div>
+                            <div class="flow-desc">可溯源结果</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>向量数据库对比</h2>
+            <div class="content">
+                <div class="three-column">
+                    <div class="card">
+                        <div class="card-title">Pinecone</div>
+                        <ul>
+                            <li>云原生SaaS</li>
+                            <li>性能最强</li>
+                            <li>易于使用</li>
+                            <li>$70/月起</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Weaviate</div>
+                        <ul>
+                            <li>开源可托管</li>
+                            <li>混合搜索</li>
+                            <li>多模态支持</li>
+                            <li>免费/云版</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Qdrant</div>
+                        <ul>
+                            <li>Rust编写</li>
+                            <li>高性能</li>
+                            <li>易于部署</li>
+                            <li>开源免费</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Milvus</div>
+                        <ul>
+                            <li>开源标准</li>
+                            <li>大规模向量</li>
+                            <li>中国主导</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Chroma</div>
+                        <ul>
+                            <li>轻量级</li>
+                            <li>易于集成</li>
+                            <li>适合小项目</li>
+                            <li>开源免费</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Postgres + pgvector</div>
+                        <ul>
+                            <li>SQL + 向量</li>
+                            <li>零额外学习</li>
+                            <li>适合已有PG</li>
+                            <li>完全免费</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Embedding 模型</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">OpenAI Embeddings</div>
+                        <ul>
+                            <li>text-embedding-3-small/large</li>
+                            <li>多语言支持好</li>
+                            <li>按量计费</li>
+                            <li>闭源API</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Cohere Embed</div>
+                        <ul>
+                            <li>多语言优秀</li>
+                            <li>语义理解强</li>
+                            <li>免费试用</li>
+                            <li>$0.1/1M tokens</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">BGE 🇨🇳</div>
+                        <ul>
+                            <li>中文最强</li>
+                            <li>完全开源</li>
+                            <li>可本地部署</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">M3E 🇨🇳</div>
+                        <ul>
+                            <li>中文优化</li>
+                            <li>轻量模型</li>
+                            <li>开源免费</li>
+                            <li>HuggingFace</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>RAG 框架</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">LangChain</div>
+                        <ul>
+                            <li>最流行框架</li>
+                            <li>生态最丰富</li>
+                            <li>Document Loaders</li>
+                            <li>Python/JS</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">LlamaIndex</div>
+                        <ul>
+                            <li>专注RAG</li>
+                            <li>索引优化</li>
+                            <li>多种检索策略</li>
+                            <li>Python</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Haystack</div>
+                        <ul>
+                            <li>deepset出品</li>
+                            <li>Pipeline设计</li>
+                            <li>企业级</li>
+                            <li>开源</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">RAGFlow 🇨🇳</div>
+                        <ul>
+                            <li>开源中文</li>
+                            <li>可视化界面</li>
+                            <li>易于部署</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>RAG 优化技术</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔪 分块策略</div>
+                        <div class="card-content">
+                            固定大小 / 语义分块<br>
+                            重叠 / 层级分块<br>
+                            <strong>影响：检索精度</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔍 检索策略</div>
+                        <div class="card-content">
+                            密集检索 / 稀疏检索<br>
+                            混合检索 / 重排序<br>
+                            <strong>影响：召回率</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎯 查询改写</div>
+                        <div class="card-content">
+                            多查询生成<br>
+                            HyDE（假设文档）<br>
+                            <strong>影响：查询质量</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🧠 上下文压缩</div>
+                        <div class="card-content">
+                            LLMLingua / 摘要<br>
+                            相关性过滤<br>
+                            <strong>影响：Token成本</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>使用场景推荐</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">📚 企业知识库</div>
+                        <div class="card-content">
+                            内部文档问答<br><br>
+                            <strong>Pinecone + LangChain</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🤖 客服机器人</div>
+                        <div class="card-content">
+                            FAQ自动回复<br><br>
+                            <strong>Weaviate + LlamaIndex</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔬 研究助手</div>
+                        <div class="card-content">
+                            论文检索、文献综述<br><br>
+                            <strong>Qdrant + BGE</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🏢 法务合规</div>
+                        <div class="card-content">
+                            法律文档、合同审查<br><br>
+                            <strong>Milvus + 私有部署</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">💬 聊天机器人</div>
+                        <div class="card-content">
+                            对话记忆、上下文<br><br>
+                            <strong>Chroma + LangChain</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🇨🇳 中文应用</div>
+                        <div class="card-content">
+                            国内业务、中文优化<br><br>
+                            <strong>Milvus + BGE</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>选择建议</h1>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">云原生 SaaS</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Pinecone + OpenAI</strong><br>
+                            开箱即用、运维简单<br>
+                            适合：快速上线、小团队
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">开源自托管</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Qdrant + BGE</strong><br>
+                            完全可控、成本可控<br>
+                            适合：技术团队、大规模
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">中文场景</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Milvus + BGE</strong><br>
+                            中文优化、社区活跃<br>
+                            适合：国内业务
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">快速原型</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Chroma + LangChain</strong><br>
+                            轻量、易用、快速验证<br>
+                            适合：MVP、Demo
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+        function nextSlide() { current = (current + 1) % total; update(); }
+        function prevSlide() { current = (current - 1 + total) % total; update(); }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        update();
+    </script>
+</body>
+</html>

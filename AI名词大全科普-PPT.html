@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI 名词大全 - 从入门到精通</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #ffffff;
+            color: #000000;
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            z-index: 2;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-100%);
+            z-index: 1;
+        }
+
+        /* 封面样式 */
+        .slide.cover {
+            background: #ffffff;
+            border-bottom: 2px solid #000000;
+        }
+
+        .cover h1 {
+            font-size: 5em;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: #000000;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .cover .subtitle {
+            font-size: 2em;
+            color: #666666;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        /* 目录样式 */
+        .slide.toc {
+            background: #ffffff;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .toc-item {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #000000;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background: #f5f5f5;
+            transform: translateY(-3px);
+        }
+
+        .toc-item h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .toc-item p {
+            color: #666666;
+        }
+
+        /* 内容页样式 */
+        .slide.content {
+            background: #ffffff;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        .slide.content.purple {
+            background: #ffffff;
+        }
+
+        .slide.content.orange {
+            background: #ffffff;
+        }
+
+        .slide.content.blue {
+            background: #ffffff;
+        }
+
+        .slide.content.dark {
+            background: #ffffff;
+        }
+
+        .slide h2 {
+            font-size: 3.5em;
+            margin-bottom: 40px;
+            font-weight: 800;
+            color: #000000;
+        }
+
+        .content-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            border: 2px solid #000000;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .content-box h3 {
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #000000;
+        }
+
+        .content-box p {
+            font-size: 1.5em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .content-box ul {
+            font-size: 1.4em;
+            line-height: 2;
+            list-style: none;
+        }
+
+        .content-box li {
+            padding-left: 30px;
+            position: relative;
+            margin-bottom: 15px;
+            color: #000000;
+        }
+
+        .content-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #000000;
+            font-size: 1.2em;
+        }
+
+        /* 代码框样式 */
+        .code-box {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3em;
+            margin: 20px 0;
+            border-left: 4px solid #000000;
+            overflow-x: auto;
+        }
+
+        .code-box pre {
+            white-space: pre-wrap;
+            color: #000000;
+        }
+
+        /* 对比卡片 */
+        .compare-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .compare-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 4px;
+            border: 2px solid #000000;
+        }
+
+        .compare-card.good {
+            border-color: #000000;
+        }
+
+        .compare-card.bad {
+            border-color: #000000;
+        }
+
+        .compare-card h4 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .compare-card p,
+        .compare-card ul,
+        .compare-card li {
+            color: #000000;
+        }
+
+        /* 流程图样式 */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            font-size: 1.5em;
+        }
+
+        .flow-item {
+            background: #ffffff;
+            padding: 20px 40px;
+            border-radius: 4px;
+            border: 2px solid #000000;
+            color: #000000;
+        }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #000000;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1.3em;
+            border: 2px solid #000000;
+        }
+
+        table th {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: left;
+            font-size: 1.2em;
+            border-bottom: 2px solid #000000;
+            color: #000000;
+        }
+
+        table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #cccccc;
+            color: #000000;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* 导航控制 */
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #000000;
+        }
+
+        .nav-btn:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 页码指示器 */
+        .page-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .page-dot {
+            width: 12px;
+            height: 12px;
+            background: #cccccc;
+            border-radius: 50%;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid #000000;
+        }
+
+        .page-dot.active {
+            background: #000000;
+            width: 40px;
+            border-radius: 6px;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* 高亮标签 */
+        .tag {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #ffffff;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 5px;
+            border: 1px solid #000000;
+            color: #000000;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px;
+            }
+
+            .slide h2 {
+                font-size: 2.5em;
+            }
+
+            .cover h1 {
+                font-size: 3em;
+            }
+
+            .toc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+
+        <!-- 封面 -->
+        <div class="slide cover active">
+            <h1>🤖 AI 名词大全</h1>
+            <p class="subtitle">从入门到精通 - 完整科普指南</p>
+            <p class="subtitle" style="margin-top: 50px; font-size: 1.5em; opacity: 0.7;">按空格键或→开始</p>
+        </div>
+
+        <!-- 目录 -->
+        <div class="slide toc">
+            <h2 style="margin-bottom: 60px;">📑 内容导航</h2>
+            <div class="toc-grid">
+                <div class="toc-item">
+                    <h3>1️⃣ 基础概念</h3>
+                    <p>AI、ML、DL、LLM、多模态</p>
+                </div>
+                <div class="toc-item">
+                    <h3>2️⃣ 模型架构</h3>
+                    <p>Transformer、Attention、GPT、BERT</p>
+                </div>
+                <div class="toc-item">
+                    <h3>3️⃣ 训练技术</h3>
+                    <p>预训练、微调、RLHF、提示工程</p>
+                </div>
+                <div class="toc-item">
+                    <h3>4️⃣ 应用技术</h3>
+                    <p>RAG、Agent、Function Calling</p>
+                </div>
+                <div class="toc-item">
+                    <h3>5️⃣ 参数调优</h3>
+                    <p>Temperature、Context Window、幻觉</p>
+                </div>
+                <div class="toc-item">
+                    <h3>6️⃣ 实用技巧</h3>
+                    <p>使用建议、安全指南、学习路径</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI基础概念 -->
+        <div class="slide content purple">
+            <h2>1️⃣ 基础概念</h2>
+            <div class="content-box">
+                <h3>🤖 AI 层次关系</h3>
+                <div class="flow-diagram" style="flex-direction: column; font-size: 1.8em;">
+                    <div class="flow-item" style="width: 300px;">AI (人工智能)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 350px;">机器学习 (ML)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 400px;">深度学习 (DL)</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 450px;">大语言模型 (LLM)</div>
+                </div>
+                <p style="text-align: center; font-size: 1.3em; margin-top: 30px;">
+                    <strong>每一层都是上一层的子集，能力越来越强大</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- 机器学习 -->
+        <div class="slide content blue">
+            <h2>🧠 机器学习 (ML)</h2>
+            <div class="content-box">
+                <h3>让计算机通过数据自己学习规律</h3>
+                <div class="compare-container">
+                    <div class="compare-card good">
+                        <h4>📚 监督学习</h4>
+                        <p>给答案学习</p>
+                        <p style="font-size: 0.9em; opacity: 0.8;">例如：猫狗分类</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>🎮 强化学习</h4>
+                        <p>试错中学习</p>
+                        <p style="font-size: 0.9em; opacity: 0.8;">例如：下棋AI</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>🔍 无监督学习</h4>
+                        <p>自己找规律</p>
+                        <p style="font-size: 0.9em; opacity: 0.8;">例如：用户分群</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>💡 应用实例</h4>
+                        <p>📧 垃圾邮件过滤</p>
+                        <p>🎬 Netflix推荐</p>
+                        <p>🗣️ 语音识别</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LLM -->
+        <div class="slide content orange">
+            <h2>🧠 大语言模型 (LLM)</h2>
+            <div class="content-box">
+                <h3>读过海量文本的超级AI</h3>
+                <table>
+                    <tr>
+                        <th>维度</th>
+                        <th>规模</th>
+                        <th>比喻</th>
+                    </tr>
+                    <tr>
+                        <td>📚 训练数据</td>
+                        <td>TB级文本</td>
+                        <td>几百万本书</td>
+                    </tr>
+                    <tr>
+                        <td>🔢 参数量</td>
+                        <td>千亿级</td>
+                        <td>人脑神经元数量</td>
+                    </tr>
+                    <tr>
+                        <td>💻 计算资源</td>
+                        <td>数千GPU</td>
+                        <td>小型数据中心</td>
+                    </tr>
+                    <tr>
+                        <td>⚡ 训练时间</td>
+                        <td>几周到几个月</td>
+                        <td>持续运行</td>
+                    </tr>
+                </table>
+                <div style="margin-top: 30px; text-align: center;">
+                    <span class="tag">✍️ 文本生成</span>
+                    <span class="tag">💬 对话聊天</span>
+                    <span class="tag">🔄 翻译</span>
+                    <span class="tag">📝 总结</span>
+                    <span class="tag">🧮 代码编写</span>
+                    <span class="tag">🎨 创意写作</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 多模态 -->
+        <div class="slide content">
+            <h2>🎭 多模态 (Multimodal)</h2>
+            <div class="content-box">
+                <h3>能同时处理多种类型数据的AI</h3>
+                <div class="compare-container">
+                    <div class="compare-card bad">
+                        <h4>❌ 单模态</h4>
+                        <div class="code-box" style="font-size: 1.1em;">
+文字 → [模型] → 文字
+                        </div>
+                        <p>只懂一种形式</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>✅ 多模态</h4>
+                        <div class="code-box" style="font-size: 1.1em;">
+文字 ╮
+图片 ├→ [模型] → 文字/图片/音频
+音频 ╯
+                        </div>
+                        <p>样样精通</p>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <p><strong>实际应用：</strong></p>
+                    <ul>
+                        <li>🖼️ 看图说话 - 上传图片，AI描述内容</li>
+                        <li>🎨 文生图 - Midjourney、DALL-E、Stable Diffusion</li>
+                        <li>🎬 视频理解 - 分析视频内容并回答问题</li>
+                        <li>🗣️ 语音对话 - 直接语音交流，无需打字</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transformer -->
+        <div class="slide content dark">
+            <h2>2️⃣ 模型架构</h2>
+            <div class="content-box">
+                <h3>🔄 Transformer - 现代AI的发动机</h3>
+                <p><strong>2017年谷歌发明，改变了整个AI领域</strong></p>
+                <table>
+                    <tr>
+                        <th>旧技术 (RNN/LSTM)</th>
+                        <th>Transformer</th>
+                    </tr>
+                    <tr>
+                        <td>🐌 一个字一个字处理</td>
+                        <td>⚡ 同时处理整个句子</td>
+                    </tr>
+                    <tr>
+                        <td>😵 记不住长文本</td>
+                        <td>🧠 轻松处理长文本</td>
+                    </tr>
+                    <tr>
+                        <td>🚫 不能并行计算</td>
+                        <td>✅ 大规模并行</td>
+                    </tr>
+                </table>
+                <div class="code-box" style="margin-top: 30px;">
+<pre>句子: "我爱吃苹果"
+
+旧方法: 我 → 爱 → 吃 → 苹果 (顺序处理)
+
+Transformer:
+  我 ←→ 爱 ←→ 吃 ←→ 苹果
+  (每个字都能"看到"其他所有字)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attention机制 -->
+        <div class="slide content purple">
+            <h2>🎯 Attention机制</h2>
+            <div class="content-box">
+                <h3>让AI知道哪些词更重要</h3>
+                <div class="code-box" style="margin-top: 20px;">
+<pre>句子: "我今天在公园看到一只黑色的流浪猫"
+
+问题1: "你在哪看到的？"
+AI注意力: 我今天在【<span style="color: #ffd700;">公园</span>】看到一只黑色的流浪猫
+          ↑ 重点关注这个词
+
+问题2: "猫是什么颜色？"
+AI注意力: 我今天在公园看到一只【<span style="color: #ffd700;">黑色</span>】的流浪猫
+          ↑ 重点关注这个词</pre>
+                </div>
+                <div style="margin-top: 40px;">
+                    <p><strong>Attention计算过程：</strong></p>
+                    <div class="flow-diagram">
+                        <div class="flow-item">Query (查询)</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Key (键)</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">Value (值)</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-item">结果</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPT vs BERT -->
+        <div class="slide content blue">
+            <h2>📝 GPT vs 🔍 BERT</h2>
+            <div class="content-box">
+                <div class="compare-container">
+                    <div class="compare-card good">
+                        <h4>📝 GPT (生成式)</h4>
+                        <div class="code-box" style="font-size: 1em;">
+"我爱吃___" → 预测下一个词
+只看前文: 我→爱→吃→?
+                        </div>
+                        <p><strong>擅长：</strong></p>
+                        <ul style="font-size: 0.95em;">
+                            <li>✍️ 写作、对话</li>
+                            <li>🎨 创意生成</li>
+                            <li>💻 代码补全</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>代表：</strong>ChatGPT</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>🔍 BERT (理解式)</h4>
+                        <div class="code-box" style="font-size: 1em;">
+"我爱吃___苹果派" → 填空
+看前后文: 我→爱→吃→?←苹果←派
+                        </div>
+                        <p><strong>擅长：</strong></p>
+                        <ul style="font-size: 0.95em;">
+                            <li>🔍 搜索排序</li>
+                            <li>📧 情感分析</li>
+                            <li>❓ 问答系统</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>代表：</strong>Google搜索</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Token -->
+        <div class="slide content orange">
+            <h2>🔢 Token (词元)</h2>
+            <div class="content-box">
+                <h3>AI理解文本的最小单位</h3>
+                <div class="code-box">
+<pre>中文示例:
+"我爱编程"
+→ 可能分成: ["我", "爱", "编程"] (3个tokens)
+
+英文示例:
+"I love programming"
+→ ["I", " love", " program", "ming"] (4个tokens)
+注意: 空格也算！</pre>
+                </div>
+                <div style="margin-top: 30px;">
+                    <p><strong>实际影响：</strong></p>
+                    <table style="margin-top: 20px;">
+                        <tr>
+                            <td><strong>💰 API费用</strong></td>
+                            <td>按token数收费</td>
+                        </tr>
+                        <tr>
+                            <td><strong>📏 上下文限制</strong></td>
+                            <td>GPT-4: 8K/32K/128K tokens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>⚡ 响应速度</strong></td>
+                            <td>tokens越多 → 处理越慢</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RAG -->
+        <div class="slide content">
+            <h2>4️⃣ 应用技术</h2>
+            <div class="content-box">
+                <h3>📚 RAG (检索增强生成)</h3>
+                <p><strong>AI先去"图书馆"查资料，再回答问题</strong></p>
+                <div class="flow-diagram" style="flex-direction: column; margin: 40px 0;">
+                    <div class="flow-item" style="width: 400px;">👤 用户提问</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 400px;">🔍 向量化查询</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 400px;">💾 向量数据库检索</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 400px;">📄 找到相关文档</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-item" style="width: 400px;">🧠 LLM生成答案</div>
+                </div>
+                <div class="compare-container" style="margin-top: 30px;">
+                    <div class="compare-card bad">
+                        <h4>❌ 纯LLM</h4>
+                        <ul>
+                            <li>知识有截止日期</li>
+                            <li>可能"幻觉"</li>
+                            <li>不了解内部知识</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>✅ RAG</h4>
+                        <ul>
+                            <li>实时查询最新信息</li>
+                            <li>基于真实文档</li>
+                            <li>可接入任何知识库</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent -->
+        <div class="slide content dark">
+            <h2>🤖 Agent (智能体)</h2>
+            <div class="content-box">
+                <h3>能自主规划、使用工具、完成目标的AI</h3>
+                <div class="compare-container">
+                    <div class="compare-card bad">
+                        <h4>🗨️ 普通LLM</h4>
+                        <div class="code-box" style="font-size: 0.95em;">
+用户: "明天北京天气怎样？"
+AI: "抱歉，我无法查询实时天气"
+                        </div>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>🤖 Agent</h4>
+                        <div class="code-box" style="font-size: 0.95em;">
+用户: "明天北京天气怎样？"
+AI: [自动调用天气API查询]
+    "明天北京晴天，15-25°C"
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <p><strong>Agent核心能力：</strong></p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
+                        <div class="flow-item">🧠 规划能力</div>
+                        <div class="flow-item">🛠️ 工具使用</div>
+                        <div class="flow-item">💾 记忆能力</div>
+                        <div class="flow-item">🔄 自我反思</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="slide content purple">
+            <h2>5️⃣ 模型参数</h2>
+            <div class="content-box">
+                <h3>🌡️ Temperature (温度)</h3>
+                <p><strong>控制AI回答的"创造性"和"随机性"</strong></p>
+                <table style="margin-top: 30px;">
+                    <tr>
+                        <th>任务类型</th>
+                        <th>推荐Temperature</th>
+                        <th>原因</th>
+                    </tr>
+                    <tr>
+                        <td>📊 数据提取</td>
+                        <td>0 - 0.3</td>
+                        <td>需要准确性</td>
+                    </tr>
+                    <tr>
+                        <td>📝 摘要总结</td>
+                        <td>0.3 - 0.5</td>
+                        <td>忠实原文</td>
+                    </tr>
+                    <tr>
+                        <td>✍️ 代码生成</td>
+                        <td>0.2 - 0.5</td>
+                        <td>准确语法</td>
+                    </tr>
+                    <tr>
+                        <td>💬 对话聊天</td>
+                        <td>0.7 - 0.9</td>
+                        <td>自然多样</td>
+                    </tr>
+                    <tr>
+                        <td>🎨 创意写作</td>
+                        <td>0.8 - 1.2</td>
+                        <td>需要想象力</td>
+                    </tr>
+                    <tr>
+                        <td>🎭 诗歌创作</td>
+                        <td>1.0 - 1.5</td>
+                        <td>追求独特</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- 幻觉 -->
+        <div class="slide content orange">
+            <h2>🌫️ Hallucination (幻觉)</h2>
+            <div class="content-box">
+                <h3>AI"一本正经地胡说八道"</h3>
+                <div class="code-box" style="margin: 20px 0;">
+<pre>❌ 事实性错误:
+Q: "谁是2025年诺贝尔物理学奖得主？"
+A: "是斯蒂芬·霍金教授..."
+   (霍金2018年去世，不可能获2025年奖)
+
+❌ 编造引用:
+A: "根据《自然》杂志2024年第15期第342页..."
+   (可能根本没这篇文章)</pre>
+                </div>
+                <p><strong>如何减少幻觉：</strong></p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
+                    <div class="flow-item">✅ 使用RAG</div>
+                    <div class="flow-item">✅ 要求引用来源</div>
+                    <div class="flow-item">✅ 降低Temperature</div>
+                    <div class="flow-item">✅ Few-shot示例</div>
+                    <div class="flow-item">✅ 多次验证</div>
+                    <div class="flow-item">✅ 使用工具增强</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt工程 -->
+        <div class="slide content blue">
+            <h2>🔧 Prompt Engineering</h2>
+            <div class="content-box">
+                <h3>设计更好的"问法"，让AI给出更好的答案</h3>
+                <div class="compare-container">
+                    <div class="compare-card bad">
+                        <h4>❌ 差的Prompt</h4>
+                        <div class="code-box" style="font-size: 0.95em;">
+"写个代码"
+                        </div>
+                        <p>太模糊，AI不知道你要什么</p>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>✅ 好的Prompt</h4>
+                        <div class="code-box" style="font-size: 0.95em;">
+"用Python写一个函数，实现:
+ - 输入: 整数列表
+ - 输出: 去重后的列表
+ - 要求: 保持原始顺序
+ - 包含测试用例"
+                        </div>
+                        <p>明确、具体、有上下文</p>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <p><strong>常用技巧：</strong></p>
+                    <ul>
+                        <li>1️⃣ 明确角色 - "你是一位资深Python工程师"</li>
+                        <li>2️⃣ 提供示例 - Few-shot Learning</li>
+                        <li>3️⃣ 思维链 - "让我们一步步思考"</li>
+                        <li>4️⃣ 分步指令 - 清晰的执行步骤</li>
+                        <li>5️⃣ 输出格式 - JSON、表格等</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实用技巧 -->
+        <div class="slide content">
+            <h2>6️⃣ 实用技巧</h2>
+            <div class="content-box">
+                <h3>💡 提升AI回答质量的技巧</h3>
+                <ul style="font-size: 1.3em;">
+                    <li><strong>1️⃣ 明确角色和任务</strong> - 告诉AI它是谁，要做什么</li>
+                    <li><strong>2️⃣ 提供充足上下文</strong> - 背景信息越多越好</li>
+                    <li><strong>3️⃣ 要求格式化输出</strong> - 表格、列表、JSON等</li>
+                    <li><strong>4️⃣ 使用分隔符</strong> - ###, """, --- 分隔不同部分</li>
+                    <li><strong>5️⃣ 分步思考</strong> - "让我们一步步思考"</li>
+                    <li><strong>6️⃣ 设置约束条件</strong> - 字数、语言风格等</li>
+                    <li><strong>7️⃣ 提供示例</strong> - 好的例子和坏的例子</li>
+                    <li><strong>8️⃣ 迭代优化</strong> - 多次改进Prompt</li>
+                    <li><strong>9️⃣ 要求自我检查</strong> - 让AI检查自己的回答</li>
+                    <li><strong>🔟 保存有效提示词</strong> - 建立自己的Prompt库</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 安全指南 -->
+        <div class="slide content dark">
+            <h2>🛡️ AI安全使用指南</h2>
+            <div class="content-box">
+                <div class="compare-container">
+                    <div class="compare-card bad">
+                        <h4>❌ 不要做的事</h4>
+                        <ul style="font-size: 1.1em;">
+                            <li>上传敏感信息</li>
+                            <li>盲目信任输出</li>
+                            <li>商业场景直接使用</li>
+                            <li>用于不当目的</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card good">
+                        <h4>✅ 应该做的事</h4>
+                        <ul style="font-size: 1.1em;">
+                            <li>匿名化敏感数据</li>
+                            <li>验证重要信息</li>
+                            <li>人工审查关键决策</li>
+                            <li>持续学习最佳实践</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 40px; text-align: center; font-size: 1.5em;">
+                    <p><strong>⚠️ 高风险场景必须人工核实：</strong></p>
+                    <p style="margin-top: 20px;">🏥 医疗建议 | ⚖️ 法律咨询 | 💰 金融决策</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习路径 -->
+        <div class="slide content purple">
+            <h2>📚 学习路径推荐</h2>
+            <div class="content-box">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
+                    <div>
+                        <h3>🌱 入门级 (0-3个月)</h3>
+                        <ul>
+                            <li>体验主流AI工具</li>
+                            <li>学习Prompt工程</li>
+                            <li>了解基本概念</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>🌿 进阶级 (3-6个月)</h3>
+                        <ul>
+                            <li>RAG知识库搭建</li>
+                            <li>Agent开发入门</li>
+                            <li>项目实践</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>🌳 高级级 (6+个月)</h3>
+                        <ul>
+                            <li>深入技术原理</li>
+                            <li>模型Fine-tuning</li>
+                            <li>系统设计</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>🚀 专家级 (持续)</h3>
+                        <ul>
+                            <li>前沿研究</li>
+                            <li>贡献社区</li>
+                            <li>商业应用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结 -->
+        <div class="slide content orange">
+            <h2>🎓 核心概念总览</h2>
+            <div class="content-box">
+                <div class="code-box" style="font-size: 1.4em; line-height: 2.2;">
+<pre>🧠 基础层:
+AI → ML → DL → LLM
+
+🏗️ 架构层:
+Transformer → Attention → Embedding → Token
+
+🎓 训练层:
+Pre-training → Fine-tuning → RLHF → Prompt Engineering
+
+🚀 应用层:
+RAG → Agent → VibeCoding → Multi-modal
+
+⚙️ 调优层:
+Temperature → Context → Function Calling</pre>
+                </div>
+                <div style="text-align: center; margin-top: 40px; font-size: 1.5em;">
+                    <p><strong>记住：</strong></p>
+                    <p style="margin-top: 20px;">AI是工具，人类是主人</p>
+                    <p>用AI增强自己，而不是被AI替代！🌟</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结束页 -->
+        <div class="slide cover">
+            <h1>🎉 感谢观看！</h1>
+            <p class="subtitle" style="margin-top: 30px;">持续学习，拥抱AI时代</p>
+            <div style="margin-top: 60px; font-size: 1.5em; opacity: 0.8;">
+                <p>🚀 行动建议：学习后立即实践</p>
+                <p style="margin-top: 20px;">💡 动手尝试才是最好的学习方式</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 导航控制 -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">→</button>
+    </div>
+
+    <!-- 页码指示器 -->
+    <div class="page-indicator" id="pageIndicator"></div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        // 初始化页码指示器
+        function initPageIndicator() {
+            const indicator = document.getElementById('pageIndicator');
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'page-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.onclick = () => goToSlide(i);
+                indicator.appendChild(dot);
+            }
+        }
+
+        // 更新页码指示器
+        function updatePageIndicator() {
+            const dots = document.querySelectorAll('.page-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // 显示指定幻灯片
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+
+            const oldSlide = currentSlide;
+            currentSlide = index;
+
+            slides[oldSlide].classList.remove('active');
+            slides[oldSlide].classList.add('prev');
+
+            slides[currentSlide].classList.remove('prev');
+            slides[currentSlide].classList.add('active');
+
+            updatePageIndicator();
+        }
+
+        // 下一页
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        // 上一页
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // 触摸滑动支持
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                prevSlide();
+            }
+        }
+
+        // 初始化
+        initPageIndicator();
+    </script>
+</body>
+</html>

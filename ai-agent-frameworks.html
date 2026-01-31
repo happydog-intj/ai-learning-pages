@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent 框架全景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; color: #000; overflow: hidden; }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 10; }
+        h1 { font-size: 4.5em; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h2 { font-size: 3em; font-weight: 600; margin-bottom: 40px; text-align: center; color: #333; }
+        .subtitle { font-size: 1.8em; color: #666; text-align: center; margin-bottom: 60px; }
+        .content { max-width: 1400px; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; transition: all 0.2s ease; }
+        .card:hover { border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; }
+        .card-content { font-size: 1.1em; line-height: 1.6; color: #666; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.2em; color: #333; position: relative; padding-left: 30px; }
+        li::before { content: '•'; position: absolute; left: 10px; font-weight: bold; }
+        li:last-child { border-bottom: none; }
+        .timeline { display: flex; flex-direction: column; gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .timeline-item { display: grid; grid-template-columns: 120px 1fr; gap: 30px; align-items: center; }
+        .timeline-year { font-size: 2em; font-weight: 700; text-align: right; }
+        .timeline-content { border-left: 2px solid #000; padding-left: 30px; }
+        .timeline-title { font-size: 1.4em; font-weight: 600; margin-bottom: 8px; }
+        .timeline-desc { color: #666; line-height: 1.5; }
+        .comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .comparison-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 25px; }
+        .comparison-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; text-align: center; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 50px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 4em; font-weight: 700; margin-bottom: 10px; }
+        .stat-label { font-size: 1.2em; color: #666; }
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .pros, .cons { padding: 15px; border-radius: 6px; }
+        .pros { background: #f0fdf4; border-left: 3px solid #22c55e; }
+        .cons { background: #fef2f2; border-left: 3px solid #ef4444; }
+        .pros-title { font-weight: 600; margin-bottom: 10px; color: #22c55e; }
+        .cons-title { font-weight: 600; margin-bottom: 10px; color: #ef4444; }
+        .pros-cons ul { list-style: none; }
+        .pros-cons li { font-size: 1em; padding: 6px 0; border: none; color: #666; padding-left: 20px; }
+        .pros li::before { content: '✓'; color: #22c55e; }
+        .cons li::before { content: '✗'; color: #ef4444; }
+        .nav { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; background: #fff; padding: 15px 25px; border-radius: 50px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3em; transition: all 0.2s ease; }
+        .nav-btn:hover { border-color: #000; background: #f5f5f5; }
+        .progress { display: flex; gap: 8px; padding: 0 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #d0d0d0; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { width: 24px; border-radius: 4px; background: #000; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <div class="slide active">
+            <h1>🤖 AI Agent 框架</h1>
+            <p class="subtitle">让 AI 自主完成复杂任务</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number">8+</div><div class="stat-label">主流框架</div></div>
+                <div class="stat-item"><div class="stat-number">自主</div><div class="stat-label">决策能力</div></div>
+                <div class="stat-item"><div class="stat-number">多步</div><div class="stat-label">任务执行</div></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>什么是 AI Agent？</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">传统 AI</div>
+                        <ul>
+                            <li>被动响应用户指令</li>
+                            <li>单次对话完成任务</li>
+                            <li>不能主动行动</li>
+                            <li>需要精确指令</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">AI Agent</div>
+                        <ul>
+                            <li>自主制定计划</li>
+                            <li>多步骤执行任务</li>
+                            <li>调用工具和 API</li>
+                            <li>从反馈中学习</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Agent 核心能力</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎯 规划 (Planning)</div>
+                        <div class="card-content">
+                            将复杂任务分解<br>
+                            制定执行计划<br>
+                            动态调整策略
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🧠 记忆 (Memory)</div>
+                        <div class="card-content">
+                            短期工作记忆<br>
+                            长期知识库<br>
+                            上下文理解
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🛠️ 工具 (Tools)</div>
+                        <div class="card-content">
+                            API 调用<br>
+                            外部服务<br>
+                            代码执行
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔄 反思 (Reflection)</div>
+                        <div class="card-content">
+                            评估执行结果<br>
+                            错误修正<br>
+                            持续优化
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>发展时间线</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">ReAct 范式</div>
+                            <div class="timeline-desc">推理+行动交替，奠定Agent基础</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">AutoGPT 爆火</div>
+                            <div class="timeline-desc">首个自主Agent，展示AGI雏形</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">LangChain/LlamaIndex</div>
+                            <div class="timeline-desc">工程化框架，Agent开发标准化</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">多智能体协作</div>
+                            <div class="timeline-desc">CrewAI、AutoGen等多Agent系统</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>LangChain / LangGraph</h2>
+            <p class="subtitle">最成熟的 Agent 框架</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>组件化开发</li>
+                            <li>链式工作流</li>
+                            <li>丰富的工具生态</li>
+                            <li>LangGraph 图状态机</li>
+                            <li>LangSmith 可观测性</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">适用场景</div>
+                            <div class="card-content">
+                                复杂业务流程<br>
+                                企业级应用<br>
+                                需要精细控制<br>
+                                Python/JS 开发
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>生态最丰富</li>
+                                    <li>社区活跃</li>
+                                    <li>文档完善</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>学习曲线陡</li>
+                                    <li>概念复杂</li>
+                                    <li>版本迭代快</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>CrewAI</h2>
+            <p class="subtitle">多智能体协作专家</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>角色分工（Role-based）</li>
+                            <li>多Agent协作</li>
+                            <li>任务委派机制</li>
+                            <li>流程编排</li>
+                            <li>易于上手</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">适用场景</div>
+                            <div class="card-content">
+                                团队模拟<br>
+                                复杂工作流<br>
+                                需要角色扮演<br>
+                                快速原型
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>设计优雅</li>
+                                    <li>易于理解</li>
+                                    <li>快速开发</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>生态较小</li>
+                                    <li>灵活性有限</li>
+                                    <li>文档较少</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>其他主流框架</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">AutoGen</div>
+                        <ul>
+                            <li>微软出品</li>
+                            <li>多Agent对话</li>
+                            <li>代码执行</li>
+                            <li>研究级别</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">MetaGPT</div>
+                        <ul>
+                            <li>软件公司模拟</li>
+                            <li>多角色协作</li>
+                            <li>文档驱动</li>
+                            <li>开源免费</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AgentGPT</div>
+                        <ul>
+                            <li>Web界面</li>
+                            <li>自主任务执行</li>
+                            <li>无需编程</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Semantic Kernel</div>
+                        <ul>
+                            <li>微软C#/.NET</li>
+                            <li>企业级</li>
+                            <li>Azure集成</li>
+                            <li>开源</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>低代码 Agent 平台</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Coze 🇨🇳</div>
+                        <ul>
+                            <li>字节跳动</li>
+                            <li>可视化编排</li>
+                            <li>丰富插件库</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Dify</div>
+                        <ul>
+                            <li>完全开源</li>
+                            <li>拖拽式构建</li>
+                            <li>RAG支持</li>
+                            <li>私有部署</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">GPTs</div>
+                        <ul>
+                            <li>OpenAI官方</li>
+                            <li>最简单</li>
+                            <li>无需编程</li>
+                            <li>$20/月</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">FlowiseAI</div>
+                        <ul>
+                            <li>开源</li>
+                            <li>拖拽式</li>
+                            <li>自托管</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>使用场景推荐</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🏢 企业应用</div>
+                        <div class="card-content">
+                            复杂业务流程<br><br>
+                            <strong>推荐：LangChain + LangGraph</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🚀 快速原型</div>
+                        <div class="card-content">
+                            MVP验证、Demo展示<br><br>
+                            <strong>推荐：Coze / Dify</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">👥 多智能体</div>
+                        <div class="card-content">
+                            团队协作模拟<br><br>
+                            <strong>推荐：CrewAI / MetaGPT</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">💻 研究探索</div>
+                        <div class="card-content">
+                            学术研究、实验<br><br>
+                            <strong>推荐：AutoGen</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎯 简单任务</div>
+                        <div class="card-content">
+                            个人助手、工具集成<br><br>
+                            <strong>推荐：GPTs / AgentGPT</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔒 私有部署</div>
+                        <div class="card-content">
+                            数据敏感、内网环境<br><br>
+                            <strong>推荐：Dify / FlowiseAI</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>选择建议</h1>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">开发者</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>LangChain</strong><br>
+                            功能全、生态好、可控性强<br>
+                            适合：企业应用、复杂流程
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">产品经理</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Coze / Dify</strong><br>
+                            可视化、无需编程<br>
+                            适合：快速验证、原型开发
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">个人用户</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>GPTs</strong><br>
+                            最简单、开箱即用<br>
+                            适合：个人助手、简单自动化
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">研究者</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>AutoGen / MetaGPT</strong><br>
+                            前沿、灵活、可定制<br>
+                            适合：学术研究、实验探索
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+        function nextSlide() { current = (current + 1) % total; update(); }
+        function prevSlide() { current = (current - 1 + total) % total; update(); }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        update();
+    </script>
+</body>
+</html>

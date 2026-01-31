@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📏 线性回归梯度下降 - 完整版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .loss-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .loss-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .formula {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .formula-line {
+            margin: 5px 0;
+        }
+
+        .loss-value-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loss-value {
+            font-size: 3.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        .loss-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .loss-change {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        #lossChart {
+            width: 100%;
+            height: 200px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .info-card.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .info-card.orange { background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); }
+        .info-card.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .info-label { font-size: 0.85em; opacity: 0.9; }
+        .info-value { font-size: 1.6em; font-weight: bold; margin-top: 5px; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-start { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-reset { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn-slow { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            font-size: 1.05em;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .status.running {
+            background: #fff3e0;
+            color: #e65100;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .explanation {
+            background: #fff9c4;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            color: #5d4037;
+        }
+
+        .explanation h4 {
+            color: #f57f17;
+            margin-bottom: 8px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 线性回归梯度下降</h1>
+        <p class="subtitle">🎯 观察损失函数如何一步步降低</p>
+
+        <div class="main-grid">
+            <!-- 左侧：拟合图 -->
+            <div class="canvas-section">
+                <canvas id="canvas" width="900" height="550"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #e74c3c;"></div>
+                        <span>数据点</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #3498db;"></div>
+                        <span>当前拟合线</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: rgba(46,204,113,0.5);"></div>
+                        <span>目标线</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：损失函数 -->
+            <div class="side-panel">
+                <div class="loss-card">
+                    <h3>📉 损失函数 (Loss Function)</h3>
+
+                    <div class="formula">
+                        <div class="formula-line"><strong>L(a, b) =</strong></div>
+                        <div class="formula-line" style="font-size: 1.3em; margin: 10px 0;">
+                            <span style="font-size: 2em;">Σ</span> (y<sub>i</sub> - (ax<sub>i</sub> + b))²
+                        </div>
+                        <div class="formula-line" style="border-top: 2px solid rgba(255,255,255,0.5); padding-top: 5px;">
+                            n
+                        </div>
+                    </div>
+
+                    <div class="loss-value-display">
+                        <div class="loss-label">当前损失值</div>
+                        <div class="loss-value" id="lossValue">0</div>
+                    </div>
+
+                    <div class="loss-change">
+                        <div>初始损失: <strong id="initialLoss">-</strong></div>
+                        <div>当前损失: <strong id="currentLoss">-</strong></div>
+                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.3);">
+                            已降低: <strong id="lossReduction">0%</strong> 📉
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>📊 损失函数变化曲线</h3>
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">迭代步数</div>
+                <div class="info-value" id="step">0</div>
+            </div>
+            <div class="info-card orange">
+                <div class="info-label">斜率 a</div>
+                <div class="info-value" id="a">0.50</div>
+            </div>
+            <div class="info-card blue">
+                <div class="info-label">截距 b</div>
+                <div class="info-value" id="b">50</div>
+            </div>
+            <div class="info-card green">
+                <div class="info-label">梯度大小</div>
+                <div class="info-value" id="gradient">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-start" onclick="start()" id="startBtn">
+                🚀 开始梯度下降
+            </button>
+            <button class="btn-slow" onclick="startSlow()" id="slowBtn">
+                🐢 慢速演示
+            </button>
+            <button class="btn-reset" onclick="reset()">
+                🔄 重置
+            </button>
+        </div>
+
+        <div class="status" id="status">
+            准备就绪！点击开始观看动画
+        </div>
+
+        <div class="explanation">
+            <h4>💡 什么是损失函数？</h4>
+            <p>
+                <strong>损失函数</strong>衡量当前拟合线与实际数据的"差距"。公式中：
+            </p>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li><strong>y<sub>i</sub></strong> = 实际房价（数据点）</li>
+                <li><strong>ax<sub>i</sub> + b</strong> = 预测房价（拟合线上的值）</li>
+                <li><strong>(y<sub>i</sub> - 预测)²</strong> = 单个点的误差平方</li>
+                <li><strong>Σ ... / n</strong> = 所有点的平均误差</li>
+            </ul>
+            <p style="margin-top: 10px;">
+                <strong>梯度下降的目标：</strong>找到最佳的 a 和 b，让损失函数最小！
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const lossCanvas = document.getElementById('lossChart');
+        const lossCtx = lossCanvas.getContext('2d');
+
+        const DATA = [
+            {x: 50, y: 150},
+            {x: 80, y: 240},
+            {x: 100, y: 300},
+            {x: 120, y: 360},
+            {x: 60, y: 180},
+            {x: 90, y: 270}
+        ];
+
+        let state = {
+            a: 0.5,
+            b: 50,
+            step: 0,
+            running: false,
+            intervalId: null,
+            lossHistory: [],
+            initialLoss: null
+        };
+
+        const TARGET = {a: 3.0, b: 0};
+
+        // 计算损失函数
+        function calculateLoss(a, b) {
+            let sum = 0;
+            DATA.forEach(p => {
+                const pred = a * p.x + b;
+                const error = p.y - pred;
+                sum += error * error;
+            });
+            return sum / DATA.length;
+        }
+
+        // 计算梯度大小
+        function calculateGradientMagnitude(a, b) {
+            let ga = 0, gb = 0;
+            DATA.forEach(p => {
+                const pred = a * p.x + b;
+                const err = pred - p.y;
+                ga += 2 * err * p.x / DATA.length;
+                gb += 2 * err / DATA.length;
+            });
+            return Math.sqrt(ga * ga + gb * gb);
+        }
+
+        // 绘制拟合图
+        function drawFit() {
+            const W = 900, H = 550, PAD = 70;
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, W, H);
+
+            const tx = x => PAD + (x / 150) * (W - 2*PAD);
+            const ty = y => H - PAD - (y / 400) * (H - 2*PAD);
+
+            // 网格
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let x = 30; x <= 150; x += 30) {
+                ctx.beginPath();
+                ctx.moveTo(tx(x), PAD);
+                ctx.lineTo(tx(x), H - PAD);
+                ctx.stroke();
+            }
+            for (let y = 100; y <= 400; y += 100) {
+                ctx.beginPath();
+                ctx.moveTo(PAD, ty(y));
+                ctx.lineTo(W - PAD, ty(y));
+                ctx.stroke();
+            }
+
+            // 坐标轴
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(PAD, H - PAD);
+            ctx.lineTo(W - PAD, H - PAD);
+            ctx.moveTo(PAD, PAD);
+            ctx.lineTo(PAD, H - PAD);
+            ctx.stroke();
+
+            // 标签
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('面积 (m²)', W/2, H - 25);
+
+            ctx.save();
+            ctx.translate(25, H/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('房价 (万元)', 0, 0);
+            ctx.restore();
+
+            // 刻度
+            ctx.font = '12px Arial';
+            for (let x = 0; x <= 150; x += 30) {
+                ctx.fillText(x.toString(), tx(x), H - PAD + 20);
+            }
+            ctx.textAlign = 'right';
+            for (let y = 0; y <= 400; y += 100) {
+                ctx.fillText(y.toString(), PAD - 10, ty(y) + 5);
+            }
+
+            // 目标线
+            ctx.strokeStyle = '#2ecc71';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 0.4;
+            ctx.setLineDash([8, 4]);
+            ctx.beginPath();
+            ctx.moveTo(tx(0), ty(TARGET.a * 0 + TARGET.b));
+            ctx.lineTo(tx(150), ty(TARGET.a * 150 + TARGET.b));
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#2ecc71';
+            ctx.font = 'bold 13px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('目标', tx(130), ty(TARGET.a * 130 + TARGET.b) - 8);
+
+            // 当前拟合线
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(tx(0), ty(state.a * 0 + state.b));
+            ctx.lineTo(tx(150), ty(state.a * 150 + state.b));
+            ctx.stroke();
+
+            // 标签背景
+            const labelY = ty(state.a * 115 + state.b) + 20;
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            ctx.fillRect(tx(110) - 5, labelY - 15, 145, 22);
+
+            ctx.fillStyle = '#3498db';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(
+                `y = ${state.a.toFixed(2)}x + ${state.b.toFixed(0)}`,
+                tx(110),
+                labelY
+            );
+
+            // 误差线
+            DATA.forEach(p => {
+                const pred = state.a * p.x + state.b;
+                const err = Math.abs(p.y - pred);
+
+                ctx.strokeStyle = `rgba(231, 76, 60, ${Math.min(err/80, 0.7)})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(tx(p.x), ty(p.y));
+                ctx.lineTo(tx(p.x), ty(pred));
+                ctx.stroke();
+            });
+
+            // 数据点
+            DATA.forEach(p => {
+                ctx.fillStyle = '#e74c3c';
+                ctx.strokeStyle = '#c0392b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(tx(p.x), ty(p.y), 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`(${p.x},${p.y})`, tx(p.x), ty(p.y) - 12);
+            });
+        }
+
+        // 绘制损失函数曲线
+        function drawLossChart() {
+            // 使用逻辑宽度（因为canvas使用了scale(2,2)）
+            const W = lossCanvas.width / 2;
+            const H = lossCanvas.height / 2;
+
+            lossCtx.fillStyle = '#f8f9fa';
+            lossCtx.fillRect(0, 0, W, H);
+
+            if (state.lossHistory.length < 2) return;
+
+            const PAD_LEFT = 50;
+            const PAD_RIGHT = 20;
+            const PAD_TOP = 25;
+            const PAD_BOTTOM = 40;
+
+            const maxLoss = Math.max(...state.lossHistory);
+            const minLoss = Math.min(...state.lossHistory);
+            const range = maxLoss - minLoss || 1;
+
+            // 坐标转换
+            const tx = i => PAD_LEFT + (i / Math.max(state.lossHistory.length - 1, 1)) * (W - PAD_LEFT - PAD_RIGHT);
+            const ty = loss => PAD_TOP + (1 - (loss - minLoss) / range) * (H - PAD_TOP - PAD_BOTTOM);
+
+            // 绘制坐标轴
+            lossCtx.strokeStyle = '#2c3e50';
+            lossCtx.lineWidth = 2;
+            lossCtx.beginPath();
+            lossCtx.moveTo(PAD_LEFT, PAD_TOP);
+            lossCtx.lineTo(PAD_LEFT, H - PAD_BOTTOM);
+            lossCtx.lineTo(W - PAD_RIGHT, H - PAD_BOTTOM);
+            lossCtx.stroke();
+
+            // Y轴刻度和网格（5条线）
+            lossCtx.font = '11px Arial';
+            for (let i = 0; i <= 4; i++) {
+                const ratio = i / 4;
+                const lossValue = minLoss + ratio * range;
+                const y = ty(lossValue);
+
+                // 网格线
+                lossCtx.strokeStyle = '#e0e0e0';
+                lossCtx.lineWidth = 1;
+                lossCtx.beginPath();
+                lossCtx.moveTo(PAD_LEFT, y);
+                lossCtx.lineTo(W - PAD_RIGHT, y);
+                lossCtx.stroke();
+
+                // Y轴刻度值
+                lossCtx.fillStyle = '#2c3e50';
+                lossCtx.textAlign = 'right';
+                lossCtx.textBaseline = 'middle';
+                lossCtx.fillText(lossValue.toFixed(0), PAD_LEFT - 5, y);
+            }
+
+            // X轴刻度（显示5个刻度点）
+            const maxSteps = state.lossHistory.length - 1;
+            for (let i = 0; i <= 4; i++) {
+                const stepValue = Math.round((maxSteps * i) / 4);
+                const x = tx(stepValue);
+
+                // X轴刻度值
+                lossCtx.fillStyle = '#2c3e50';
+                lossCtx.textAlign = 'center';
+                lossCtx.textBaseline = 'top';
+                lossCtx.fillText(stepValue.toString(), x, H - PAD_BOTTOM + 5);
+
+                // 刻度线
+                lossCtx.strokeStyle = '#2c3e50';
+                lossCtx.lineWidth = 1;
+                lossCtx.beginPath();
+                lossCtx.moveTo(x, H - PAD_BOTTOM);
+                lossCtx.lineTo(x, H - PAD_BOTTOM + 4);
+                lossCtx.stroke();
+            }
+
+            // X轴标签
+            lossCtx.fillStyle = '#2c3e50';
+            lossCtx.font = 'bold 12px Arial';
+            lossCtx.textAlign = 'center';
+            lossCtx.fillText('迭代步数', W/2, H - 10);
+
+            // Y轴标签（旋转）
+            lossCtx.save();
+            lossCtx.translate(12, H/2);
+            lossCtx.rotate(-Math.PI/2);
+            lossCtx.font = 'bold 12px Arial';
+            lossCtx.textAlign = 'center';
+            lossCtx.fillText('损失值', 0, 0);
+            lossCtx.restore();
+
+            // 绘制曲线
+            lossCtx.strokeStyle = '#e74c3c';
+            lossCtx.lineWidth = 3;
+            lossCtx.beginPath();
+            state.lossHistory.forEach((loss, i) => {
+                if (i === 0) {
+                    lossCtx.moveTo(tx(i), ty(loss));
+                } else {
+                    lossCtx.lineTo(tx(i), ty(loss));
+                }
+            });
+            lossCtx.stroke();
+
+            // 填充区域
+            lossCtx.fillStyle = 'rgba(231, 76, 60, 0.1)';
+            lossCtx.beginPath();
+            lossCtx.moveTo(tx(0), H - PAD_BOTTOM);
+            state.lossHistory.forEach((loss, i) => {
+                lossCtx.lineTo(tx(i), ty(loss));
+            });
+            lossCtx.lineTo(tx(state.lossHistory.length - 1), H - PAD_BOTTOM);
+            lossCtx.closePath();
+            lossCtx.fill();
+
+            // 当前点
+            const lastLoss = state.lossHistory[state.lossHistory.length - 1];
+            lossCtx.fillStyle = '#e74c3c';
+            lossCtx.strokeStyle = 'white';
+            lossCtx.lineWidth = 2;
+            lossCtx.beginPath();
+            lossCtx.arc(tx(state.lossHistory.length - 1), ty(lastLoss), 5, 0, Math.PI * 2);
+            lossCtx.fill();
+            lossCtx.stroke();
+        }
+
+        // 更新UI
+        function updateUI() {
+            const loss = calculateLoss(state.a, state.b);
+            const gradMag = calculateGradientMagnitude(state.a, state.b);
+
+            document.getElementById('step').textContent = state.step;
+            document.getElementById('a').textContent = state.a.toFixed(3);
+            document.getElementById('b').textContent = state.b.toFixed(1);
+            document.getElementById('gradient').textContent = gradMag.toFixed(2);
+
+            document.getElementById('lossValue').textContent = loss.toFixed(1);
+            document.getElementById('currentLoss').textContent = loss.toFixed(1);
+
+            if (state.initialLoss !== null) {
+                const reduction = ((state.initialLoss - loss) / state.initialLoss * 100);
+                document.getElementById('lossReduction').textContent = reduction.toFixed(1) + '%';
+            }
+        }
+
+        function draw() {
+            drawFit();
+            drawLossChart();
+            updateUI();
+        }
+
+        function startWithSpeed(speed, label) {
+            if (state.running) return;
+
+            state.running = true;
+            state.step = 0;
+            state.lossHistory = [];
+            state.initialLoss = calculateLoss(state.a, state.b);
+
+            document.getElementById('initialLoss').textContent = state.initialLoss.toFixed(1);
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('slowBtn').disabled = true;
+
+            document.getElementById('status').textContent = `🚀 ${label}中...`;
+            document.getElementById('status').classList.add('running');
+
+            const maxSteps = 200;
+
+            state.intervalId = setInterval(() => {
+                if (state.step >= maxSteps) {
+                    stop();
+                    return;
+                }
+
+                // 向目标移动
+                state.a += (TARGET.a - state.a) * 0.05;
+                state.b += (TARGET.b - state.b) * 0.05;
+                state.step++;
+
+                // 记录损失
+                state.lossHistory.push(calculateLoss(state.a, state.b));
+
+                // 重绘
+                draw();
+
+                const progress = (state.step / maxSteps * 100).toFixed(0);
+                document.getElementById('status').textContent =
+                    `🚀 ${label}中... ${progress}% (${state.step}/${maxSteps})`;
+
+            }, speed);
+        }
+
+        function start() {
+            startWithSpeed(25, '梯度下降');
+        }
+
+        function startSlow() {
+            startWithSpeed(100, '慢速演示');
+        }
+
+        function stop() {
+            if (state.intervalId) {
+                clearInterval(state.intervalId);
+                state.intervalId = null;
+            }
+
+            state.running = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('slowBtn').disabled = false;
+
+            const finalLoss = calculateLoss(state.a, state.b);
+            const reduction = ((state.initialLoss - finalLoss) / state.initialLoss * 100);
+
+            document.getElementById('status').textContent =
+                `✅ 完成！损失函数降低了 ${reduction.toFixed(1)}%`;
+            document.getElementById('status').classList.remove('running');
+        }
+
+        function reset() {
+            if (state.running) stop();
+
+            state.a = 0.5;
+            state.b = 50;
+            state.step = 0;
+            state.lossHistory = [];
+            state.initialLoss = null;
+
+            document.getElementById('initialLoss').textContent = '-';
+            document.getElementById('currentLoss').textContent = '-';
+            document.getElementById('lossReduction').textContent = '0%';
+
+            draw();
+
+            document.getElementById('status').textContent = '🔄 已重置！准备开始';
+        }
+
+        // 初始化
+        lossCanvas.width = lossCanvas.offsetWidth * 2;
+        lossCanvas.height = 200 * 2;
+        lossCtx.scale(2, 2);
+
+        draw();
+
+        // 自动提示
+        setTimeout(() => {
+            if (confirm('👋 要看梯度下降如何降低损失函数吗？\n\n✅ 观察蓝色线移动\n✅ 观察损失值下降\n✅ 观察损失曲线变化\n\n⏱️ 约6秒完成')) {
+                start();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

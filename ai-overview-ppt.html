@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 全景图 - 从概念到实践</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #000000;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.4s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 4.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 3em;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #333;
+        }
+
+        /* 紧凑布局的标题调整 */
+        .slide:has(.comparison.compact) h2 {
+            font-size: 2.5em;
+            margin-bottom: 25px;
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: #666;
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 400;
+        }
+
+        /* 内容布局 */
+        .content {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* 链接样式 */
+        .detail-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .detail-link:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        .section-link {
+            display: inline-block;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9em;
+            margin-left: 15px;
+            border-bottom: 1px solid #ccc;
+            transition: all 0.2s ease;
+        }
+
+        .section-link:hover {
+            color: #000;
+            border-bottom-color: #000;
+        }
+
+        .card-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .card-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        /* 列表 */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.2em;
+            color: #333;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        li::before {
+            content: '•';
+            position: absolute;
+            left: 10px;
+            font-weight: bold;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        /* 数字展示 */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 4em;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        /* 时间线 */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .timeline-year {
+            font-size: 2em;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .timeline-content {
+            border-left: 2px solid #000;
+            padding-left: 30px;
+        }
+
+        .timeline-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .timeline-desc {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* 对比表格 */
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        /* 紧凑版对比表格（用于内容较多的页面） */
+        .comparison.compact {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .comparison.compact .comparison-item {
+            padding: 20px;
+        }
+
+        .comparison.compact .comparison-title {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+        }
+
+        .comparison.compact li {
+            padding: 8px 0;
+            font-size: 1em;
+            padding-left: 25px;
+        }
+
+        .comparison.compact li::before {
+            left: 8px;
+        }
+
+        .comparison-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        .comparison-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .comparison-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        /* 滚动条样式 */
+        .comparison.compact::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comparison.compact::-webkit-scrollbar-track {
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .comparison.compact::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .comparison.compact::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        /* 导航 */
+        .nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: #000;
+            background: #f5f5f5;
+        }
+
+        .progress {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d0d0d0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: #000;
+        }
+
+        /* 页码提示 */
+        .page-hint {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 1em;
+            color: #999;
+            z-index: 100;
+        }
+
+        /* 响应式 */
+        @media (max-width: 968px) {
+            .slide { padding: 40px 20px; }
+            h1 { font-size: 2.5em; }
+            h2 { font-size: 2em; }
+            .two-column { grid-template-columns: 1fr; }
+            .timeline-item { grid-template-columns: 80px 1fr; }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-hint">使用 ← → 切换</div>
+
+    <div class="presentation">
+        <!-- Slide 1: 封面 -->
+        <div class="slide active">
+            <h1>AI 全景图</h1>
+            <p class="subtitle">从概念到实践 · 完整技术体系</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">核心主题</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">工具产品</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">70年</div>
+                    <div class="stat-label">发展历程</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 目录 -->
+        <div class="slide">
+            <h2>目录</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">01 AI 发展历程 <a href="ai-roadmap.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">从图灵测试到AGI，70年创新之旅</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">02 大语言模型 <a href="claude-intro.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">Claude、GPT、Gemini等主流模型对比</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">03 AI 编程助手 <a href="ai-coding-assistants.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">Cursor、Copilot等开发工具</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">04 AIGC 工具 <a href="aigc-tools.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">图像、视频、音频生成</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">05 AI 搜索引擎 <a href="ai-search-engines.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">Perplexity、秘塔等新一代搜索</div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">06 Workflow 自动化 <a href="ai-workflow.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">Zapier、n8n、Coze等平台</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">07 Agent 框架 <a href="ai-agent-frameworks.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">AutoGPT、LangGraph等自主智能体</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">08 RAG 技术栈 <a href="rag-tech-stack.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">向量数据库、检索增强生成</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">09 硬件基础 <a href="nvidia-gpu-intro.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">NVIDIA GPU及竞品对比</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">10 开源生态 <a href="claude-intro.html" class="section-link" target="_blank">查看详情 →</a></div>
+                            <div class="card-content">LLaMA、Qwen等开源模型</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: AI发展关键节点 -->
+        <div class="slide">
+            <h2>AI 发展关键节点 <a href="ai-roadmap.html" class="section-link" target="_blank">完整时间线 →</a></h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">1950</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">图灵测试</div>
+                            <div class="timeline-desc">Alan Turing 提出机器智能标准</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">1956</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">AI 诞生</div>
+                            <div class="timeline-desc">达特茅斯会议，学科正式确立</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2012</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">深度学习革命</div>
+                            <div class="timeline-desc">AlexNet 点燃计算机视觉突破</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2017</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Transformer 架构</div>
+                            <div class="timeline-desc">彻底改变NLP，大模型基础</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">ChatGPT 爆发</div>
+                            <div class="timeline-desc">2个月破亿用户，AI进入大众</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">多模态时代</div>
+                            <div class="timeline-desc">GPT-4、Sora开启新纪元</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 主流大语言模型 -->
+        <div class="slide">
+            <h2>主流大语言模型全景 <a href="llm-landscape.html" class="section-link" target="_blank">完整对比 →</a></h2>
+            <div class="content">
+                <div class="comparison compact">
+                    <!-- 闭源商业模型 -->
+                    <div class="comparison-item">
+                        <div class="comparison-title">Claude 3.5 Sonnet</div>
+                        <ul>
+                            <li>编程能力最强</li>
+                            <li>200K 长上下文</li>
+                            <li>Computer Use 独创</li>
+                            <li>安全性突出</li>
+                        </ul>
+                        <a href="claude-intro.html" class="detail-link" target="_blank">Claude详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">GPT-4o</div>
+                        <ul>
+                            <li>多模态支持全面</li>
+                            <li>生态最成熟</li>
+                            <li>实时语音对话</li>
+                            <li>响应速度快</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Gemini 2.0</div>
+                        <ul>
+                            <li>超长上下文 2M</li>
+                            <li>视频理解强</li>
+                            <li>性价比最高</li>
+                            <li>Google 整合</li>
+                        </ul>
+                    </div>
+
+                    <!-- 开源模型 -->
+                    <div class="comparison-item">
+                        <div class="comparison-title">LLaMA 3.1</div>
+                        <ul>
+                            <li>Meta开源</li>
+                            <li>405B参数版本</li>
+                            <li>性能接近GPT-4</li>
+                            <li>商业友好许可</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Mixtral 8x7B</div>
+                        <ul>
+                            <li>Mistral AI</li>
+                            <li>MoE架构</li>
+                            <li>性价比之王</li>
+                            <li>Apache 2.0</li>
+                        </ul>
+                    </div>
+
+                    <!-- 国产模型 -->
+                    <div class="comparison-item">
+                        <div class="comparison-title">DeepSeek V3 🇨🇳</div>
+                        <ul>
+                            <li>开源之王</li>
+                            <li>编程接近 Claude</li>
+                            <li>成本0.14元/M tokens</li>
+                            <li>MoE 架构</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Qwen 🇨🇳</div>
+                        <ul>
+                            <li>阿里云通义千问</li>
+                            <li>中文能力顶尖</li>
+                            <li>多模态全覆盖</li>
+                            <li>持续快速迭代</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">ChatGLM 🇨🇳</div>
+                        <ul>
+                            <li>清华智谱AI</li>
+                            <li>双语优化</li>
+                            <li>企业级支持</li>
+                            <li>工具调用强</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Yi 🇨🇳</div>
+                        <ul>
+                            <li>零一万物</li>
+                            <li>200K长上下文</li>
+                            <li>性能均衡优秀</li>
+                            <li>Apache 2.0开源</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">ERNIE 🇨🇳</div>
+                        <ul>
+                            <li>百度文心</li>
+                            <li>搜索增强</li>
+                            <li>产业落地广</li>
+                            <li>多模态支持</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">InternLM 🇨🇳</div>
+                        <ul>
+                            <li>上海AI Lab</li>
+                            <li>书生·浦语系列</li>
+                            <li>完整工具链</li>
+                            <li>科研友好</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Kimi 🇨🇳</div>
+                        <ul>
+                            <li>月之暗面</li>
+                            <li>200万字上下文</li>
+                            <li>长文档处理</li>
+                            <li>学术背景</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: AI编程助手 -->
+        <div class="slide">
+            <h2>AI 编程助手 <a href="ai-coding-assistants.html" class="section-link" target="_blank">更多工具 →</a></h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">Cursor</div>
+                            <div class="card-content">
+                                最火编辑器，基于VSCode<br>
+                                Tab 补全 + Ctrl+K 对话编辑<br>
+                                适合：全栈开发、快速迭代
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">GitHub Copilot</div>
+                            <div class="card-content">
+                                微软出品，全IDE支持<br>
+                                代码建议精准，生态成熟<br>
+                                适合：企业开发、团队协作
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Cline / Claude Dev</div>
+                            <div class="card-content">
+                                Claude集成VSCode插件<br>
+                                适合复杂重构和架构设计<br>
+                                适合：大型重构、系统设计
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">Windsurf</div>
+                            <div class="card-content">
+                                Codeium出品<br>
+                                Flow模式下AI自主编码<br>
+                                适合：探索性编程
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">v0 by Vercel</div>
+                            <div class="card-content">
+                                前端代码生成神器<br>
+                                自然语言→React组件<br>
+                                适合：前端快速原型
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Continue</div>
+                            <div class="card-content">
+                                开源替代品<br>
+                                支持自定义模型<br>
+                                适合：私有部署、定制化
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: AIGC工具 -->
+        <div class="slide">
+            <h2>AIGC 内容生成工具 <a href="aigc-tools.html" class="section-link" target="_blank">完整列表 →</a></h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">图像生成</div>
+                        <ul>
+                            <li>Midjourney - 艺术性最强</li>
+                            <li>DALL-E 3 - OpenAI</li>
+                            <li>Stable Diffusion - 开源</li>
+                            <li>文心一格 - 百度 🇨🇳</li>
+                            <li>通义万相 - 阿里 🇨🇳</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">视频生成</div>
+                        <ul>
+                            <li>Sora - OpenAI革命性</li>
+                            <li>Runway - 专业级</li>
+                            <li>Pika - 易用性强</li>
+                            <li>可灵 - 快手 🇨🇳</li>
+                            <li>Gen-2/Gen-3</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">音频/语音</div>
+                        <ul>
+                            <li>ElevenLabs - 语音克隆</li>
+                            <li>Whisper - 语音识别</li>
+                            <li>Suno - AI音乐</li>
+                            <li>Udio - 音乐生成</li>
+                            <li>火山TTS - 字节 🇨🇳</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: AI Workflow -->
+        <div class="slide">
+            <h2>AI Workflow 自动化 <a href="ai-workflow.html" class="section-link" target="_blank">产品详情 →</a></h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Zapier 🇺🇸</div>
+                        <ul>
+                            <li>5000+ 应用集成</li>
+                            <li>生态最成熟</li>
+                            <li>无代码易用</li>
+                            <li>$19.99/月起</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Make 🇪🇺</div>
+                        <ul>
+                            <li>可视化流程</li>
+                            <li>逻辑能力强</li>
+                            <li>性价比高</li>
+                            <li>$9/月起</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">n8n 🇩🇪</div>
+                        <ul>
+                            <li>完全开源</li>
+                            <li>可自部署</li>
+                            <li>高度可定制</li>
+                            <li>开源免费</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Coze 🇨🇳</div>
+                        <ul>
+                            <li>字节跳动</li>
+                            <li>AI能力强</li>
+                            <li>完全免费</li>
+                            <li>中文友好</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Dify 🇨🇳</div>
+                        <ul>
+                            <li>开源平台</li>
+                            <li>私有部署</li>
+                            <li>LLM应用开发</li>
+                            <li>开源免费</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: AI Agent框架 -->
+        <div class="slide">
+            <h2>AI Agent 框架 <a href="ai-agent-frameworks.html" class="section-link" target="_blank">深入了解 →</a></h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">AutoGPT</div>
+                            <div class="card-content">最早的自主Agent<br>目标分解 + 循环执行</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">LangGraph</div>
+                            <div class="card-content">LangChain出品<br>状态图 + 循环控制</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">MetaGPT</div>
+                            <div class="card-content">多智能体协作<br>模拟软件开发团队</div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">Semantic Kernel</div>
+                            <div class="card-content">微软出品<br>企业级Agent框架</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">CrewAI</div>
+                            <div class="card-content">角色扮演<br>任务分配的团队协作</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">ChatDev</div>
+                            <div class="card-content">软件开发Agent<br>自动化软件工程</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: RAG技术栈 -->
+        <div class="slide">
+            <h2>RAG 技术栈 <a href="rag-tech-stack.html" class="section-link" target="_blank">技术详解 →</a></h2>
+            <p class="subtitle">检索增强生成 · 企业AI的核心</p>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">向量数据库</div>
+                        <ul>
+                            <li>Pinecone - 云端托管</li>
+                            <li>Weaviate - 开源</li>
+                            <li>Milvus - 国产 🇨🇳</li>
+                            <li>Qdrant - Rust高性能</li>
+                            <li>Chroma - 轻量级</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Embedding</div>
+                        <ul>
+                            <li>OpenAI Embeddings</li>
+                            <li>BGE - 智源 🇨🇳</li>
+                            <li>M3E - 中文 🇨🇳</li>
+                            <li>Cohere Embeddings</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">RAG框架</div>
+                        <ul>
+                            <li>LlamaIndex - 最流行</li>
+                            <li>Haystack - 企业级</li>
+                            <li>LangChain - 全能</li>
+                            <li>Vectara - 端到端</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: 硬件基础 -->
+        <div class="slide">
+            <h2>AI 硬件基础 <a href="nvidia-gpu-intro.html" class="section-link" target="_blank">GPU详情 →</a></h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">NVIDIA 💚</div>
+                        <ul>
+                            <li>RTX 4090 - 游戏之王</li>
+                            <li>H100 - AI训练旗舰</li>
+                            <li>A100 - 数据中心主力</li>
+                            <li>L40S - 推理专用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AMD 🔴</div>
+                        <ul>
+                            <li>MI300X - AI加速卡</li>
+                            <li>RX 7900 XTX - 游戏</li>
+                            <li>性价比优势</li>
+                            <li>开源驱动</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Google 🌈</div>
+                        <ul>
+                            <li>TPU v5p - 云端专用</li>
+                            <li>AI性能强劲</li>
+                            <li>仅云服务</li>
+                            <li>TensorFlow优化</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">华为 🇨🇳</div>
+                        <ul>
+                            <li>昇腾 910B</li>
+                            <li>国产替代</li>
+                            <li>AI训练/推理</li>
+                            <li>约¥50,000</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 核心技术概念 -->
+        <div class="slide">
+            <h2>核心技术概念</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">Transformer</div>
+                            <div class="card-content">注意力机制，大模型基础架构</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">RAG</div>
+                            <div class="card-content">检索增强生成，解决知识幻觉</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">LoRA</div>
+                            <div class="card-content">低秩适应，高效微调大模型</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">MoE</div>
+                            <div class="card-content">混合专家模型，提升效率</div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">RLHF</div>
+                            <div class="card-content">人类反馈强化学习，对齐偏好</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Chain of Thought</div>
+                            <div class="card-content">思维链，逐步推理复杂问题</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Function Calling</div>
+                            <div class="card-content">工具调用，LLM使用外部工具</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Prompt Engineering</div>
+                            <div class="card-content">提示工程，优化模型输出</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: 实践建议 -->
+        <div class="slide">
+            <h2>AI 实践建议</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">学习路径</div>
+                            <ul>
+                                <li>从使用开始（ChatGPT/Claude）</li>
+                                <li>尝试编程助手（Cursor）</li>
+                                <li>学习Prompt工程</li>
+                                <li>了解RAG和Fine-tuning</li>
+                                <li>探索Agent框架</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">工具选择</div>
+                            <ul>
+                                <li>开发：Cursor + Claude</li>
+                                <li>搜索：Perplexity + 秘塔</li>
+                                <li>创作：Midjourney + Suno</li>
+                                <li>自动化：Coze + n8n</li>
+                                <li>知识库：Dify + FastGPT</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">企业应用</div>
+                            <ul>
+                                <li>智能客服（RAG + Agent）</li>
+                                <li>内容创作（AIGC）</li>
+                                <li>代码辅助（Copilot）</li>
+                                <li>数据分析（LLM + SQL）</li>
+                                <li>流程自动化（Workflow）</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">注意事项</div>
+                            <ul>
+                                <li>数据安全和隐私保护</li>
+                                <li>模型幻觉和事实核查</li>
+                                <li>成本控制和优化</li>
+                                <li>持续学习和迭代</li>
+                                <li>伦理和合规考量</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: 专题页面索引 -->
+        <div class="slide">
+            <h2>📚 专题页面索引</h2>
+            <p class="subtitle">点击查看详细内容和动态可视化</p>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">AI 发展路线图</div>
+                        <div class="comparison-content">
+                            70年完整历程 · 18个关键节点<br>
+                            时间线动画 · 技术浪潮演进
+                        </div>
+                        <a href="ai-roadmap.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Claude 模型对比</div>
+                        <div class="comparison-content">
+                            中美6大模型对比 · 雷达图分析<br>
+                            性能跑分 · 价格对比
+                        </div>
+                        <a href="claude-intro.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Workflow 平台</div>
+                        <div class="comparison-content">
+                            10个主流平台 · 优劣势对比<br>
+                            经典案例 · 交互流程图
+                        </div>
+                        <a href="ai-workflow.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">NVIDIA GPU</div>
+                        <div class="comparison-content">
+                            RTX40/数据中心系列<br>
+                            性能对比 · 竞品分析
+                        </div>
+                        <a href="nvidia-gpu-intro.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AI 编程助手</div>
+                        <div class="comparison-content">
+                            6大工具对比·场景推荐<br>
+                            Cursor、Copilot等
+                        </div>
+                        <a href="ai-coding-assistants.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AIGC 工具</div>
+                        <div class="comparison-content">
+                            图像·视频·音频生成<br>
+                            15+主流工具对比
+                        </div>
+                        <a href="aigc-tools.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AI 搜索引擎</div>
+                        <div class="comparison-content">
+                            Perplexity·秘塔等<br>
+                            6大平台深度对比
+                        </div>
+                        <a href="ai-search-engines.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">AI Agent 框架</div>
+                        <div class="comparison-content">
+                            LangChain·CrewAI等<br>
+                            8大框架全解析
+                        </div>
+                        <a href="ai-agent-frameworks.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">RAG 技术栈</div>
+                        <div class="comparison-content">
+                            向量数据库·Embedding<br>
+                            完整技术体系
+                        </div>
+                        <a href="rag-tech-stack.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Clawdbot 平台</div>
+                        <div class="comparison-content">
+                            全能AI工作伙伴<br>
+                            多渠道 · 持久化记忆
+                        </div>
+                        <a href="clawdbot-intro.html" class="detail-link" target="_blank">查看详情 →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: 总结 -->
+        <div class="slide">
+            <h1>AI 的黄金时代</h1>
+            <p class="subtitle">才刚刚开始</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">核心领域</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">工具产品</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">可能性</div>
+                </div>
+            </div>
+            <div style="margin-top: 60px; font-size: 1.5em; color: #666; text-align: center;">
+                拥抱变化 · 持续学习 · 创造价值
+            </div>
+        </div>
+    </div>
+
+    <!-- 导航 -->
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+
+        function update() {
+            slides.forEach((s, i) => {
+                s.classList.toggle('active', i === current);
+            });
+            
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+
+        function nextSlide() {
+            current = (current + 1) % total;
+            update();
+        }
+
+        function prevSlide() {
+            current = (current - 1 + total) % total;
+            update();
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < total) {
+                current = index;
+                update();
+            }
+        }
+
+        function findSlideIndex(slideId) {
+            const slides = document.querySelectorAll('.slide');
+            for (let i = 0; i < slides.length; i++) {
+                if (slides[i].id === slideId) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // 触摸支持
+        let touchStart = 0;
+        document.addEventListener('touchstart', e => touchStart = e.touches[0].clientX);
+        document.addEventListener('touchend', e => {
+            const touchEnd = e.changedTouches[0].clientX;
+            if (touchStart - touchEnd > 50) nextSlide();
+            if (touchEnd - touchStart > 50) prevSlide();
+        });
+
+        update();
+    </script>
+</body>
+</html>

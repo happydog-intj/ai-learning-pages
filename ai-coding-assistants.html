@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 编程助手全景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #fff; color: #000; overflow: hidden; }
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 10; }
+        h1 { font-size: 4.5em; font-weight: 700; margin-bottom: 30px; text-align: center; }
+        h2 { font-size: 3em; font-weight: 600; margin-bottom: 40px; text-align: center; color: #333; }
+        .subtitle { font-size: 1.8em; color: #666; text-align: center; margin-bottom: 60px; }
+        .content { max-width: 1400px; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; transition: all 0.2s ease; }
+        .card:hover { border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-title { font-size: 1.6em; font-weight: 600; margin-bottom: 15px; }
+        .card-content { font-size: 1.1em; line-height: 1.6; color: #666; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.2em; color: #333; position: relative; padding-left: 30px; }
+        li::before { content: '•'; position: absolute; left: 10px; font-weight: bold; }
+        li:last-child { border-bottom: none; }
+        .timeline { display: flex; flex-direction: column; gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .timeline-item { display: grid; grid-template-columns: 120px 1fr; gap: 30px; align-items: center; }
+        .timeline-year { font-size: 2em; font-weight: 700; text-align: right; }
+        .timeline-content { border-left: 2px solid #000; padding-left: 30px; }
+        .timeline-title { font-size: 1.4em; font-weight: 600; margin-bottom: 8px; }
+        .timeline-desc { color: #666; line-height: 1.5; }
+        .comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
+        .comparison-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; }
+        .comparison-title { font-size: 1.8em; font-weight: 600; margin-bottom: 20px; text-align: center; }
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .pros, .cons { padding: 15px; border-radius: 6px; }
+        .pros { background: #f0fdf4; border-left: 3px solid #22c55e; }
+        .cons { background: #fef2f2; border-left: 3px solid #ef4444; }
+        .pros-title { font-weight: 600; margin-bottom: 10px; color: #22c55e; }
+        .cons-title { font-weight: 600; margin-bottom: 10px; color: #ef4444; }
+        .pros-cons ul { list-style: none; }
+        .pros-cons li { font-size: 1em; padding: 6px 0; border: none; color: #666; padding-left: 20px; }
+        .pros li::before { content: '✓'; color: #22c55e; }
+        .cons li::before { content: '✗'; color: #ef4444; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 50px; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 4em; font-weight: 700; margin-bottom: 10px; }
+        .stat-label { font-size: 1.2em; color: #666; }
+        .nav { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; align-items: center; background: #fff; padding: 15px 25px; border-radius: 50px; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3em; transition: all 0.2s ease; }
+        .nav-btn:hover { border-color: #000; background: #f5f5f5; }
+        .progress { display: flex; gap: 8px; padding: 0 15px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #d0d0d0; cursor: pointer; transition: all 0.2s ease; }
+        .dot.active { width: 24px; border-radius: 4px; background: #000; }
+        @media (max-width: 968px) { .slide { padding: 40px 20px; } h1 { font-size: 2.5em; } h2 { font-size: 2em; } .two-column, .pros-cons { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: 封面 -->
+        <div class="slide active">
+            <h1>💻 AI 编程助手</h1>
+            <p class="subtitle">让 AI 成为你的结对编程伙伴</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number">6+</div><div class="stat-label">主流工具</div></div>
+                <div class="stat-item"><div class="stat-number">10x</div><div class="stat-label">效率提升</div></div>
+                <div class="stat-item"><div class="stat-number">50%</div><div class="stat-label">开发时间节省</div></div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 背景介绍 -->
+        <div class="slide">
+            <h2>背景：编程助手的演进</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div>
+                        <div class="card">
+                            <div class="card-title">传统方式</div>
+                            <ul>
+                                <li>手动编写所有代码</li>
+                                <li>Google/StackOverflow 查找</li>
+                                <li>复制粘贴代码片段</li>
+                                <li>反复调试和修改</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">AI 时代</div>
+                            <ul>
+                                <li>实时代码补全</li>
+                                <li>自然语言生成代码</li>
+                                <li>智能重构和优化</li>
+                                <li>上下文理解整个项目</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 发展时间线 -->
+        <div class="slide">
+            <h2>发展时间线</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">2021</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">GitHub Copilot 发布</div>
+                            <div class="timeline-desc">首个商业化AI编程助手，基于Codex模型</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2022</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">多家跟进</div>
+                            <div class="timeline-desc">Tabnine、Amazon CodeWhisperer等相继推出</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Cursor 爆火</div>
+                            <div class="timeline-desc">基于GPT-4的IDE，引入对话式编程模式</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">多模态编程</div>
+                            <div class="timeline-desc">Claude 3.5/GPT-4o带来更强代码能力，支持图像理解</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4-9: 各工具详细介绍 -->
+        <div class="slide">
+            <h2>Cursor</h2>
+            <p class="subtitle">最火的AI编辑器</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>基于 VSCode，无缝迁移</li>
+                            <li>Tab 智能补全</li>
+                            <li>Ctrl+K 对话式编辑</li>
+                            <li>多文件上下文理解</li>
+                            <li>@符号引用文件/文档</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">价格</div>
+                            <div class="card-content">
+                                免费版：基础功能<br>
+                                Pro版：$20/月<br>
+                                Business：$40/月
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>响应速度快</li>
+                                    <li>上下文理解强</li>
+                                    <li>快捷键流畅</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>收费较贵</li>
+                                    <li>需要联网</li>
+                                    <li>数据上传云端</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>GitHub Copilot</h2>
+            <p class="subtitle">微软出品，生态最成熟</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>全IDE支持（VS/VSCode/JetBrains）</li>
+                            <li>代码补全精准</li>
+                            <li>多语言支持</li>
+                            <li>企业级权限管理</li>
+                            <li>GitHub原生集成</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">价格</div>
+                            <div class="card-content">
+                                个人版：$10/月<br>
+                                企业版：$19/月/用户<br>
+                                学生/开源免费
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>生态成熟</li>
+                                    <li>企业级支持</li>
+                                    <li>稳定性高</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>对话能力弱</li>
+                                    <li>上下文有限</li>
+                                    <li>功能相对保守</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Cline / Claude Dev</h2>
+            <p class="subtitle">Claude 驱动的重构专家</p>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">核心特性</div>
+                        <ul>
+                            <li>VSCode 插件</li>
+                            <li>Claude 3.5 Sonnet 驱动</li>
+                            <li>适合大型重构</li>
+                            <li>架构级别理解</li>
+                            <li>可以读取整个代码库</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-title">价格</div>
+                            <div class="card-content">
+                                插件免费<br>
+                                需要 Anthropic API Key<br>
+                                按使用量计费
+                            </div>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <div class="pros-title">优势</div>
+                                <ul>
+                                    <li>重构能力强</li>
+                                    <li>理解深度好</li>
+                                    <li>适合复杂项目</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <div class="cons-title">劣势</div>
+                                <ul>
+                                    <li>需要API配置</li>
+                                    <li>成本不固定</li>
+                                    <li>响应略慢</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>其他工具对比</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">Windsurf</div>
+                        <ul>
+                            <li>Codeium 出品</li>
+                            <li>Flow 模式自主编码</li>
+                            <li>探索性编程</li>
+                            <li>免费试用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">v0 by Vercel</div>
+                        <ul>
+                            <li>前端代码生成</li>
+                            <li>自然语言→React</li>
+                            <li>快速原型</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Continue</div>
+                        <ul>
+                            <li>完全开源</li>
+                            <li>自定义模型</li>
+                            <li>私有部署</li>
+                            <li>免费使用</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">Tabnine</div>
+                        <ul>
+                            <li>隐私友好</li>
+                            <li>本地模型可选</li>
+                            <li>企业级</li>
+                            <li>$12/月起</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: 使用场景 -->
+        <div class="slide">
+            <h2>适用场景推荐</h2>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">🚀 快速开发</div>
+                        <div class="card-content">
+                            需要快速迭代、原型验证<br><br>
+                            <strong>推荐：Cursor + v0</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🏢 企业项目</div>
+                        <div class="card-content">
+                            团队协作、权限管理<br><br>
+                            <strong>推荐：GitHub Copilot</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔧 大型重构</div>
+                        <div class="card-content">
+                            架构调整、代码重构<br><br>
+                            <strong>推荐：Cline (Claude Dev)</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🔒 私有部署</div>
+                        <div class="card-content">
+                            数据敏感、内网环境<br><br>
+                            <strong>推荐：Continue + 本地模型</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">🎨 前端开发</div>
+                        <div class="card-content">
+                            快速构建UI组件<br><br>
+                            <strong>推荐：v0 + Cursor</strong>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">💰 预算有限</div>
+                        <div class="card-content">
+                            学生、个人开发者<br><br>
+                            <strong>推荐：Continue (免费)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: 使用建议 -->
+        <div class="slide">
+            <h2>最佳实践建议</h2>
+            <div class="content">
+                <div class="two-column">
+                    <div class="card">
+                        <div class="card-title">✅ 适合用AI的场景</div>
+                        <ul>
+                            <li>样板代码生成</li>
+                            <li>单元测试编写</li>
+                            <li>文档和注释</li>
+                            <li>代码格式化</li>
+                            <li>简单bug修复</li>
+                            <li>API调用代码</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">⚠️ 注意事项</div>
+                        <ul>
+                            <li>代码需人工审查</li>
+                            <li>安全性检查</li>
+                            <li>不要盲目信任</li>
+                            <li>保持代码风格一致</li>
+                            <li>敏感信息保护</li>
+                            <li>版权和许可问题</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: 总结 -->
+        <div class="slide">
+            <h1>选择建议</h1>
+            <div class="content">
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <div class="comparison-title">新手首选</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Cursor</strong><br>
+                            易上手、功能强、体验好
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">企业首选</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>GitHub Copilot</strong><br>
+                            稳定、安全、管理完善
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-title">极客首选</div>
+                        <div class="card-content" style="font-size: 1.3em; line-height: 2;">
+                            <strong>Continue</strong><br>
+                            开源、可定制、免费
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <div class="progress" id="progress"></div>
+        <button class="nav-btn" onclick="nextSlide()">→</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        function update() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === current));
+            const progress = document.getElementById('progress');
+            progress.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === current ? ' active' : '');
+                dot.onclick = () => { current = i; update(); };
+                progress.appendChild(dot);
+            }
+        }
+        function nextSlide() { current = (current + 1) % total; update(); }
+        function prevSlide() { current = (current - 1 + total) % total; update(); }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        let touchStart = 0;
+        document.addEventListener('touchstart', e => touchStart = e.touches[0].clientX);
+        document.addEventListener('touchend', e => {
+            const touchEnd = e.changedTouches[0].clientX;
+            if (touchStart - touchEnd > 50) nextSlide();
+            if (touchEnd - touchStart > 50) prevSlide();
+        });
+        update();
+    </script>
+</body>
+</html>

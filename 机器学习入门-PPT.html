@@ -996,6 +996,84 @@
                 margin: 10px 0 !important;
             }
         }
+
+        /* 学习类比页面响应式 */
+        .learning-analogy-container {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .student-c-card {
+            margin-top: 15px;
+        }
+
+        .score-section {
+            margin-top: 15px;
+        }
+
+        @media screen and (max-height: 700px) {
+            .learning-analogy-container {
+                max-height: 450px;
+                overflow-y: auto;
+                padding-right: 5px;
+            }
+            .student-c-card {
+                margin-top: 10px;
+            }
+            .score-section {
+                margin-top: 10px;
+            }
+            .progress-bar {
+                height: 22px;
+                margin: 8px 0;
+            }
+            .progress-fill {
+                line-height: 22px;
+                font-size: 0.8em;
+            }
+        }
+
+        @media screen and (max-height: 600px) {
+            .learning-analogy-container {
+                max-height: 380px;
+            }
+            .student-c-card {
+                margin-top: 8px;
+            }
+            .score-section {
+                margin-top: 8px;
+            }
+            .progress-bar {
+                height: 20px;
+                margin: 6px 0;
+            }
+            .progress-fill {
+                line-height: 20px;
+                font-size: 0.75em;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .student-c-card {
+                margin-top: 12px;
+            }
+            .score-section {
+                margin-top: 12px;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            .student-c-card {
+                margin-top: 10px;
+            }
+            .score-section {
+                margin-top: 10px;
+            }
+            .progress-bar {
+                margin: 8px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1353,6 +1431,32 @@
                 </section>
 
                 <section>
+                    <h2>4.4 朴素贝叶斯 (Naive Bayes) 🎲</h2>
+                    <h3 class="section-subtitle" style="color: var(--accent-color);">用概率来推理决策</h3>
+
+                    <div class="algorithm-explanation">
+                        <p><strong>📖 算法原理：</strong></p>
+                        <p>根据已知特征，计算它是好瓜或坏瓜的概率，选择概率大的那个！</p>
+                        <ul>
+                            <li><strong>第1步：</strong>统计历史数据中好瓜和坏瓜的比例（先验概率）</li>
+                            <li><strong>第2步：</strong>计算在好瓜中，某特征出现的概率（条件概率）</li>
+                            <li><strong>第3步：</strong>同样计算在坏瓜中，该特征出现的概率</li>
+                            <li><strong>第4步：</strong>用贝叶斯公式综合计算，比较哪个概率更高</li>
+                        </ul>
+                        <p class="explanation-note">💡 <strong>"朴素"的含义：</strong>假设各个特征之间相互独立（比如颜色和形状互不影响），这个假设简化了计算，但在很多实际情况下效果依然很好！</p>
+                    </div>
+
+                    <div class="chart-wrapper square-chart">
+                        <canvas id="bayesChart"></canvas>
+                    </div>
+                    <div class="button-wrapper">
+                        <button onclick="animateBayes()" class="action-button" style="background: var(--primary-color);">
+                            🎲 演示贝叶斯分类
+                        </button>
+                    </div>
+                </section>
+
+                <section>
                     <h2>📊 四种算法对比</h2>
                     <table class="comparison-table">
                         <thead>
@@ -1512,7 +1616,38 @@
 
                 <section>
                     <h2>📏 评估指标</h2>
-                    <canvas id="metricsChart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="metricsChart" class="large-canvas"></canvas>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>🎯 准确率 (Accuracy)</h2>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; margin: 20px 0;">
+                        <h3 style="color: white; font-size: 2em; margin-bottom: 20px;">准确率 = 92%</h3>
+                        <div style="font-size: 1.5em; margin: 20px 0;">
+                            <strong>准确率 = (TP + TN) / (TP + TN + FP + FN)</strong>
+                        </div>
+                        <p style="font-size: 1.1em; margin-top: 20px;">= (40 + 52) / (40 + 52 + 5 + 3) = 92 / 100 = 92%</p>
+                    </div>
+                    <div class="feature-grid" style="margin-top: 30px;">
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">✅ 含义</h3>
+                            <p style="font-size: 1.1em; line-height: 1.6;">预测正确的样本占总样本的比例</p>
+                            <p style="margin-top: 15px;"><strong>"考试得了多少分"</strong></p>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--warning-color);">
+                            <h3 style="color: var(--warning-color);">⚠️ 局限性</h3>
+                            <p style="font-size: 1.1em; line-height: 1.6;">在数据不平衡时会误导</p>
+                            <p style="margin-top: 15px;">例如：100个样本，95个是A类<br>模型全预测为A，准确率95%<br>但对B类完全无效！</p>
+                        </div>
+                    </div>
+                    <div class="code-block" style="margin-top: 20px;">
+                        <strong>🤔 生活例子：</strong><br>
+                        医生诊断100个病人，92个诊断正确 → 准确率92%<br>
+                        看起来不错，但如果漏诊了癌症患者呢？<br>
+                        所以还需要看精确率和召回率！
+                    </div>
                 </section>
 
                 <section>
@@ -1539,7 +1674,9 @@
 
                 <section>
                     <h2>📈 ROC曲线与AUC</h2>
-                    <canvas id="rocChart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="rocChart" class="large-canvas"></canvas>
+                    </div>
                     <div class="code-block" style="margin-top: 20px;">
                         <strong>AUC (曲线下面积):</strong><br>
                         0.9-1.0: 优秀 ⭐⭐⭐⭐⭐<br>
@@ -1560,46 +1697,289 @@
                 </section>
 
                 <section>
-                    <h2>📊 过拟合 vs 欠拟合</h2>
-                    <canvas id="fittingChart"></canvas>
+                    <h2>📊 欠拟合 - 模型太简单</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="underfittingChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white;">
+                        <h3 style="color: white;">❌ 欠拟合问题</h3>
+                        <p>• 模型太简单，连训练数据都拟合不好</p>
+                        <p>• 训练误差大，测试误差也大</p>
+                        <p>• 解决方法：增加模型复杂度</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📊 恰到好处 - 完美平衡</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="goodfitChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white;">
+                        <h3 style="color: white;">✅ 理想状态</h3>
+                        <p>• 既能拟合训练数据，又能泛化到新数据</p>
+                        <p>• 训练误差小，测试误差也小</p>
+                        <p>• 目标：找到这个平衡点！</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📊 过拟合 - 模型太复杂</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="overfittingChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white;">
+                        <h3 style="color: white;">⚠️ 过拟合问题</h3>
+                        <p>• 模型太复杂，记住了训练数据的噪声</p>
+                        <p>• 训练误差很小，但测试误差大</p>
+                        <p>• 解决方法：正则化、Dropout、更多数据</p>
+                    </div>
                 </section>
 
                 <section>
                     <h2>🎓 学习类比</h2>
-                    <div class="feature-grid">
-                        <div class="feature-card" style="border-color: var(--danger-color);">
-                            <h3 style="color: var(--danger-color);">学生A (欠拟合)</h3>
-                            <p style="font-size: 1.2em;">📚</p>
-                            <p>课本没学懂</p>
-                            <div style="margin-top: 20px;">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 40%; background: var(--danger-color);">40分</div>
+                    <div class="learning-analogy-container">
+                        <div class="feature-grid">
+                            <div class="feature-card" style="border-color: var(--danger-color);">
+                                <h3 style="color: var(--danger-color);">学生A (欠拟合)</h3>
+                                <p style="font-size: 1.2em;">📚</p>
+                                <p>课本没学懂</p>
+                                <div class="score-section">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 40%; background: var(--danger-color);">40分</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="feature-card" style="border-color: var(--success-color);">
+                                <h3 style="color: var(--success-color);">学生B (恰到好处)</h3>
+                                <p style="font-size: 1.2em;">🎯</p>
+                                <p>理解了知识</p>
+                                <div class="score-section">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 90%;">90分</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="feature-card" style="border-color: var(--success-color);">
-                            <h3 style="color: var(--success-color);">学生B (恰到好处)</h3>
-                            <p style="font-size: 1.2em;">🎯</p>
-                            <p>理解了知识</p>
-                            <div style="margin-top: 20px;">
+                        <div class="feature-card student-c-card" style="border-color: var(--warning-color);">
+                            <h3 style="color: var(--warning-color);">学生C (过拟合)</h3>
+                            <p style="font-size: 1.2em;">📝</p>
+                            <p>背答案，不会举一反三</p>
+                            <div class="score-section">
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 90%;">90分</div>
+                                    <div class="progress-fill" style="width: 100%; background: var(--warning-color);">作业100分</div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 60%; background: var(--danger-color);">考试60分</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="feature-card" style="border-color: var(--warning-color); margin-top: 20px;">
-                        <h3 style="color: var(--warning-color);">学生C (过拟合)</h3>
-                        <p style="font-size: 1.2em;">📝</p>
-                        <p>背答案，不会举一反三</p>
-                        <div style="margin-top: 20px;">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 100%; background: var(--warning-color);">作业100分</div>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 60%; background: var(--danger-color);">考试60分</div>
+                </section>
+            </section>
+
+            <!-- 第8章：深度学习与神经网络 -->
+            <section>
+                <section class="center">
+                    <h1>第八章</h1>
+                    <h2>🧠 深度学习与神经网络</h2>
+                    <h3>让机器像人脑一样学习</h3>
+                </section>
+
+                <section>
+                    <h2>🧠 什么是神经网络？</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card" style="border-color: var(--accent-color);">
+                            <h3 style="color: var(--accent-color);">🧬 灵感来源</h3>
+                            <p style="font-size: 1.1em; line-height: 1.6;">模仿人脑神经元的连接方式</p>
+                            <div style="margin-top: 15px;">
+                                <div style="font-size: 2em;">👁️ → 🧠 → 💭</div>
+                                <p style="margin-top: 10px; font-size: 0.9em;">输入 → 隐藏层 → 输出</p>
                             </div>
                         </div>
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">⚡ 核心思想</h3>
+                            <p style="font-size: 1.1em; line-height: 1.6;">通过多层网络自动学习特征</p>
+                            <ul style="text-align: left; margin-top: 15px; font-size: 0.95em;">
+                                <li>输入层：接收原始数据</li>
+                                <li>隐藏层：提取特征</li>
+                                <li>输出层：做出预测</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <canvas id="neuralNetworkChart" style="max-height: 300px; margin-top: 20px;"></canvas>
+                </section>
+
+                <section>
+                    <h2>🎨 案例1：图片分类</h2>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h3 style="color: white;">识别手写数字 (MNIST)</h3>
+                        <p style="font-size: 1.1em; margin: 15px 0;">任务：识别0-9的手写数字</p>
+                    </div>
+                    <div class="feature-grid" style="margin-top: 20px;">
+                        <div class="feature-card" style="border-color: var(--accent-color);">
+                            <h3 style="color: var(--accent-color);">📥 输入</h3>
+                            <p>28×28像素的灰度图像</p>
+                            <div style="margin: 15px 0; font-size: 3em;">7</div>
+                            <p style="font-size: 0.9em;">784个数字 (28×28)</p>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--warning-color);">
+                            <h3 style="color: var(--warning-color);">🔄 处理</h3>
+                            <p>卷积神经网络 (CNN)</p>
+                            <div style="margin: 15px 0;">
+                                <div style="font-size: 1.5em;">🔍 → 🧠 → 🎯</div>
+                                <p style="font-size: 0.85em; margin-top: 10px;">
+                                    卷积层 → 池化层 → 全连接层
+                                </p>
+                            </div>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">📤 输出</h3>
+                            <p>10个类别的概率</p>
+                            <div style="margin: 15px 0; font-size: 0.9em; text-align: left;">
+                                <div>0: 1%</div>
+                                <div>1: 2%</div>
+                                <div style="color: #27ae60; font-weight: bold;">7: 95% ✓</div>
+                                <div>8: 1%</div>
+                                <div>9: 1%</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📊 图片分类准确率</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="imageClassificationChart" class="large-canvas"></canvas>
+                    </div>
+                    <div class="code-block" style="margin-top: 20px;">
+                        <strong>💡 深度学习的优势：</strong><br>
+                        • 自动提取特征，不需要人工设计<br>
+                        • 层数越深，能学到越复杂的模式<br>
+                        • 在图像、语音等领域表现卓越
+                    </div>
+                </section>
+
+                <section>
+                    <h2>📝 案例2：BERT实体提取</h2>
+                    <div class="highlight-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                        <h3 style="color: white;">命名实体识别 (NER)</h3>
+                        <p style="font-size: 1.1em; margin: 15px 0;">任务：从文本中提取人名、地名、组织等</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 15px; margin: 20px 0;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 20px;">📄 输入文本：</h4>
+                        <p style="font-size: 1.2em; line-height: 1.8; color: #2c3e50;">
+                            "马云在<span style="background: #3498db; color: white; padding: 3px 8px; border-radius: 5px;">杭州</span>创立了<span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 5px;">阿里巴巴</span>集团"
+                        </p>
+                        <h4 style="color: var(--primary-color); margin: 25px 0 15px 0;">🎯 BERT识别结果：</h4>
+                        <div class="feature-grid">
+                            <div class="feature-card" style="border-color: #9b59b6;">
+                                <h3 style="color: #9b59b6;">👤 人名</h3>
+                                <p style="font-size: 1.3em; margin: 10px 0;">马云</p>
+                            </div>
+                            <div class="feature-card" style="border-color: #3498db;">
+                                <h3 style="color: #3498db;">📍 地名</h3>
+                                <p style="font-size: 1.3em; margin: 10px 0;">杭州</p>
+                            </div>
+                            <div class="feature-card" style="border-color: #e74c3c;">
+                                <h3 style="color: #e74c3c;">🏢 组织</h3>
+                                <p style="font-size: 1.3em; margin: 10px 0;">阿里巴巴</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>🔤 BERT如何工作？</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card" style="border-color: var(--accent-color);">
+                            <h3 style="color: var(--accent-color);">1️⃣ 预训练</h3>
+                            <p style="line-height: 1.6;">在海量文本上学习语言规律</p>
+                            <p style="margin-top: 10px; font-size: 0.9em;">📚 维基百科 + 书籍语料</p>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--warning-color);">
+                            <h3 style="color: var(--warning-color);">2️⃣ 微调</h3>
+                            <p style="line-height: 1.6;">在特定任务上fine-tune</p>
+                            <p style="margin-top: 10px; font-size: 0.9em;">🎯 实体识别数据集</p>
+                        </div>
+                        <div class="feature-card" style="border-color: var(--success-color);">
+                            <h3 style="color: var(--success-color);">3️⃣ 预测</h3>
+                            <p style="line-height: 1.6;">输出每个词的类别</p>
+                            <p style="margin-top: 10px; font-size: 0.9em;">✅ 准确率 > 90%</p>
+                        </div>
+                    </div>
+                    <canvas id="bertPerformanceChart" style="max-height: 300px; margin-top: 20px;"></canvas>
+                </section>
+
+                <section>
+                    <h2>🆚 深度学习 vs 传统机器学习</h2>
+                    <table class="comparison-table" style="font-size: 0.85em;">
+                        <thead>
+                            <tr>
+                                <th>对比维度</th>
+                                <th style="color: var(--accent-color);">传统机器学习</th>
+                                <th style="color: var(--success-color);">深度学习</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>特征工程</strong></td>
+                                <td>需要人工设计特征</td>
+                                <td class="good">自动学习特征 ✓</td>
+                            </tr>
+                            <tr>
+                                <td><strong>数据量需求</strong></td>
+                                <td class="good">小数据也能工作 ✓</td>
+                                <td>需要大量数据</td>
+                            </tr>
+                            <tr>
+                                <td><strong>计算资源</strong></td>
+                                <td class="good">普通电脑即可 ✓</td>
+                                <td>需要GPU加速</td>
+                            </tr>
+                            <tr>
+                                <td><strong>训练时间</strong></td>
+                                <td class="good">快速（分钟级）✓</td>
+                                <td>较慢（小时到天）</td>
+                            </tr>
+                            <tr>
+                                <td><strong>模型性能</strong></td>
+                                <td>在小数据上较好</td>
+                                <td class="good">在大数据上卓越 ✓</td>
+                            </tr>
+                            <tr>
+                                <td><strong>适用场景</strong></td>
+                                <td>结构化数据</td>
+                                <td class="good">图像、语音、文本 ✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>🚀 流行的深度学习框架</h2>
+                    <div class="feature-grid">
+                        <div class="feature-card" style="border-color: #FF6F00;">
+                            <div style="font-size: 2.5em; margin-bottom: 15px;">🔥</div>
+                            <h3 style="color: #FF6F00;">PyTorch</h3>
+                            <p style="margin: 10px 0;">灵活、易调试</p>
+                            <p style="font-size: 0.85em;">Meta开发，研究首选</p>
+                        </div>
+                        <div class="feature-card" style="border-color: #FF6F00;">
+                            <div style="font-size: 2.5em; margin-bottom: 15px;">📐</div>
+                            <h3 style="color: #FF6F00;">TensorFlow</h3>
+                            <p style="margin: 10px 0;">强大、可扩展</p>
+                            <p style="font-size: 0.85em;">Google开发，工业部署</p>
+                        </div>
+                        <div class="feature-card" style="border-color: #D00000;">
+                            <div style="font-size: 2.5em; margin-bottom: 15px;">⚡</div>
+                            <h3 style="color: #D00000;">Keras</h3>
+                            <p style="margin: 10px 0;">简单、快速</p>
+                            <p style="font-size: 0.85em;">高级API，新手友好</p>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 25px;">
+                        <h3>💡 学习建议</h3>
+                        <p>从Keras开始 → 熟悉后学PyTorch → 根据项目需求选择框架</p>
                     </div>
                 </section>
             </section>
@@ -2228,7 +2608,128 @@
             });
         }
 
-        // 7. K-means聚类
+        // 7. 朴素贝叶斯可视化
+        let bayesChart;
+        const bayesCtx = document.getElementById('bayesChart');
+        if (bayesCtx) {
+            bayesChart = new Chart(bayesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['好瓜概率 P(好瓜|青绿+蜷缩)', '坏瓜概率 P(坏瓜|青绿+蜷缩)'],
+                    datasets: [{
+                        label: '后验概率',
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(39, 174, 96, 0.7)',
+                            'rgba(231, 76, 60, 0.7)'
+                        ],
+                        borderColor: [
+                            '#27ae60',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '🎲 朴素贝叶斯 - 概率推理',
+                            font: {
+                                size: window.innerWidth <= 768 ? 14 : (window.innerWidth <= 1024 ? 16 : 18)
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: window.innerWidth <= 768 ? 10 : 12
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: '概率值'
+                            },
+                            ticks: {
+                                stepSize: 0.1,
+                                callback: function(value) {
+                                    return (value * 100).toFixed(0) + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function animateBayes() {
+            // 模拟贝叶斯计算过程
+            // 假设样本：观察到的西瓜特征为 "青绿" + "蜷缩"
+
+            // 先验概率（历史数据统计）
+            const priorGood = 0.6;  // 60% 的瓜是好瓜
+            const priorBad = 0.4;   // 40% 的瓜是坏瓜
+
+            // 条件概率（特征在各类别中的出现概率）
+            // P(青绿|好瓜) * P(蜷缩|好瓜)
+            const likelihoodGood = 0.8 * 0.9;  // 好瓜中，青绿占80%，蜷缩占90%
+            // P(青绿|坏瓜) * P(蜷缩|坏瓜)
+            const likelihoodBad = 0.3 * 0.4;   // 坏瓜中，青绿占30%，蜷缩占40%
+
+            // 贝叶斯公式：P(好瓜|特征) = P(特征|好瓜) * P(好瓜) / P(特征)
+            const evidenceGood = likelihoodGood * priorGood;
+            const evidenceBad = likelihoodBad * priorBad;
+            const totalEvidence = evidenceGood + evidenceBad;
+
+            // 后验概率（归一化）
+            const posteriorGood = evidenceGood / totalEvidence;
+            const posteriorBad = evidenceBad / totalEvidence;
+
+            // 动画更新图表
+            let progress = 0;
+            const targetGood = posteriorGood;
+            const targetBad = posteriorBad;
+
+            const interval = setInterval(() => {
+                if (progress >= 1) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        const result = posteriorGood > posteriorBad ? '好瓜！✅' : '坏瓜！❌';
+                        const confidence = Math.max(posteriorGood, posteriorBad) * 100;
+                        alert(
+                            `🎯 贝叶斯分类结果：\n\n` +
+                            `观察特征：青绿 + 蜷缩\n\n` +
+                            `📊 计算过程：\n` +
+                            `• P(好瓜|特征) = ${(posteriorGood * 100).toFixed(1)}%\n` +
+                            `• P(坏瓜|特征) = ${(posteriorBad * 100).toFixed(1)}%\n\n` +
+                            `✨ 结论：这是${result}\n` +
+                            `🎲 置信度：${confidence.toFixed(1)}%`
+                        );
+                    }, 500);
+                    return;
+                }
+
+                progress += 0.05;
+                bayesChart.data.datasets[0].data = [
+                    targetGood * progress,
+                    targetBad * progress
+                ];
+                bayesChart.update();
+            }, 50);
+        }
+
+        // 8. K-means聚类
         let kmeansChart;
         const kmeansCtx = document.getElementById('kmeansChart');
         if (kmeansCtx) {
@@ -2532,9 +3033,9 @@
             });
         }
 
-        // 11. 过拟合vs欠拟合
-        const fittingCtx = document.getElementById('fittingChart');
-        if (fittingCtx) {
+        // 11. 欠拟合图表
+        const underfittingCtx = document.getElementById('underfittingChart');
+        if (underfittingCtx) {
             const dataPoints = [
                 { x: 1, y: 2.1 },
                 { x: 2, y: 3.9 },
@@ -2543,25 +3044,82 @@
                 { x: 5, y: 10.1 }
             ];
 
-            new Chart(fittingCtx, {
+            new Chart(underfittingCtx, {
                 type: 'scatter',
                 data: {
                     datasets: [{
-                        label: '数据点',
+                        label: '真实数据点',
                         data: dataPoints,
                         backgroundColor: '#34495e',
                         borderColor: '#2c3e50',
-                        pointRadius: 8
+                        pointRadius: 10,
+                        pointHoverRadius: 12
                     }, {
-                        label: '❌ 欠拟合（太简单）',
+                        label: '❌ 欠拟合线（太简单）',
                         data: [{ x: 0, y: 4 }, { x: 6, y: 8 }],
                         type: 'line',
                         borderColor: '#e74c3c',
-                        borderWidth: 2,
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 4,
                         pointRadius: 0,
                         fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { font: { size: 14 } }
+                        },
+                        title: {
+                            display: true,
+                            text: '❌ 欠拟合：一条直线无法捕捉数据规律',
+                            font: { size: 16 },
+                            color: '#e74c3c'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 6,
+                            title: { display: true, text: 'X' }
+                        },
+                        y: {
+                            min: 0,
+                            max: 12,
+                            title: { display: true, text: 'Y' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 12. 恰到好处图表
+        const goodfitCtx = document.getElementById('goodfitChart');
+        if (goodfitCtx) {
+            const dataPoints = [
+                { x: 1, y: 2.1 },
+                { x: 2, y: 3.9 },
+                { x: 3, y: 6.2 },
+                { x: 4, y: 7.8 },
+                { x: 5, y: 10.1 }
+            ];
+
+            new Chart(goodfitCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '真实数据点',
+                        data: dataPoints,
+                        backgroundColor: '#34495e',
+                        borderColor: '#2c3e50',
+                        pointRadius: 10,
+                        pointHoverRadius: 12
                     }, {
-                        label: '✅ 恰到好处',
+                        label: '✅ 恰到好处（完美平衡）',
                         data: [
                             { x: 0, y: 0 },
                             { x: 1, y: 2 },
@@ -2573,12 +3131,68 @@
                         ],
                         type: 'line',
                         borderColor: '#27ae60',
-                        borderWidth: 3,
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 4,
                         pointRadius: 0,
                         fill: false,
                         tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { font: { size: 14 } }
+                        },
+                        title: {
+                            display: true,
+                            text: '✅ 恰到好处：完美捕捉数据趋势',
+                            font: { size: 16 },
+                            color: '#27ae60'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 6,
+                            title: { display: true, text: 'X' }
+                        },
+                        y: {
+                            min: 0,
+                            max: 12,
+                            title: { display: true, text: 'Y' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 13. 过拟合图表
+        const overfittingCtx = document.getElementById('overfittingChart');
+        if (overfittingCtx) {
+            const dataPoints = [
+                { x: 1, y: 2.1 },
+                { x: 2, y: 3.9 },
+                { x: 3, y: 6.2 },
+                { x: 4, y: 7.8 },
+                { x: 5, y: 10.1 }
+            ];
+
+            new Chart(overfittingCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '真实数据点',
+                        data: dataPoints,
+                        backgroundColor: '#34495e',
+                        borderColor: '#2c3e50',
+                        pointRadius: 10,
+                        pointHoverRadius: 12
                     }, {
-                        label: '⚠️ 过拟合（太复杂）',
+                        label: '⚠️ 过拟合线（太复杂）',
                         data: [
                             { x: 0, y: -1 },
                             { x: 1, y: 2.1 },
@@ -2594,10 +3208,117 @@
                         ],
                         type: 'line',
                         borderColor: '#f39c12',
-                        borderWidth: 2,
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 4,
                         pointRadius: 0,
                         fill: false,
                         tension: 0.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { font: { size: 14 } }
+                        },
+                        title: {
+                            display: true,
+                            text: '⚠️ 过拟合：记住了噪声，失去泛化能力',
+                            font: { size: 16 },
+                            color: '#f39c12'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 6,
+                            title: { display: true, text: 'X' }
+                        },
+                        y: {
+                            min: -2,
+                            max: 14,
+                            title: { display: true, text: 'Y' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 14. 神经网络结构可视化
+        const neuralNetworkCtx = document.getElementById('neuralNetworkChart');
+        if (neuralNetworkCtx) {
+            new Chart(neuralNetworkCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['输入层\n(784个神经元)', '隐藏层1\n(128个神经元)', '隐藏层2\n(64个神经元)', '输出层\n(10个神经元)'],
+                    datasets: [{
+                        label: '神经元数量',
+                        data: [784, 128, 64, 10],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(231, 76, 60, 0.7)'
+                        ],
+                        borderColor: [
+                            '#3498db',
+                            '#9b59b6',
+                            '#2ecc71',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '🧠 神经网络层次结构',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '神经元数量'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 15. 图片分类准确率对比
+        const imageClassificationCtx = document.getElementById('imageClassificationChart');
+        if (imageClassificationCtx) {
+            new Chart(imageClassificationCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Epoch 1', 'Epoch 5', 'Epoch 10', 'Epoch 15', 'Epoch 20', 'Epoch 25', 'Epoch 30'],
+                    datasets: [{
+                        label: '训练准确率',
+                        data: [65, 85, 92, 95, 97, 98, 99],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '验证准确率',
+                        data: [60, 82, 90, 93, 95, 96, 96.5],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -2610,18 +3331,76 @@
                         },
                         title: {
                             display: true,
-                            text: '⚖️ 过拟合 vs 欠拟合 vs 恰到好处',
+                            text: '📈 CNN图片分类训练过程',
                             font: { size: 18 }
                         }
                     },
                     scales: {
                         x: {
-                            min: 0,
-                            max: 6
+                            title: {
+                                display: true,
+                                text: '训练轮次 (Epoch)'
+                            }
                         },
                         y: {
-                            min: -2,
-                            max: 14
+                            min: 50,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '准确率 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 16. BERT性能对比
+        const bertPerformanceCtx = document.getElementById('bertPerformanceChart');
+        if (bertPerformanceCtx) {
+            new Chart(bertPerformanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['传统CRF', 'BiLSTM', 'BiLSTM+CRF', 'BERT', 'BERT-Large'],
+                    datasets: [{
+                        label: 'F1分数 (%)',
+                        data: [85.2, 88.5, 91.3, 94.6, 96.1],
+                        backgroundColor: [
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(243, 156, 18, 0.7)',
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(39, 174, 96, 0.8)'
+                        ],
+                        borderColor: [
+                            '#e74c3c',
+                            '#f39c12',
+                            '#3498db',
+                            '#2ecc71',
+                            '#27ae60'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '📊 实体识别模型性能对比',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 80,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'F1分数 (%)'
+                            }
                         }
                     }
                 }

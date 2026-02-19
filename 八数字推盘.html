@@ -922,10 +922,13 @@
             const [fromRow, fromCol] = fromPos;
             const [toRow, toCol] = toPos;
             
-            if (toRow < fromRow) return '上方';
-            if (toRow > fromRow) return '下方';
-            if (toCol < fromCol) return '左侧';
-            if (toCol > fromCol) return '右侧';
+            // 注意：这里是空格的移动方向，但我们要描述的是数字的移动方向
+            // 空格向上移动 = 数字向下移动到空格位置
+            // 所以方向要反过来
+            if (toRow < fromRow) return '下方';  // 空格上移，数字下移
+            if (toRow > fromRow) return '上方';  // 空格下移，数字上移
+            if (toCol < fromCol) return '右侧';  // 空格左移，数字右移
+            if (toCol > fromCol) return '左侧';  // 空格右移，数字左移
             return '';
         }
         

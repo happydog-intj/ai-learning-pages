@@ -221,6 +221,9 @@
         .search-node.current {
             background: #fff3e0;
             border-left-color: #ff9800;
+            border-left-width: 6px;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+            transform: scale(1.02);
         }
 
         .search-node.solution {
@@ -689,6 +692,33 @@
             currentState = solution[solutionIndex];
             renderPuzzle('currentPuzzle', currentState.board, false);
             updateStats();
+            
+            // 高亮当前步骤对应的搜索节点
+            const log = document.getElementById('searchLog');
+            const nodes = log.querySelectorAll('.search-node');
+            nodes.forEach((node, idx) => {
+                node.classList.remove('current');
+                // 找到匹配当前状态的节点
+                const miniPuzzles = node.querySelectorAll('.mini-tile');
+                let match = true;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        const tileIndex = i * 3 + j;
+                        const expectedValue = currentState.board[i][j] || '';
+                        const actualValue = miniPuzzles[tileIndex].textContent;
+                        if (String(expectedValue) !== actualValue) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (!match) break;
+                }
+                if (match) {
+                    node.classList.add('current');
+                    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+            
             solutionIndex++;
             
             // 更新状态信息

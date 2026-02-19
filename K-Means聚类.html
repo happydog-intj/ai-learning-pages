@@ -79,6 +79,36 @@
             border-radius: 15px;
             padding: 20px;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 750px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .right-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .right-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .right-panel::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        .right-panel::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         canvas {
@@ -87,19 +117,19 @@
             border-radius: 10px;
             background: white;
             cursor: crosshair;
+            max-height: 500px;
         }
 
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         button {
-            padding: 12px 24px;
-            font-size: 1em;
+            padding: 10px 20px;
+            font-size: 0.95em;
             font-weight: 600;
             border: none;
             border-radius: 10px;
@@ -200,13 +230,12 @@
 
         .status {
             text-align: center;
-            padding: 15px;
+            padding: 12px;
             background: #e8f5e9;
             border-radius: 10px;
-            font-size: 1.05em;
+            font-size: 1em;
             color: #2e7d32;
             font-weight: 600;
-            margin-bottom: 15px;
         }
 
         .status.running {
@@ -306,7 +335,7 @@
 
         <div class="main-grid">
             <div class="canvas-section">
-                <canvas id="canvas" width="800" height="600"></canvas>
+                <canvas id="canvas" width="800" height="500"></canvas>
                 <div class="legend">
                     <div class="legend-item">
                         <div class="legend-circle" style="background: #e74c3c; border: 3px solid #c0392b;"></div>
@@ -325,9 +354,21 @@
                         <span>数据点（簇3）</span>
                     </div>
                 </div>
+                
+                <div class="controls">
+                    <button class="btn-generate" onclick="generateData()">🎲 生成数据</button>
+                    <button class="btn-init" onclick="initCentroids()" id="initBtn" disabled>🎯 初始化中心</button>
+                    <button class="btn-step" onclick="step()" id="stepBtn" disabled>⏭️ 单步执行</button>
+                    <button class="btn-auto" onclick="autoRun()" id="autoBtn" disabled>▶️ 自动运行</button>
+                    <button class="btn-reset" onclick="reset()">🔄 重置</button>
+                </div>
+
+                <div class="status" id="status">
+                    点击"生成数据"创建随机数据点
+                </div>
             </div>
 
-            <div>
+            <div class="right-panel">
                 <div class="calc-panel">
                     <div class="calc-title">⚙️ 参数设置</div>
                     <div class="input-group">
@@ -341,29 +382,17 @@
                 </div>
 
                 <div class="calc-panel">
+                    <div class="calc-title">📊 聚类统计</div>
+                    <div id="clusterStats" style="font-size: 0.9em;"></div>
+                </div>
+
+                <div class="calc-panel">
                     <div class="calc-title">📐 当前步骤计算</div>
                     <div id="calcDetails" style="font-size: 0.9em; color: #666;">
                         点击"生成数据"开始
                     </div>
                 </div>
-
-                <div class="calc-panel">
-                    <div class="calc-title">📊 聚类统计</div>
-                    <div id="clusterStats" style="font-size: 0.9em;"></div>
-                </div>
             </div>
-        </div>
-
-        <div class="controls">
-            <button class="btn-generate" onclick="generateData()">🎲 生成数据</button>
-            <button class="btn-init" onclick="initCentroids()" id="initBtn" disabled>🎯 初始化中心</button>
-            <button class="btn-step" onclick="step()" id="stepBtn" disabled>⏭️ 单步执行</button>
-            <button class="btn-auto" onclick="autoRun()" id="autoBtn" disabled>▶️ 自动运行</button>
-            <button class="btn-reset" onclick="reset()">🔄 重置</button>
-        </div>
-
-        <div class="status" id="status">
-            点击"生成数据"创建随机数据点
         </div>
 
         <div class="explanation">
@@ -432,7 +461,7 @@
 
             for (let i = 0; i < numClusters; i++) {
                 const centerX = 150 + Math.random() * 500;
-                const centerY = 150 + Math.random() * 300;
+                const centerY = 100 + Math.random() * 300;
                 const spread = 50 + Math.random() * 40;
 
                 for (let j = 0; j < pointsPerCluster; j++) {
@@ -451,7 +480,7 @@
             for (let i = 0; i < remaining; i++) {
                 points.push({
                     x: 100 + Math.random() * 600,
-                    y: 100 + Math.random() * 400
+                    y: 50 + Math.random() * 400
                 });
             }
 
@@ -721,7 +750,7 @@
                 ctx.lineTo(i, 600);
                 ctx.stroke();
             }
-            for (let i = 0; i <= 600; i += 50) {
+            for (let i = 0; i <= 500; i += 50) {
                 ctx.beginPath();
                 ctx.moveTo(0, i);
                 ctx.lineTo(800, i);

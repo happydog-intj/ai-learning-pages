@@ -804,9 +804,15 @@
         
         // 更新计算过程显示
         function updateCalculationDisplay() {
+            // 确保使用最新的值
             const g = currentState.g;
             const h = currentState.h;
-            const f = currentState.f;
+            const f = g + h; // 重新计算确保正确
+            
+            // 验证：如果 currentState.f 与计算值不一致，更新它
+            if (currentState.f !== f) {
+                currentState.f = f;
+            }
             
             // g 值说明
             document.getElementById('gCalc').innerHTML = `
@@ -815,6 +821,8 @@
             
             // h 值详细计算
             const hDetails = calculateManhattanDetails();
+            const calculatedH = hDetails.map(d => d.distance).reduce((a, b) => a + b, 0);
+            
             let hHtml = `所有数字到目标位置的距离之和：<br>`;
             hHtml += `<div style="margin-top: 5px;">`;
             hDetails.forEach(detail => {
@@ -826,13 +834,13 @@
             });
             hHtml += `</div>`;
             hHtml += `<div style="margin-top: 8px; font-weight: 600; color: #f57c00;">
-                总计 h = ${hDetails.map(d => d.distance).reduce((a, b) => a + b, 0)}
+                总计 h = ${calculatedH}
             </div>`;
             document.getElementById('hCalc').innerHTML = hHtml;
             
-            // f 值计算
+            // f 值计算（确保显示正确的加法）
             document.getElementById('fCalc').innerHTML = `
-                f = ${g} + ${h} = <strong style="color: #7b1fa2; font-size: 1.2em;">${f}</strong>
+                f = <span style="color: #1976d2;">${g}</span> + <span style="color: #f57c00;">${h}</span> = <strong style="color: #7b1fa2; font-size: 1.2em;">${f}</strong>
                 <div style="font-size: 0.85em; color: #999; margin-top: 3px;">
                     (预计总共需要 ${f} 步到达目标)
                 </div>

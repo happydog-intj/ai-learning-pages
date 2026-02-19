@@ -301,7 +301,7 @@
         <div class="main-grid">
             <div class="section">
                 <div class="section-title">决策树结构</div>
-                <svg id="treeSvg" width="800" height="450"></svg>
+                <svg id="treeSvg" width="800" height="480"></svg>
                 
                 <div class="controls">
                     <button class="btn-start" onclick="buildTree()" id="buildBtn">🚀 构建决策树</button>
@@ -448,6 +448,9 @@
 
         // 构建决策树（递归）
         function buildDecisionTree(data, features, depth = 0) {
+            // 计算当前节点的熵
+            const nodeEntropy = entropy(data);
+            
             // 检查停止条件
             const labels = data.map(d => d[TARGET]);
             const uniqueLabels = [...new Set(labels)];
@@ -458,9 +461,16 @@
                     type: 'leaf',
                     label: uniqueLabels[0],
                     data: data,
-                    depth
+                    depth,
+                    entropy: nodeEntropy
                 });
-                return { type: 'leaf', label: uniqueLabels[0], depth };
+                return { 
+                    type: 'leaf', 
+                    label: uniqueLabels[0], 
+                    depth,
+                    entropy: nodeEntropy,
+                    samples: data.length
+                };
             }
 
             // 无特征可选
@@ -470,9 +480,16 @@
                     type: 'leaf',
                     label: majorityLabel,
                     data: data,
-                    depth
+                    depth,
+                    entropy: nodeEntropy
                 });
-                return { type: 'leaf', label: majorityLabel, depth };
+                return { 
+                    type: 'leaf', 
+                    label: majorityLabel, 
+                    depth,
+                    entropy: nodeEntropy,
+                    samples: data.length
+                };
             }
 
             // 选择最佳特征
@@ -485,14 +502,17 @@
                 info: bestInfo,
                 details: details,
                 data: data,
-                depth
+                depth,
+                entropy: nodeEntropy
             });
 
             const node = {
                 type: 'decision',
                 feature: bestFeature,
                 children: {},
-                depth
+                depth,
+                entropy: nodeEntropy,
+                samples: data.length
             };
 
             const remainingFeatures = features.filter(f => f !== bestFeature);
@@ -539,9 +559,9 @@
         function drawTree(node, svg, x = 400, y = 50, level = 0, parentX = null, parentY = null, edgeLabel = '') {
             if (!node) return;
 
-            const nodeWidth = 120;
-            const nodeHeight = 50;
-            const levelHeight = 100;
+            const nodeWidth = 140;
+            const nodeHeight = 65;
+            const levelHeight = 110;
 
             // 绘制连接线
             if (parentX !== null && parentY !== null) {
@@ -557,6 +577,7 @@
                 text.setAttribute('y', (parentY + y) / 2 - 5);
                 text.setAttribute('class', 'tree-text');
                 text.setAttribute('fill', '#7f8c8d');
+                text.setAttribute('font-size', '11');
                 text.textContent = edgeLabel;
                 svg.appendChild(text);
             }
@@ -577,20 +598,50 @@
             
             svg.appendChild(rect);
 
-            // 节点文本
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', x);
-            text.setAttribute('y', y);
-            text.setAttribute('class', 'tree-text');
-            text.setAttribute('fill', 'white');
-            text.setAttribute('dy', '0.35em');
-            text.textContent = node.type === 'leaf' ? `结果: ${node.label}` : node.feature;
-            svg.appendChild(text);
+            // 节点主文本（特征名或结果）
+            const mainText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            mainText.setAttribute('x', x);
+            mainText.setAttribute('y', y - 10);
+            mainText.setAttribute('class', 'tree-text');
+            mainText.setAttribute('fill', 'white');
+            mainText.setAttribute('dy', '0.35em');
+            mainText.setAttribute('font-size', '13');
+            mainText.setAttribute('font-weight', 'bold');
+            mainText.textContent = node.type === 'leaf' ? `结果: ${node.label}` : node.feature;
+            svg.appendChild(mainText);
+
+            // 熵值文本
+            if (node.entropy !== undefined) {
+                const entropyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                entropyText.setAttribute('x', x);
+                entropyText.setAttribute('y', y + 8);
+                entropyText.setAttribute('class', 'tree-text');
+                entropyText.setAttribute('fill', 'white');
+                entropyText.setAttribute('dy', '0.35em');
+                entropyText.setAttribute('font-size', '10');
+                entropyText.setAttribute('opacity', '0.9');
+                entropyText.textContent = `H = ${node.entropy.toFixed(3)}`;
+                svg.appendChild(entropyText);
+            }
+
+            // 样本数文本
+            if (node.samples !== undefined) {
+                const samplesText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                samplesText.setAttribute('x', x);
+                samplesText.setAttribute('y', y + 22);
+                samplesText.setAttribute('class', 'tree-text');
+                samplesText.setAttribute('fill', 'white');
+                samplesText.setAttribute('dy', '0.35em');
+                samplesText.setAttribute('font-size', '9');
+                samplesText.setAttribute('opacity', '0.85');
+                samplesText.textContent = `n = ${node.samples}`;
+                svg.appendChild(samplesText);
+            }
 
             // 递归绘制子节点
             if (node.children) {
                 const childrenCount = Object.keys(node.children).length;
-                const spacing = Math.min(200, 600 / childrenCount);
+                const spacing = Math.min(220, 650 / childrenCount);
                 const startX = x - (childrenCount - 1) * spacing / 2;
 
                 Object.entries(node.children).forEach(([value, child], i) => {
@@ -640,8 +691,8 @@
             if (step.type === 'split') {
                 html += `<div class="step-entropy">
                     <strong>步骤 ${index + 1}: 计算熵和信息增益</strong><br>
-                    当前数据集样本数: ${step.data.length}<br>
-                    总熵 H(S) = ${step.info.totalEntropy.toFixed(4)}
+                    当前节点样本数: ${step.data.length}<br>
+                    <strong>当前节点熵 H = ${step.entropy.toFixed(4)}</strong>
                 </div>`;
 
                 html += `<div class="step-gain"><strong>各特征的信息增益：</strong><br>`;
@@ -655,14 +706,17 @@
 
                 html += `<div class="step-split">
                     <strong>选择特征: ${step.feature}</strong><br>
-                    信息增益: ${step.gain.toFixed(4)}<br>
+                    信息增益: IG = ${step.entropy.toFixed(4)} - ${step.info.weightedEntropy.toFixed(4)} = <strong>${step.gain.toFixed(4)}</strong><br>
                     分裂后子集:`;
                 
                 for (const val in step.info.splits) {
                     const subset = step.info.splits[val];
                     const subEnt = entropy(subset);
+                    const yesCount = subset.filter(d => d[TARGET] === '是').length;
+                    const noCount = subset.filter(d => d[TARGET] === '否').length;
                     html += `<div class="formula">
-                        ${step.feature} = ${val}: ${subset.length}个样本, 熵 = ${subEnt.toFixed(4)}
+                        ${step.feature} = ${val}: ${subset.length}个样本 (是:${yesCount}, 否:${noCount})<br>
+                        子节点熵 H = ${subEnt.toFixed(4)}
                     </div>`;
                 }
                 html += `</div>`;
@@ -675,7 +729,8 @@
                 html += `<div class="step-result">
                     <strong>步骤 ${index + 1}: 生成叶节点</strong><br>
                     所有样本属于同一类别: <strong>${step.label}</strong><br>
-                    样本数: ${step.data.length}
+                    样本数: ${step.data.length}<br>
+                    <strong>节点熵 H = ${step.entropy.toFixed(4)}</strong> (纯净节点)
                 </div>`;
 
                 const partialTree = buildPartialTree(buildSteps.slice(0, index + 1));

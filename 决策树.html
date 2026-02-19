@@ -304,8 +304,7 @@
                 <svg id="treeSvg" width="800" height="480"></svg>
                 
                 <div class="controls">
-                    <button class="btn-start" onclick="buildTree()" id="buildBtn">🚀 构建决策树</button>
-                    <button class="btn-step" onclick="stepBuild()" id="stepBtn" disabled>⏭️ 单步执行</button>
+                    <button class="btn-step" onclick="stepBuild()" id="stepBtn">⏭️ 单步执行</button>
                     <button class="btn-reset" onclick="reset()">🔄 重置</button>
                 </div>
 
@@ -373,9 +372,11 @@
         const TARGET = 'play';
 
         let tree = null;
-        let buildSteps = [];
+        let buildQueue = [];  // 待构建节点队列
         let currentStep = 0;
-        let stepMode = false;
+        let allSteps = [];  // 所有步骤记录
+        let treeNodes = new Map();  // 节点ID映射
+        let nodeIdCounter = 0;
 
         // 计算熵
         function entropy(data) {
@@ -446,84 +447,6 @@
             return { bestFeature, bestGain, bestInfo, details };
         }
 
-        // 构建决策树（递归）
-        function buildDecisionTree(data, features, depth = 0) {
-            // 计算当前节点的熵
-            const nodeEntropy = entropy(data);
-            
-            // 检查停止条件
-            const labels = data.map(d => d[TARGET]);
-            const uniqueLabels = [...new Set(labels)];
-
-            // 所有样本同一类别
-            if (uniqueLabels.length === 1) {
-                buildSteps.push({
-                    type: 'leaf',
-                    label: uniqueLabels[0],
-                    data: data,
-                    depth,
-                    entropy: nodeEntropy
-                });
-                return { 
-                    type: 'leaf', 
-                    label: uniqueLabels[0], 
-                    depth,
-                    entropy: nodeEntropy,
-                    samples: data.length
-                };
-            }
-
-            // 无特征可选
-            if (features.length === 0) {
-                const majorityLabel = getMajorityLabel(data);
-                buildSteps.push({
-                    type: 'leaf',
-                    label: majorityLabel,
-                    data: data,
-                    depth,
-                    entropy: nodeEntropy
-                });
-                return { 
-                    type: 'leaf', 
-                    label: majorityLabel, 
-                    depth,
-                    entropy: nodeEntropy,
-                    samples: data.length
-                };
-            }
-
-            // 选择最佳特征
-            const { bestFeature, bestGain, bestInfo, details } = selectBestFeature(data, features);
-            
-            buildSteps.push({
-                type: 'split',
-                feature: bestFeature,
-                gain: bestGain,
-                info: bestInfo,
-                details: details,
-                data: data,
-                depth,
-                entropy: nodeEntropy
-            });
-
-            const node = {
-                type: 'decision',
-                feature: bestFeature,
-                children: {},
-                depth,
-                entropy: nodeEntropy,
-                samples: data.length
-            };
-
-            const remainingFeatures = features.filter(f => f !== bestFeature);
-
-            for (const value in bestInfo.splits) {
-                const subset = bestInfo.splits[value];
-                node.children[value] = buildDecisionTree(subset, remainingFeatures, depth + 1);
-            }
-
-            return node;
-        }
 
         // 获取多数类别
         function getMajorityLabel(data) {
@@ -555,8 +478,165 @@
             table.innerHTML = html;
         }
 
-        // 绘制决策树
-        function drawTree(node, svg, x = 400, y = 50, level = 0, parentX = null, parentY = null, edgeLabel = '') {
+
+        // 初始化构建
+        function initBuild() {
+            tree = null;
+            buildQueue = [];
+            currentStep = 0;
+            allSteps = [];
+            treeNodes = new Map();
+            nodeIdCounter = 0;
+            
+            // 创建根节点
+            const rootId = nodeIdCounter++;
+            const rootNode = {
+                id: rootId,
+                type: 'pending',
+                data: DATA,
+                features: [...FEATURES],
+                depth: 0,
+                parent: null,
+                parentEdge: null
+            };
+            
+            buildQueue.push(rootNode);
+            treeNodes.set(rootId, rootNode);
+            tree = rootNode;
+            
+            document.getElementById('stepBtn').disabled = false;
+            document.getElementById('status').textContent = '准备开始！点击"单步执行"构建决策树';
+            
+            updateStats();
+            drawCurrentTree();
+        }
+
+        // 单步执行
+        function stepBuild() {
+            if (buildQueue.length === 0) {
+                document.getElementById('stepBtn').disabled = true;
+                document.getElementById('status').textContent = '✅ 决策树构建完成！';
+                return;
+            }
+            
+            // 从队列中取出一个节点
+            const node = buildQueue.shift();
+            const nodeEntropy = entropy(node.data);
+            
+            // 检查停止条件
+            const labels = node.data.map(d => d[TARGET]);
+            const uniqueLabels = [...new Set(labels)];
+            
+            // 情况1: 所有样本同一类别 -> 叶节点
+            if (uniqueLabels.length === 1) {
+                node.type = 'leaf';
+                node.label = uniqueLabels[0];
+                node.entropy = nodeEntropy;
+                node.samples = node.data.length;
+                
+                allSteps.push({
+                    type: 'leaf',
+                    label: uniqueLabels[0],
+                    data: node.data,
+                    depth: node.depth,
+                    entropy: nodeEntropy,
+                    nodeId: node.id
+                });
+                
+                currentStep++;
+                updateStats();
+                drawCurrentTree();
+                showStep(allSteps.length - 1);
+                document.getElementById('status').textContent = `步骤 ${currentStep}: 生成叶节点 "${uniqueLabels[0]}" | 剩余 ${buildQueue.length} 个节点待处理`;
+                return;
+            }
+            
+            // 情况2: 无特征可选 -> 叶节点（多数投票）
+            if (node.features.length === 0) {
+                const majorityLabel = getMajorityLabel(node.data);
+                node.type = 'leaf';
+                node.label = majorityLabel;
+                node.entropy = nodeEntropy;
+                node.samples = node.data.length;
+                
+                allSteps.push({
+                    type: 'leaf',
+                    label: majorityLabel,
+                    data: node.data,
+                    depth: node.depth,
+                    entropy: nodeEntropy,
+                    nodeId: node.id
+                });
+                
+                currentStep++;
+                updateStats();
+                drawCurrentTree();
+                showStep(allSteps.length - 1);
+                document.getElementById('status').textContent = `步骤 ${currentStep}: 生成叶节点 "${majorityLabel}" (无特征) | 剩余 ${buildQueue.length} 个节点待处理`;
+                return;
+            }
+            
+            // 情况3: 选择最佳特征分裂
+            const { bestFeature, bestGain, bestInfo, details } = selectBestFeature(node.data, node.features);
+            
+            node.type = 'decision';
+            node.feature = bestFeature;
+            node.children = {};
+            node.entropy = nodeEntropy;
+            node.samples = node.data.length;
+            
+            allSteps.push({
+                type: 'split',
+                feature: bestFeature,
+                gain: bestGain,
+                info: bestInfo,
+                details: details,
+                data: node.data,
+                depth: node.depth,
+                entropy: nodeEntropy,
+                nodeId: node.id
+            });
+            
+            const remainingFeatures = node.features.filter(f => f !== bestFeature);
+            
+            // 为每个特征值创建子节点并加入队列
+            for (const value in bestInfo.splits) {
+                const subset = bestInfo.splits[value];
+                const childId = nodeIdCounter++;
+                const childNode = {
+                    id: childId,
+                    type: 'pending',
+                    data: subset,
+                    features: remainingFeatures,
+                    depth: node.depth + 1,
+                    parent: node,
+                    parentEdge: value
+                };
+                
+                node.children[value] = childNode;
+                treeNodes.set(childId, childNode);
+                buildQueue.push(childNode);
+            }
+            
+            currentStep++;
+            updateStats();
+            drawCurrentTree();
+            showStep(allSteps.length - 1);
+            document.getElementById('status').textContent = `步骤 ${currentStep}: 选择特征 "${bestFeature}" 分裂 | 剩余 ${buildQueue.length} 个节点待处理`;
+        }
+
+        // 绘制当前树状态
+        function drawCurrentTree() {
+            const svg = document.getElementById('treeSvg');
+            svg.innerHTML = '';
+            
+            if (tree) {
+                drawTreeNode(tree, svg);
+            }
+        }
+
+        // 递归绘制树节点（包括pending状态）
+        function drawTreeNode(node, svg, x = 400, y = 50, level = 0, parentX = null, parentY = null, edgeLabel = '') {
             if (!node) return;
 
             const nodeWidth = 140;
@@ -592,13 +672,18 @@
             
             if (node.type === 'leaf') {
                 rect.setAttribute('class', node.label === '是' ? 'tree-node leaf-yes' : 'tree-node leaf-no');
-            } else {
+            } else if (node.type === 'decision') {
                 rect.setAttribute('class', 'tree-node decision');
+            } else {
+                // pending 状态
+                rect.setAttribute('class', 'tree-node');
+                rect.setAttribute('fill', '#95a5a6');
+                rect.setAttribute('stroke-dasharray', '5,5');
             }
             
             svg.appendChild(rect);
 
-            // 节点主文本（特征名或结果）
+            // 节点主文本
             const mainText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             mainText.setAttribute('x', x);
             mainText.setAttribute('y', y - 10);
@@ -607,35 +692,44 @@
             mainText.setAttribute('dy', '0.35em');
             mainText.setAttribute('font-size', '13');
             mainText.setAttribute('font-weight', 'bold');
-            mainText.textContent = node.type === 'leaf' ? `结果: ${node.label}` : node.feature;
+            
+            if (node.type === 'leaf') {
+                mainText.textContent = `结果: ${node.label}`;
+            } else if (node.type === 'decision') {
+                mainText.textContent = node.feature;
+            } else {
+                mainText.textContent = '待处理...';
+            }
+            
             svg.appendChild(mainText);
 
-            // 熵值文本
-            if (node.entropy !== undefined) {
-                const entropyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                entropyText.setAttribute('x', x);
-                entropyText.setAttribute('y', y + 8);
-                entropyText.setAttribute('class', 'tree-text');
-                entropyText.setAttribute('fill', 'white');
-                entropyText.setAttribute('dy', '0.35em');
-                entropyText.setAttribute('font-size', '10');
-                entropyText.setAttribute('opacity', '0.9');
-                entropyText.textContent = `H = ${node.entropy.toFixed(3)}`;
-                svg.appendChild(entropyText);
-            }
+            // 熵值和样本数（非pending状态）
+            if (node.type !== 'pending') {
+                if (node.entropy !== undefined) {
+                    const entropyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    entropyText.setAttribute('x', x);
+                    entropyText.setAttribute('y', y + 8);
+                    entropyText.setAttribute('class', 'tree-text');
+                    entropyText.setAttribute('fill', 'white');
+                    entropyText.setAttribute('dy', '0.35em');
+                    entropyText.setAttribute('font-size', '10');
+                    entropyText.setAttribute('opacity', '0.9');
+                    entropyText.textContent = `H = ${node.entropy.toFixed(3)}`;
+                    svg.appendChild(entropyText);
+                }
 
-            // 样本数文本
-            if (node.samples !== undefined) {
-                const samplesText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                samplesText.setAttribute('x', x);
-                samplesText.setAttribute('y', y + 22);
-                samplesText.setAttribute('class', 'tree-text');
-                samplesText.setAttribute('fill', 'white');
-                samplesText.setAttribute('dy', '0.35em');
-                samplesText.setAttribute('font-size', '9');
-                samplesText.setAttribute('opacity', '0.85');
-                samplesText.textContent = `n = ${node.samples}`;
-                svg.appendChild(samplesText);
+                if (node.samples !== undefined) {
+                    const samplesText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    samplesText.setAttribute('x', x);
+                    samplesText.setAttribute('y', y + 22);
+                    samplesText.setAttribute('class', 'tree-text');
+                    samplesText.setAttribute('fill', 'white');
+                    samplesText.setAttribute('dy', '0.35em');
+                    samplesText.setAttribute('font-size', '9');
+                    samplesText.setAttribute('opacity', '0.85');
+                    samplesText.textContent = `n = ${node.samples}`;
+                    svg.appendChild(samplesText);
+                }
             }
 
             // 递归绘制子节点
@@ -647,45 +741,14 @@
                 Object.entries(node.children).forEach(([value, child], i) => {
                     const childX = startX + i * spacing;
                     const childY = y + levelHeight;
-                    drawTree(child, svg, childX, childY, level + 1, x, y, value);
+                    drawTreeNode(child, svg, childX, childY, level + 1, x, y, value);
                 });
-            }
-        }
-
-        // 构建树（完整）
-        function buildTree() {
-            buildSteps = [];
-            currentStep = 0;
-            
-            tree = buildDecisionTree(DATA, FEATURES);
-            
-            document.getElementById('stepBtn').disabled = false;
-            document.getElementById('buildBtn').disabled = true;
-            document.getElementById('status').textContent = `决策树构建完成！共 ${buildSteps.length} 步，点击"单步执行"查看详细过程`;
-            
-            updateStats();
-            showStep(0);
-        }
-
-        // 单步执行
-        function stepBuild() {
-            if (currentStep < buildSteps.length) {
-                showStep(currentStep);
-                currentStep++;
-
-                if (currentStep >= buildSteps.length) {
-                    document.getElementById('stepBtn').disabled = true;
-                    document.getElementById('status').textContent = '✅ 所有步骤完成！';
-                }
             }
         }
 
         // 显示步骤
         function showStep(index) {
-            const step = buildSteps[index];
-            const svg = document.getElementById('treeSvg');
-            svg.innerHTML = '';
-
+            const step = allSteps[index];
             let html = '';
 
             if (step.type === 'split') {
@@ -752,8 +815,6 @@
                 </div>`;
 
                 // 绘制部分树
-                const partialTree = buildPartialTree(buildSteps.slice(0, index + 1));
-                drawTree(partialTree, svg);
 
             } else if (step.type === 'leaf') {
                 const yesCount = step.data.filter(d => d[TARGET] === '是').length;
@@ -779,19 +840,9 @@
                 }
                 
                 html += `</div></div>`;
-
-                const partialTree = buildPartialTree(buildSteps.slice(0, index + 1));
-                drawTree(partialTree, svg);
             }
 
             document.getElementById('calcDetails').innerHTML = html;
-            document.getElementById('status').textContent = `步骤 ${index + 1}/${buildSteps.length}`;
-        }
-
-        // 构建部分树（用于可视化）
-        function buildPartialTree(steps) {
-            // 简化版本：直接返回最终树的前几层
-            return tree;
         }
 
         // 更新统计
@@ -801,7 +852,9 @@
 
             function traverse(node) {
                 if (!node) return;
-                nodeCount++;
+                if (node.type !== 'pending') {
+                    nodeCount++;
+                }
                 maxDepth = Math.max(maxDepth, node.depth || 0);
                 if (node.children) {
                     Object.values(node.children).forEach(traverse);
@@ -812,28 +865,17 @@
 
             document.getElementById('depth').textContent = maxDepth + 1;
             document.getElementById('nodeCount').textContent = nodeCount;
-            document.getElementById('stepCount').textContent = buildSteps.length;
+            document.getElementById('stepCount').textContent = currentStep;
         }
 
         // 重置
         function reset() {
-            tree = null;
-            buildSteps = [];
-            currentStep = 0;
-            
-            document.getElementById('treeSvg').innerHTML = '';
-            document.getElementById('calcDetails').innerHTML = '';
-            document.getElementById('stepBtn').disabled = true;
-            document.getElementById('buildBtn').disabled = false;
-            document.getElementById('status').textContent = '已重置！点击"构建决策树"开始';
-            
-            document.getElementById('depth').textContent = '0';
-            document.getElementById('nodeCount').textContent = '0';
-            document.getElementById('stepCount').textContent = '0';
+            initBuild();
         }
 
         // 初始化
         displayDataTable();
+        initBuild();
     </script>
 </body>
 </html>

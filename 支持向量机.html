@@ -582,6 +582,8 @@
 
         // 单步训练
         function stepTrain() {
+            console.log('stepTrain called, iteration:', state.iteration);
+            
             if (state.iteration >= state.maxIterations) {
                 document.getElementById('stepBtn').disabled = true;
                 document.getElementById('status').textContent = '✅ 训练完成！';
@@ -626,12 +628,14 @@
             });
             
             // 更新显示
+            console.log('Updating stats and drawing...');
             updateStats();
             draw();
             showStep(allSteps.length - 1);
             
             document.getElementById('status').textContent = 
                 `步骤 ${state.iteration}: 更新参数 | 支持向量: ${svIndices.length} 个`;
+            console.log('Step completed successfully');
         }
 
         // 显示计算步骤

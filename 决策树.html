@@ -689,49 +689,96 @@
             let html = '';
 
             if (step.type === 'split') {
+                // 计算当前节点的类别分布
+                const yesCount = step.data.filter(d => d[TARGET] === '是').length;
+                const noCount = step.data.filter(d => d[TARGET] === '否').length;
+                const total = step.data.length;
+                const pYes = yesCount / total;
+                const pNo = noCount / total;
+                
                 html += `<div class="step-entropy">
-                    <strong>步骤 ${index + 1}: 计算熵和信息增益</strong><br>
-                    当前节点样本数: ${step.data.length}<br>
-                    <strong>当前节点熵 H = ${step.entropy.toFixed(4)}</strong>
+                    <strong>步骤 ${index + 1}: 计算当前节点熵</strong><br>
+                    样本数: ${total} (是:${yesCount}, 否:${noCount})<br>
+                    <div class="formula">
+                        p(是) = ${yesCount}/${total} = ${pYes.toFixed(4)}<br>
+                        p(否) = ${noCount}/${total} = ${pNo.toFixed(4)}<br>
+                        H(S) = -p(是)·log₂p(是) - p(否)·log₂p(否)<br>
+                        H(S) = -(${pYes.toFixed(4)})·log₂(${pYes.toFixed(4)}) - (${pNo.toFixed(4)})·log₂(${pNo.toFixed(4)})<br>
+                        H(S) = ${(-pYes * Math.log2(pYes)).toFixed(4)} + ${(-pNo * Math.log2(pNo)).toFixed(4)}<br>
+                        <strong>H(S) = ${step.entropy.toFixed(4)}</strong>
+                    </div>
                 </div>`;
 
-                html += `<div class="step-gain"><strong>各特征的信息增益：</strong><br>`;
+                html += `<div class="step-gain"><strong>计算各特征的信息增益：</strong><br>`;
                 step.details.forEach(d => {
-                    html += `<div class="formula">
-                        ${d.feature}: IG = ${d.gain.toFixed(4)}
-                        ${d.feature === step.feature ? ' ⭐ 最大' : ''}
-                    </div>`;
+                    html += `<div class="formula" style="margin-bottom: 10px;">
+                        <strong>${d.feature}</strong>:`;
+                    
+                    // 计算每个特征值的熵
+                    let weightedSum = '';
+                    let weightedCalc = '';
+                    for (const val in d.splits) {
+                        const subset = d.splits[val];
+                        const subYes = subset.filter(s => s[TARGET] === '是').length;
+                        const subNo = subset.filter(s => s[TARGET] === '否').length;
+                        const subTotal = subset.length;
+                        const subEnt = entropy(subset);
+                        const weight = subTotal / total;
+                        
+                        html += `<br>　${val}: ${subTotal}个样本 (是:${subYes}, 否:${subNo}), H=${subEnt.toFixed(4)}`;
+                        
+                        if (weightedSum) weightedSum += ' + ';
+                        weightedSum += `(${subTotal}/${total})·${subEnt.toFixed(4)}`;
+                        
+                        if (weightedCalc) weightedCalc += ' + ';
+                        weightedCalc += `${(weight * subEnt).toFixed(4)}`;
+                    }
+                    
+                    html += `<br>加权熵 = ${weightedSum}<br>`;
+                    html += `　　　 = ${weightedCalc} = ${d.weightedEntropy.toFixed(4)}<br>`;
+                    html += `IG(${d.feature}) = ${step.entropy.toFixed(4)} - ${d.weightedEntropy.toFixed(4)} = <strong>${d.gain.toFixed(4)}</strong>`;
+                    
+                    if (d.feature === step.feature) {
+                        html += ` ⭐ <span style="color: #e67e22;">最大，选择此特征！</span>`;
+                    }
+                    html += `</div>`;
                 });
                 html += `</div>`;
 
                 html += `<div class="step-split">
-                    <strong>选择特征: ${step.feature}</strong><br>
-                    信息增益: IG = ${step.entropy.toFixed(4)} - ${step.info.weightedEntropy.toFixed(4)} = <strong>${step.gain.toFixed(4)}</strong><br>
-                    分裂后子集:`;
-                
-                for (const val in step.info.splits) {
-                    const subset = step.info.splits[val];
-                    const subEnt = entropy(subset);
-                    const yesCount = subset.filter(d => d[TARGET] === '是').length;
-                    const noCount = subset.filter(d => d[TARGET] === '否').length;
-                    html += `<div class="formula">
-                        ${step.feature} = ${val}: ${subset.length}个样本 (是:${yesCount}, 否:${noCount})<br>
-                        子节点熵 H = ${subEnt.toFixed(4)}
-                    </div>`;
-                }
-                html += `</div>`;
+                    <strong>✅ 最终选择: ${step.feature}</strong><br>
+                    信息增益: <strong>${step.gain.toFixed(4)}</strong><br>
+                    将数据按 "${step.feature}" 的值分裂成 ${Object.keys(step.info.splits).length} 个子集
+                </div>`;
 
                 // 绘制部分树
                 const partialTree = buildPartialTree(buildSteps.slice(0, index + 1));
                 drawTree(partialTree, svg);
 
             } else if (step.type === 'leaf') {
+                const yesCount = step.data.filter(d => d[TARGET] === '是').length;
+                const noCount = step.data.filter(d => d[TARGET] === '否').length;
+                const total = step.data.length;
+                
                 html += `<div class="step-result">
                     <strong>步骤 ${index + 1}: 生成叶节点</strong><br>
-                    所有样本属于同一类别: <strong>${step.label}</strong><br>
-                    样本数: ${step.data.length}<br>
-                    <strong>节点熵 H = ${step.entropy.toFixed(4)}</strong> (纯净节点)
-                </div>`;
+                    样本数: ${total} (是:${yesCount}, 否:${noCount})<br>
+                    <div class="formula">`;
+                
+                if (yesCount === 0 || noCount === 0) {
+                    html += `所有样本属于同一类别: <strong>${step.label}</strong><br>
+                        熵 H = 0 (完全纯净，停止分裂)`;
+                } else {
+                    const pYes = yesCount / total;
+                    const pNo = noCount / total;
+                    html += `p(是) = ${yesCount}/${total} = ${pYes.toFixed(4)}<br>
+                        p(否) = ${noCount}/${total} = ${pNo.toFixed(4)}<br>
+                        H = -(${pYes.toFixed(4)})·log₂(${pYes.toFixed(4)}) - (${pNo.toFixed(4)})·log₂(${pNo.toFixed(4)})<br>
+                        H = ${step.entropy.toFixed(4)}<br>
+                        多数类别: <strong>${step.label}</strong> (无更多特征可选)`;
+                }
+                
+                html += `</div></div>`;
 
                 const partialTree = buildPartialTree(buildSteps.slice(0, index + 1));
                 drawTree(partialTree, svg);

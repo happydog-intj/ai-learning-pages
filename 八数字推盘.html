@@ -315,6 +315,29 @@
                 <div style="text-align: center; margin-top: 15px; color: #7f8c8d;">
                     点击数字可移动到空格
                 </div>
+                
+                <!-- 计算过程可视化 -->
+                <div style="margin-top: 20px; background: white; padding: 15px; border-radius: 12px; border: 2px solid #e0e0e0;">
+                    <div style="font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📊 评估值计算过程</div>
+                    
+                    <!-- g 值 -->
+                    <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+                        <div style="font-weight: 600; color: #1976d2;">g(n) = 已走步数</div>
+                        <div id="gCalc" style="margin-top: 5px; color: #555; font-size: 0.95em;"></div>
+                    </div>
+                    
+                    <!-- h 值 -->
+                    <div style="margin: 10px 0; padding: 10px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                        <div style="font-weight: 600; color: #f57c00;">h(n) = 曼哈顿距离</div>
+                        <div id="hCalc" style="margin-top: 5px; color: #555; font-size: 0.9em;"></div>
+                    </div>
+                    
+                    <!-- f 值 -->
+                    <div style="margin: 10px 0; padding: 10px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                        <div style="font-weight: 600; color: #7b1fa2;">f(n) = g(n) + h(n)</div>
+                        <div id="fCalc" style="margin-top: 5px; color: #555; font-size: 0.95em; font-weight: 600;"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="puzzle-section">
@@ -325,6 +348,13 @@
                     <div style="font-size: 0.85em; margin-top: 5px; color: #7f8c8d;">
                         f: 总代价 | g: 已走步数 | h: 曼哈顿距离
                     </div>
+                </div>
+                
+                <!-- 曼哈顿距离可视化 -->
+                <div style="margin-top: 20px; background: white; padding: 15px; border-radius: 12px; border: 2px solid #e0e0e0;">
+                    <div style="font-weight: 600; color: #2c3e50; margin-bottom: 10px;">📐 曼哈顿距离详解</div>
+                    <canvas id="manhattanViz" width="300" height="300" style="width: 100%; max-width: 300px; margin: 0 auto; display: block;"></canvas>
+                    <div id="manhattanDetails" style="margin-top: 10px; font-size: 0.85em; color: #666;"></div>
                 </div>
             </div>
         </div>
@@ -760,6 +790,206 @@
             document.getElementById('exploredCount').textContent = exploredStates;
             document.getElementById('moveCount').textContent = currentState.g;
             document.getElementById('heuristicValue').textContent = currentState.h;
+            
+            // 更新计算过程
+            updateCalculationDisplay();
+            drawManhattanVisualization();
+        }
+        
+        // 更新计算过程显示
+        function updateCalculationDisplay() {
+            const g = currentState.g;
+            const h = currentState.h;
+            const f = currentState.f;
+            
+            // g 值说明
+            document.getElementById('gCalc').innerHTML = `
+                从初始状态移动了 <strong style="color: #1976d2;">${g}</strong> 步
+            `;
+            
+            // h 值详细计算
+            const hDetails = calculateManhattanDetails();
+            let hHtml = `所有数字到目标位置的距离之和：<br>`;
+            hHtml += `<div style="margin-top: 5px;">`;
+            hDetails.forEach(detail => {
+                if (detail.distance > 0) {
+                    hHtml += `<span style="display: inline-block; margin: 2px 5px; padding: 2px 8px; background: rgba(255, 152, 0, 0.1); border-radius: 4px;">
+                        ${detail.value}: ${detail.distance}步
+                    </span>`;
+                }
+            });
+            hHtml += `</div>`;
+            hHtml += `<div style="margin-top: 8px; font-weight: 600; color: #f57c00;">
+                总计 h = ${hDetails.map(d => d.distance).reduce((a, b) => a + b, 0)}
+            </div>`;
+            document.getElementById('hCalc').innerHTML = hHtml;
+            
+            // f 值计算
+            document.getElementById('fCalc').innerHTML = `
+                f = ${g} + ${h} = <strong style="color: #7b1fa2; font-size: 1.2em;">${f}</strong>
+                <div style="font-size: 0.85em; color: #999; margin-top: 3px;">
+                    (预计总共需要 ${f} 步到达目标)
+                </div>
+            `;
+        }
+        
+        // 计算每个数字的曼哈顿距离详情
+        function calculateManhattanDetails() {
+            const goal = [[1,2,3],[4,5,6],[7,8,0]];
+            const details = [];
+            
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const value = currentState.board[i][j];
+                    if (value !== 0) {
+                        // 找到目标位置
+                        for (let gi = 0; gi < 3; gi++) {
+                            for (let gj = 0; gj < 3; gj++) {
+                                if (goal[gi][gj] === value) {
+                                    const distance = Math.abs(i - gi) + Math.abs(j - gj);
+                                    details.push({
+                                        value: value,
+                                        currentPos: [i, j],
+                                        goalPos: [gi, gj],
+                                        distance: distance
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return details.sort((a, b) => a.value - b.value);
+        }
+        
+        // 绘制曼哈顿距离可视化
+        function drawManhattanVisualization() {
+            const canvas = document.getElementById('manhattanViz');
+            const ctx = canvas.getContext('2d');
+            const size = 300;
+            const cellSize = 90;
+            const padding = 15;
+            
+            ctx.clearRect(0, 0, size, size);
+            
+            // 绘制网格背景
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(padding + i * cellSize, padding);
+                ctx.lineTo(padding + i * cellSize, padding + cellSize * 3);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(padding, padding + i * cellSize);
+                ctx.lineTo(padding + cellSize * 3, padding + i * cellSize);
+                ctx.stroke();
+            }
+            
+            const details = calculateManhattanDetails();
+            const goal = [[1,2,3],[4,5,6],[7,8,0]];
+            
+            // 绘制箭头和距离
+            details.forEach((detail, idx) => {
+                if (detail.distance > 0) {
+                    const [ci, cj] = detail.currentPos;
+                    const [gi, gj] = detail.goalPos;
+                    
+                    const cx = padding + cj * cellSize + cellSize / 2;
+                    const cy = padding + ci * cellSize + cellSize / 2;
+                    const gx = padding + gj * cellSize + cellSize / 2;
+                    const gy = padding + gi * cellSize + cellSize / 2;
+                    
+                    // 绘制箭头
+                    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+                    ctx.strokeStyle = colors[idx % colors.length];
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 3]);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(gx, gy);
+                    ctx.stroke();
+                    
+                    // 箭头头部
+                    const angle = Math.atan2(gy - cy, gx - cx);
+                    ctx.setLineDash([]);
+                    ctx.beginPath();
+                    ctx.moveTo(gx, gy);
+                    ctx.lineTo(gx - 10 * Math.cos(angle - Math.PI / 6), gy - 10 * Math.sin(angle - Math.PI / 6));
+                    ctx.moveTo(gx, gy);
+                    ctx.lineTo(gx - 10 * Math.cos(angle + Math.PI / 6), gy - 10 * Math.sin(angle + Math.PI / 6));
+                    ctx.stroke();
+                    
+                    // 标注距离
+                    const mx = (cx + gx) / 2;
+                    const my = (cy + gy) / 2;
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(mx - 12, my - 10, 24, 20);
+                    ctx.fillStyle = colors[idx % colors.length];
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(detail.distance.toString(), mx, my);
+                }
+            });
+            
+            // 绘制数字
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const value = currentState.board[i][j];
+                    const goalValue = goal[i][j];
+                    
+                    const x = padding + j * cellSize;
+                    const y = padding + i * cellSize;
+                    
+                    if (value !== 0) {
+                        // 当前数字
+                        const isCorrect = value === goalValue;
+                        ctx.fillStyle = isCorrect ? '#4caf50' : '#ff9800';
+                        ctx.fillRect(x + 5, y + 5, cellSize - 10, cellSize - 10);
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 32px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(value.toString(), x + cellSize / 2, y + cellSize / 2);
+                        
+                        // 小标签显示目标位置
+                        if (!isCorrect) {
+                            const detail = details.find(d => d.value === value);
+                            if (detail) {
+                                const [gi, gj] = detail.goalPos;
+                                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                                ctx.font = '10px Arial';
+                                ctx.fillText(`→(${gi},${gj})`, x + cellSize / 2, y + cellSize - 8);
+                            }
+                        }
+                    } else {
+                        // 空格
+                        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                        ctx.fillRect(x + 5, y + 5, cellSize - 10, cellSize - 10);
+                    }
+                }
+            }
+            
+            // 更新详细说明
+            let detailsHtml = `<div style="font-weight: 600; margin-bottom: 5px;">距离计算：</div>`;
+            details.forEach(detail => {
+                if (detail.distance > 0) {
+                    const [ci, cj] = detail.currentPos;
+                    const [gi, gj] = detail.goalPos;
+                    detailsHtml += `<div style="margin: 3px 0;">
+                        数字 <strong>${detail.value}</strong>: 
+                        (${ci},${cj}) → (${gi},${gj}) = 
+                        |${ci}-${gi}| + |${cj}-${gj}| = 
+                        <strong>${detail.distance}</strong>
+                    </div>`;
+                }
+            });
+            document.getElementById('manhattanDetails').innerHTML = detailsHtml;
         }
 
         // 工具函数

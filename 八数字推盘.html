@@ -328,8 +328,9 @@
 
         <div class="controls">
             <button class="btn-shuffle" onclick="shufflePuzzle()">🔀 打乱</button>
-            <button class="btn-solve" onclick="solve()" id="solveBtn">🚀 自动求解</button>
+            <button class="btn-solve" onclick="solve()" id="solveBtn">🚀 求解</button>
             <button class="btn-step" onclick="step()" id="stepBtn" disabled>⏭️ 单步执行</button>
+            <button class="btn-solve" onclick="autoPlay()" id="playBtn" disabled>▶️ 自动播放</button>
             <button class="btn-reset" onclick="reset()">🔄 重置</button>
         </div>
 
@@ -622,7 +623,6 @@
             }
             
             document.getElementById('solveBtn').disabled = true;
-            document.getElementById('stepBtn').disabled = false;
             document.getElementById('status').className = 'status solving';
             document.getElementById('status').textContent = '🔍 正在搜索最优解...';
             
@@ -632,28 +632,44 @@
                 
                 if (solution) {
                     solutionIndex = 0;
-                    document.getElementById('status').textContent = `✅ 找到解！共 ${solution.length - 1} 步，点击「单步执行」查看`;
-                    animateSolution();
+                    document.getElementById('status').className = 'status';
+                    document.getElementById('status').textContent = `✅ 找到解！共 ${solution.length - 1} 步。使用「单步执行」或「自动播放」查看过程`;
+                    document.getElementById('stepBtn').disabled = false;
+                    document.getElementById('playBtn').disabled = false;
                 } else {
                     document.getElementById('status').textContent = '❌ 无解（理论上不可能）';
                     document.getElementById('solveBtn').disabled = false;
-                    document.getElementById('stepBtn').disabled = true;
                 }
             }, 100);
+        }
+        
+        // 自动播放解决方案
+        async function autoPlay() {
+            if (animationRunning || !solution) return;
+            
+            document.getElementById('stepBtn').disabled = true;
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('status').className = 'status solving';
+            
+            animateSolution();
         }
 
         // 动画展示解决方案
         async function animateSolution() {
             animationRunning = true;
+            solutionIndex = 0;
             
             for (let i = 0; i < solution.length; i++) {
                 currentState = solution[i];
+                solutionIndex = i + 1;
                 renderPuzzle('currentPuzzle', currentState.board, false);
                 updateStats();
                 
                 // 高亮当前搜索节点
                 const nodes = document.querySelectorAll('.search-node');
                 nodes.forEach(n => n.classList.remove('current'));
+                
+                document.getElementById('status').textContent = `▶️ 自动播放中... 步骤 ${i + 1}/${solution.length}`;
                 
                 await sleep(600);
             }
@@ -663,6 +679,7 @@
             document.getElementById('status').textContent = '🎉 求解完成！';
             document.getElementById('solveBtn').disabled = false;
             document.getElementById('stepBtn').disabled = true;
+            document.getElementById('playBtn').disabled = true;
         }
 
         // 单步执行
@@ -674,10 +691,15 @@
             updateStats();
             solutionIndex++;
             
+            // 更新状态信息
+            document.getElementById('status').className = 'status solving';
+            document.getElementById('status').textContent = `⏭️ 步骤 ${solutionIndex}/${solution.length} - 还剩 ${solution.length - solutionIndex} 步`;
+            
             if (solutionIndex >= solution.length) {
                 document.getElementById('status').className = 'status solved';
                 document.getElementById('status').textContent = '🎉 求解完成！';
                 document.getElementById('stepBtn').disabled = true;
+                document.getElementById('playBtn').disabled = true;
             }
         }
 
@@ -695,6 +717,7 @@
             document.getElementById('status').textContent = '已重置到初始状态';
             document.getElementById('solveBtn').disabled = false;
             document.getElementById('stepBtn').disabled = true;
+            document.getElementById('playBtn').disabled = true;
         }
 
         // 更新统计信息

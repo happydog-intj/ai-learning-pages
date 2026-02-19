@@ -521,8 +521,6 @@
 
         // 单步执行
         function stepBuild() {
-            console.log('stepBuild called, buildQueue length:', buildQueue.length);
-            
             if (buildQueue.length === 0) {
                 document.getElementById('stepBtn').disabled = true;
                 document.getElementById('status').textContent = '✅ 决策树构建完成！';
@@ -531,9 +529,7 @@
             
             // 从队列中取出一个节点
             const node = buildQueue.shift();
-            console.log('Processing node:', node);
             const nodeEntropy = entropy(node.data);
-            console.log('Node entropy:', nodeEntropy);
             
             // 检查停止条件
             const labels = node.data.map(d => d[TARGET]);
@@ -639,14 +635,11 @@
 
         // 绘制当前树状态
         function drawCurrentTree() {
-            console.log('drawCurrentTree called, tree:', tree);
             const svg = document.getElementById('treeSvg');
             svg.innerHTML = '';
             
             if (tree) {
                 drawTreeNode(tree, svg);
-            } else {
-                console.warn('Tree is null!');
             }
         }
 
@@ -763,14 +756,11 @@
 
         // 显示步骤
         function showStep(index) {
-            console.log('showStep called with index:', index, 'allSteps length:', allSteps.length);
             const step = allSteps[index];
             if (!step) {
-                console.error('Step not found at index:', index, 'allSteps:', allSteps);
                 return;
             }
             
-            console.log('Showing step:', step);
             let html = '';
 
             if (step.type === 'split') {
@@ -781,8 +771,12 @@
                 const pYes = yesCount / total;
                 const pNo = noCount / total;
                 
+                html += `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em;">
+                    🌳 步骤 ${currentStep}: 决策节点 (深度 ${step.depth})
+                </div>`;
+                
                 html += `<div class="step-entropy">
-                    <strong>步骤 ${index + 1}: 计算当前节点熵</strong><br>
+                    <strong>📊 计算当前节点熵</strong><br>
                     样本数: ${total} (是:${yesCount}, 否:${noCount})<br>
                     <div class="formula">
                         p(是) = ${yesCount}/${total} = ${pYes.toFixed(4)}<br>
@@ -831,9 +825,9 @@
                 html += `</div>`;
 
                 html += `<div class="step-split">
-                    <strong>✅ 最终选择: ${step.feature}</strong><br>
+                    <strong>✅ 决策: 选择特征 "${step.feature}"</strong><br>
                     信息增益: <strong>${step.gain.toFixed(4)}</strong><br>
-                    将数据按 "${step.feature}" 的值分裂成 ${Object.keys(step.info.splits).length} 个子集
+                    将数据按 "${step.feature}" 的值分裂成 ${Object.keys(step.info.splits).length} 个子集，创建 ${Object.keys(step.info.splits).length} 个子节点
                 </div>`;
 
                 // 绘制部分树
@@ -843,8 +837,13 @@
                 const noCount = step.data.filter(d => d[TARGET] === '否').length;
                 const total = step.data.length;
                 
+                const leafColor = step.label === '是' ? '#2ecc71' : '#e74c3c';
+                html += `<div style="background: ${leafColor}; color: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em;">
+                    🍃 步骤 ${currentStep}: 叶节点 - 结果: ${step.label} (深度 ${step.depth})
+                </div>`;
+                
                 html += `<div class="step-result">
-                    <strong>步骤 ${index + 1}: 生成叶节点</strong><br>
+                    <strong>📋 节点信息</strong><br>
                     样本数: ${total} (是:${yesCount}, 否:${noCount})<br>
                     <div class="formula">`;
                 
@@ -864,7 +863,22 @@
                 html += `</div></div>`;
             }
 
-            document.getElementById('calcDetails').innerHTML = html;
+            // 追加到现有内容
+            const calcDetails = document.getElementById('calcDetails');
+            if (currentStep === 1) {
+                // 第一步，清空提示文字
+                calcDetails.innerHTML = '';
+            }
+            
+            // 添加分隔线（非第一步）
+            if (currentStep > 1) {
+                calcDetails.innerHTML += '<div style="border-top: 2px solid #e0e0e0; margin: 20px 0;"></div>';
+            }
+            
+            calcDetails.innerHTML += html;
+            
+            // 自动滚动到底部
+            calcDetails.scrollTop = calcDetails.scrollHeight;
         }
 
         // 更新统计

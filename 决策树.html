@@ -154,6 +154,25 @@
             margin-bottom: 15px;
             max-height: 400px;
             overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .calc-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .calc-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .calc-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .calc-panel::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
 
         .calc-title {
@@ -241,6 +260,21 @@
             margin-bottom: 8px;
         }
 
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-step {
+            animation: fadeInSlide 0.5s ease-out;
+        }
+
         .github-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
@@ -321,7 +355,7 @@
 
                 <div class="calc-panel">
                     <div class="calc-title">📐 计算过程</div>
-                    <div id="calcDetails" style="font-size: 0.9em;"></div>
+                    <div id="calcDetails" style="font-size: 0.9em; position: relative;"></div>
                 </div>
             </div>
         </div>
@@ -771,6 +805,7 @@
                 const pYes = yesCount / total;
                 const pNo = noCount / total;
                 
+                html += `<div class="new-step">`;
                 html += `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em;">
                     🌳 步骤 ${currentStep}: 决策节点 (深度 ${step.depth})
                 </div>`;
@@ -829,14 +864,15 @@
                     信息增益: <strong>${step.gain.toFixed(4)}</strong><br>
                     将数据按 "${step.feature}" 的值分裂成 ${Object.keys(step.info.splits).length} 个子集，创建 ${Object.keys(step.info.splits).length} 个子节点
                 </div>`;
-
-                // 绘制部分树
+                
+                html += `</div>`; // 关闭 .new-step
 
             } else if (step.type === 'leaf') {
                 const yesCount = step.data.filter(d => d[TARGET] === '是').length;
                 const noCount = step.data.filter(d => d[TARGET] === '否').length;
                 const total = step.data.length;
                 
+                html += `<div class="new-step">`;
                 const leafColor = step.label === '是' ? '#2ecc71' : '#e74c3c';
                 html += `<div style="background: ${leafColor}; color: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em;">
                     🍃 步骤 ${currentStep}: 叶节点 - 结果: ${step.label} (深度 ${step.depth})
@@ -861,6 +897,7 @@
                 }
                 
                 html += `</div></div>`;
+                html += `</div>`; // 关闭 .new-step
             }
 
             // 追加到现有内容
@@ -877,8 +914,13 @@
             
             calcDetails.innerHTML += html;
             
-            // 自动滚动到底部
-            calcDetails.scrollTop = calcDetails.scrollHeight;
+            // 自动滚动到底部（使用setTimeout确保DOM更新完成）
+            setTimeout(() => {
+                calcDetails.scrollTo({
+                    top: calcDetails.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
 
         // 更新统计

@@ -715,7 +715,12 @@
                 }
                 if (match) {
                     node.classList.add('current');
-                    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 只在搜索日志容器内滚动，不影响整个页面
+                    const logContainer = node.parentElement;
+                    const nodeTop = node.offsetTop;
+                    const containerHeight = logContainer.clientHeight;
+                    const scrollPos = nodeTop - containerHeight / 2;
+                    logContainer.scrollTop = scrollPos;
                 }
             });
             

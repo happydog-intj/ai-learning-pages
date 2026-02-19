@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧩 八数字推盘问题 - A* 算法可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .puzzle-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 0 auto;
+            width: fit-content;
+            background: #34495e;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .puzzle-tile {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .puzzle-tile:hover {
+            transform: scale(1.05);
+        }
+
+        .puzzle-tile.empty {
+            background: rgba(52, 73, 94, 0.3);
+            cursor: default;
+        }
+
+        .puzzle-tile.empty:hover {
+            transform: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-step {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-shuffle {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            font-size: 1.05em;
+            color: #2e7d32;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status.solving {
+            background: #fff3e0;
+            color: #e65100;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status.solved {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .algorithm-viz {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-node {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .search-node.current {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .search-node.solution {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .explanation {
+            background: #fff9c4;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            color: #5d4037;
+            line-height: 1.8;
+        }
+
+        .explanation h4 {
+            color: #f57f17;
+            margin-bottom: 8px;
+        }
+
+        .formula {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 1.05em;
+            color: #667eea;
+        }
+
+        .mini-puzzle {
+            display: inline-grid;
+            grid-template-columns: repeat(3, 20px);
+            grid-template-rows: repeat(3, 20px);
+            gap: 2px;
+            background: #34495e;
+            padding: 2px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        .mini-tile {
+            background: #667eea;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+        }
+
+        .mini-tile.empty {
+            background: rgba(52, 73, 94, 0.3);
+        }
+
+        .github-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 八数字推盘问题</h1>
+        <p class="subtitle">A* 搜索算法可视化演示</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">已探索状态</div>
+                <div class="stat-value" id="exploredCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">当前步数</div>
+                <div class="stat-value" id="moveCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">启发值 (h)</div>
+                <div class="stat-value" id="heuristicValue">-</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="puzzle-section">
+                <div class="section-title">当前状态</div>
+                <div class="puzzle-grid" id="currentPuzzle"></div>
+                <div style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                    点击数字可移动到空格
+                </div>
+            </div>
+
+            <div class="puzzle-section">
+                <div class="section-title">目标状态</div>
+                <div class="puzzle-grid" id="goalPuzzle"></div>
+                <div class="formula" style="margin-top: 15px;">
+                    f(n) = g(n) + h(n)
+                    <div style="font-size: 0.85em; margin-top: 5px; color: #7f8c8d;">
+                        f: 总代价 | g: 已走步数 | h: 曼哈顿距离
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-shuffle" onclick="shufflePuzzle()">🔀 打乱</button>
+            <button class="btn-solve" onclick="solve()" id="solveBtn">🚀 自动求解</button>
+            <button class="btn-step" onclick="step()" id="stepBtn" disabled>⏭️ 单步执行</button>
+            <button class="btn-reset" onclick="reset()">🔄 重置</button>
+        </div>
+
+        <div class="status" id="status">
+            点击「打乱」开始，或手动移动数字
+        </div>
+
+        <div class="puzzle-section">
+            <div class="section-title">搜索过程</div>
+            <div class="algorithm-viz" id="searchLog"></div>
+        </div>
+
+        <div class="explanation">
+            <h4>💡 A* 搜索算法原理</h4>
+            <p>
+                <strong>A* 算法</strong>是一种启发式搜索算法，结合了 Dijkstra 算法和贪心最佳优先搜索：
+            </p>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li><strong>f(n) = g(n) + h(n)</strong> - 评估函数</li>
+                <li><strong>g(n)</strong> - 从起点到当前节点的实际代价（已走步数）</li>
+                <li><strong>h(n)</strong> - 从当前节点到目标的估计代价（启发式函数）</li>
+                <li><strong>曼哈顿距离</strong> - 所有数字到目标位置的距离之和</li>
+            </ul>
+            <p style="margin-top: 10px;">
+                算法总是优先探索 f 值最小的状态，保证找到最优解！
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; text-align: center; border-top: 2px solid #e0e0e0;">
+            <a href="https://github.com/happydog-intj/ai-learning-pages" target="_blank" class="github-link" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #24292e 0%, #3d4349 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                <span>View on GitHub</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 八数字推盘状态
+        class PuzzleState {
+            constructor(board, emptyPos, g = 0, parent = null) {
+                this.board = board; // 3x3 数组
+                this.emptyPos = emptyPos; // [row, col]
+                this.g = g; // 已走步数
+                this.parent = parent; // 父状态
+                this.h = this.calculateHeuristic();
+                this.f = this.g + this.h;
+            }
+
+            // 计算曼哈顿距离（启发式函数）
+            calculateHeuristic() {
+                let distance = 0;
+                const goal = [[1,2,3],[4,5,6],[7,8,0]];
+                
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        const value = this.board[i][j];
+                        if (value !== 0) {
+                            // 找到目标位置
+                            for (let gi = 0; gi < 3; gi++) {
+                                for (let gj = 0; gj < 3; gj++) {
+                                    if (goal[gi][gj] === value) {
+                                        distance += Math.abs(i - gi) + Math.abs(j - gj);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return distance;
+            }
+
+            // 获取可能的移动
+            getMoves() {
+                const moves = [];
+                const [row, col] = this.emptyPos;
+                const directions = [[-1,0], [1,0], [0,-1], [0,1]]; // 上下左右
+                
+                for (const [dr, dc] of directions) {
+                    const newRow = row + dr;
+                    const newCol = col + dc;
+                    
+                    if (newRow >= 0 && newRow < 3 && newCol >= 0 && newCol < 3) {
+                        const newBoard = this.board.map(r => [...r]);
+                        // 交换
+                        newBoard[row][col] = newBoard[newRow][newCol];
+                        newBoard[newRow][newCol] = 0;
+                        
+                        moves.push(new PuzzleState(
+                            newBoard,
+                            [newRow, newCol],
+                            this.g + 1,
+                            this
+                        ));
+                    }
+                }
+                return moves;
+            }
+
+            // 转换为字符串（用于去重）
+            toString() {
+                return this.board.flat().join(',');
+            }
+
+            // 检查是否为目标状态
+            isGoal() {
+                const goal = '1,2,3,4,5,6,7,8,0';
+                return this.toString() === goal;
+            }
+        }
+
+        // 全局状态
+        let currentState = null;
+        let solution = null;
+        let solutionIndex = 0;
+        let exploredStates = 0;
+        let animationRunning = false;
+
+        const GOAL_BOARD = [[1,2,3],[4,5,6],[7,8,0]];
+
+        // 初始化
+        function init() {
+            currentState = new PuzzleState(
+                [[1,2,3],[4,5,6],[7,8,0]],
+                [2, 2]
+            );
+            renderPuzzle('currentPuzzle', currentState.board, true);
+            renderPuzzle('goalPuzzle', GOAL_BOARD, false);
+            updateStats();
+        }
+
+        // 渲染拼图
+        function renderPuzzle(containerId, board, interactive) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'puzzle-tile';
+                    
+                    if (board[i][j] === 0) {
+                        tile.classList.add('empty');
+                    } else {
+                        tile.textContent = board[i][j];
+                        if (interactive) {
+                            tile.onclick = () => moveTile(i, j);
+                        }
+                    }
+                    
+                    container.appendChild(tile);
+                }
+            }
+        }
+
+        // 手动移动数字
+        function moveTile(row, col) {
+            if (animationRunning) return;
+            
+            const [emptyRow, emptyCol] = currentState.emptyPos;
+            const distance = Math.abs(row - emptyRow) + Math.abs(col - emptyCol);
+            
+            if (distance === 1) {
+                const newBoard = currentState.board.map(r => [...r]);
+                newBoard[emptyRow][emptyCol] = newBoard[row][col];
+                newBoard[row][col] = 0;
+                
+                currentState = new PuzzleState(newBoard, [row, col], currentState.g + 1);
+                renderPuzzle('currentPuzzle', currentState.board, true);
+                updateStats();
+                
+                if (currentState.isGoal()) {
+                    document.getElementById('status').className = 'status solved';
+                    document.getElementById('status').textContent = '🎉 恭喜！您手动解决了拼图！';
+                }
+            }
+        }
+
+        // 打乱拼图
+        function shufflePuzzle() {
+            reset();
+            const moves = 20 + Math.floor(Math.random() * 20);
+            
+            for (let i = 0; i < moves; i++) {
+                const possibleMoves = currentState.getMoves();
+                if (possibleMoves.length > 0) {
+                    currentState = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                }
+            }
+            
+            currentState.g = 0; // 重置步数
+            renderPuzzle('currentPuzzle', currentState.board, true);
+            updateStats();
+            document.getElementById('status').textContent = '已打乱！点击「自动求解」查看算法如何解决';
+        }
+
+        // A* 搜索算法
+        function aStarSearch(startState) {
+            const openList = [startState];
+            const closedSet = new Set();
+            const openSet = new Set([startState.toString()]);
+            exploredStates = 0;
+            
+            document.getElementById('searchLog').innerHTML = '';
+            
+            while (openList.length > 0) {
+                // 找到 f 值最小的状态
+                openList.sort((a, b) => a.f - b.f);
+                const current = openList.shift();
+                openSet.delete(current.toString());
+                
+                exploredStates++;
+                logSearchStep(current, false);
+                
+                if (current.isGoal()) {
+                    logSearchStep(current, true);
+                    return reconstructPath(current);
+                }
+                
+                closedSet.add(current.toString());
+                
+                for (const neighbor of current.getMoves()) {
+                    const neighborStr = neighbor.toString();
+                    
+                    if (closedSet.has(neighborStr)) continue;
+                    
+                    if (!openSet.has(neighborStr)) {
+                        openList.push(neighbor);
+                        openSet.add(neighborStr);
+                    }
+                }
+            }
+            
+            return null; // 无解
+        }
+
+        // 重建路径
+        function reconstructPath(state) {
+            const path = [];
+            let current = state;
+            
+            while (current) {
+                path.unshift(current);
+                current = current.parent;
+            }
+            
+            return path;
+        }
+
+        // 记录搜索步骤
+        function logSearchStep(state, isSolution) {
+            const log = document.getElementById('searchLog');
+            const entry = document.createElement('div');
+            entry.className = 'search-node';
+            if (isSolution) entry.classList.add('solution');
+            
+            const miniPuzzle = createMiniPuzzle(state.board);
+            entry.innerHTML = `
+                ${miniPuzzle}
+                <span style="margin-left: 10px;">
+                    g=${state.g} h=${state.h} f=${state.f}
+                    ${isSolution ? '<strong style="color: #4caf50;">✓ 找到解！</strong>' : ''}
+                </span>
+            `;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // 创建小型拼图显示
+        function createMiniPuzzle(board) {
+            let html = '<div class="mini-puzzle">';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const value = board[i][j];
+                    html += `<div class="mini-tile ${value === 0 ? 'empty' : ''}">${value || ''}</div>`;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // 自动求解
+        async function solve() {
+            if (animationRunning) return;
+            if (currentState.isGoal()) {
+                alert('已经是目标状态了！');
+                return;
+            }
+            
+            document.getElementById('solveBtn').disabled = true;
+            document.getElementById('stepBtn').disabled = false;
+            document.getElementById('status').className = 'status solving';
+            document.getElementById('status').textContent = '🔍 正在搜索最优解...';
+            
+            // 异步执行搜索
+            setTimeout(() => {
+                solution = aStarSearch(currentState);
+                
+                if (solution) {
+                    solutionIndex = 0;
+                    document.getElementById('status').textContent = `✅ 找到解！共 ${solution.length - 1} 步，点击「单步执行」查看`;
+                    animateSolution();
+                } else {
+                    document.getElementById('status').textContent = '❌ 无解（理论上不可能）';
+                    document.getElementById('solveBtn').disabled = false;
+                    document.getElementById('stepBtn').disabled = true;
+                }
+            }, 100);
+        }
+
+        // 动画展示解决方案
+        async function animateSolution() {
+            animationRunning = true;
+            
+            for (let i = 0; i < solution.length; i++) {
+                currentState = solution[i];
+                renderPuzzle('currentPuzzle', currentState.board, false);
+                updateStats();
+                
+                // 高亮当前搜索节点
+                const nodes = document.querySelectorAll('.search-node');
+                nodes.forEach(n => n.classList.remove('current'));
+                
+                await sleep(600);
+            }
+            
+            animationRunning = false;
+            document.getElementById('status').className = 'status solved';
+            document.getElementById('status').textContent = '🎉 求解完成！';
+            document.getElementById('solveBtn').disabled = false;
+            document.getElementById('stepBtn').disabled = true;
+        }
+
+        // 单步执行
+        function step() {
+            if (!solution || solutionIndex >= solution.length) return;
+            
+            currentState = solution[solutionIndex];
+            renderPuzzle('currentPuzzle', currentState.board, false);
+            updateStats();
+            solutionIndex++;
+            
+            if (solutionIndex >= solution.length) {
+                document.getElementById('status').className = 'status solved';
+                document.getElementById('status').textContent = '🎉 求解完成！';
+                document.getElementById('stepBtn').disabled = true;
+            }
+        }
+
+        // 重置
+        function reset() {
+            animationRunning = false;
+            solution = null;
+            solutionIndex = 0;
+            exploredStates = 0;
+            currentState = new PuzzleState([[1,2,3],[4,5,6],[7,8,0]], [2, 2]);
+            renderPuzzle('currentPuzzle', currentState.board, true);
+            updateStats();
+            document.getElementById('searchLog').innerHTML = '';
+            document.getElementById('status').className = 'status';
+            document.getElementById('status').textContent = '已重置到初始状态';
+            document.getElementById('solveBtn').disabled = false;
+            document.getElementById('stepBtn').disabled = true;
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            document.getElementById('exploredCount').textContent = exploredStates;
+            document.getElementById('moveCount').textContent = currentState.g;
+            document.getElementById('heuristicValue').textContent = currentState.h;
+        }
+
+        // 工具函数
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

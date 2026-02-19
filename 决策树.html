@@ -521,6 +521,8 @@
 
         // 单步执行
         function stepBuild() {
+            console.log('stepBuild called, buildQueue length:', buildQueue.length);
+            
             if (buildQueue.length === 0) {
                 document.getElementById('stepBtn').disabled = true;
                 document.getElementById('status').textContent = '✅ 决策树构建完成！';
@@ -529,7 +531,9 @@
             
             // 从队列中取出一个节点
             const node = buildQueue.shift();
+            console.log('Processing node:', node);
             const nodeEntropy = entropy(node.data);
+            console.log('Node entropy:', nodeEntropy);
             
             // 检查停止条件
             const labels = node.data.map(d => d[TARGET]);
@@ -635,11 +639,14 @@
 
         // 绘制当前树状态
         function drawCurrentTree() {
+            console.log('drawCurrentTree called, tree:', tree);
             const svg = document.getElementById('treeSvg');
             svg.innerHTML = '';
             
             if (tree) {
                 drawTreeNode(tree, svg);
+            } else {
+                console.warn('Tree is null!');
             }
         }
 
@@ -756,12 +763,14 @@
 
         // 显示步骤
         function showStep(index) {
+            console.log('showStep called with index:', index, 'allSteps length:', allSteps.length);
             const step = allSteps[index];
             if (!step) {
                 console.error('Step not found at index:', index, 'allSteps:', allSteps);
                 return;
             }
             
+            console.log('Showing step:', step);
             let html = '';
 
             if (step.type === 'split') {

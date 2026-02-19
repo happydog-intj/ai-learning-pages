@@ -488,6 +488,10 @@
             treeNodes = new Map();
             nodeIdCounter = 0;
             
+            // 清空显示
+            document.getElementById('treeSvg').innerHTML = '';
+            document.getElementById('calcDetails').innerHTML = '<div style="color: #7f8c8d; padding: 20px; text-align: center;">点击"单步执行"开始构建决策树...</div>';
+            
             // 创建根节点
             const rootId = nodeIdCounter++;
             const rootNode = {
@@ -507,7 +511,11 @@
             document.getElementById('stepBtn').disabled = false;
             document.getElementById('status').textContent = '准备开始！点击"单步执行"构建决策树';
             
-            updateStats();
+            // 重置统计
+            document.getElementById('depth').textContent = '1';
+            document.getElementById('nodeCount').textContent = '0';
+            document.getElementById('stepCount').textContent = '0';
+            
             drawCurrentTree();
         }
 
@@ -749,6 +757,11 @@
         // 显示步骤
         function showStep(index) {
             const step = allSteps[index];
+            if (!step) {
+                console.error('Step not found at index:', index, 'allSteps:', allSteps);
+                return;
+            }
+            
             let html = '';
 
             if (step.type === 'split') {

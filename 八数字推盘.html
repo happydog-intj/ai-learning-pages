@@ -337,6 +337,12 @@
                         <div style="font-weight: 600; color: #7b1fa2;">f(n) = g(n) + h(n)</div>
                         <div id="fCalc" style="margin-top: 5px; color: #555; font-size: 0.95em; font-weight: 600;"></div>
                     </div>
+                    
+                    <!-- 下一步选择 -->
+                    <div id="nextMoveSection" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
+                        <div style="font-weight: 600; color: #2e7d32;">🎯 A* 算法会选择哪一步？</div>
+                        <div id="nextMoveCalc" style="margin-top: 5px; color: #555; font-size: 0.9em;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -831,6 +837,88 @@
                     (预计总共需要 ${f} 步到达目标)
                 </div>
             `;
+            
+            // 计算并显示下一步选择
+            updateNextMoveDisplay();
+        }
+        
+        // 显示下一步移动选择
+        function updateNextMoveDisplay() {
+            const nextMoveSection = document.getElementById('nextMoveSection');
+            const nextMoveCalc = document.getElementById('nextMoveCalc');
+            
+            // 如果已经是目标状态，隐藏这个区域
+            if (currentState.isGoal()) {
+                nextMoveSection.style.display = 'none';
+                return;
+            }
+            
+            nextMoveSection.style.display = 'block';
+            
+            // 获取所有可能的下一步
+            const possibleMoves = currentState.getMoves();
+            
+            if (possibleMoves.length === 0) {
+                nextMoveCalc.innerHTML = '没有可用的移动';
+                return;
+            }
+            
+            // 按 f 值排序
+            possibleMoves.sort((a, b) => a.f - b.f);
+            
+            let html = `<div style="margin-bottom: 8px; color: #666;">
+                评估所有可能的移动（空格可以移动到的位置）：
+            </div>`;
+            
+            html += `<div style="display: grid; gap: 8px;">`;
+            
+            possibleMoves.forEach((move, idx) => {
+                const [emptyRow, emptyCol] = move.emptyPos;
+                const movedTile = currentState.board[emptyRow][emptyCol];
+                const direction = getDirection(currentState.emptyPos, move.emptyPos);
+                const isBest = idx === 0;
+                
+                html += `<div style="
+                    padding: 8px;
+                    background: ${isBest ? 'rgba(76, 175, 80, 0.15)' : 'rgba(0,0,0,0.03)'};
+                    border-radius: 6px;
+                    border: 2px solid ${isBest ? '#4caf50' : '#e0e0e0'};
+                    ${isBest ? 'box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);' : ''}
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            ${isBest ? '<strong style="color: #2e7d32;">✓ 最优选择：</strong>' : ''}
+                            移动数字 <strong>${movedTile}</strong> 到${direction}
+                        </div>
+                        <div style="font-family: 'Courier New', monospace; font-size: 0.9em;">
+                            <span style="color: #1976d2;">g=${move.g}</span> + 
+                            <span style="color: #f57c00;">h=${move.h}</span> = 
+                            <strong style="color: ${isBest ? '#2e7d32' : '#7b1fa2'};">f=${move.f}</strong>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            
+            html += `</div>`;
+            
+            html += `<div style="margin-top: 10px; padding: 8px; background: rgba(76, 175, 80, 0.1); border-radius: 6px; font-size: 0.9em;">
+                💡 A* 算法选择 <strong style="color: #2e7d32;">f 值最小</strong> 的移动（f=${possibleMoves[0].f}），
+                因为它预计能以最少的总步数到达目标！
+            </div>`;
+            
+            nextMoveCalc.innerHTML = html;
+        }
+        
+        // 获取移动方向描述
+        function getDirection(fromPos, toPos) {
+            const [fromRow, fromCol] = fromPos;
+            const [toRow, toCol] = toPos;
+            
+            if (toRow < fromRow) return '上方';
+            if (toRow > fromRow) return '下方';
+            if (toCol < fromCol) return '左侧';
+            if (toCol > fromCol) return '右侧';
+            return '';
         }
         
         // 计算每个数字的曼哈顿距离详情
